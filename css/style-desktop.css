@@ -1,0 +1,309 @@
+/*
+	Beyond by Pixelarity
+	pixelarity.com @pixelarity
+	License: pixelarity.com/license
+*/
+
+/*********************************************************************************/
+/* Basic                                                                         */
+/*********************************************************************************/
+
+	body
+	{
+		font-size: 10pt;
+		line-height: 1.75em;
+	}
+
+	.box.cta
+	{
+		padding-top: 4em;
+		padding-bottom: 4em;
+	}
+	
+		.box.cta h2
+		{
+			font-size: 2.35em;
+			letter-spacing: -0.05em;
+			margin: 0 0 0.8em 0;
+		}
+		
+		.box.cta p
+		{
+			font-size: 1.75em;
+			line-height: 1.35em;
+			margin: 0 0 1.25em 0;
+		}
+
+		.box.cta section
+		{
+			padding-bottom: 3em;
+			margin-bottom: 3em;
+		}
+
+	.box.main
+	{
+		padding-top: 4em;
+		padding-bottom: 4em;
+	}
+	
+		.box.main h2
+		{
+			font-size: 2.35em;
+			letter-spacing: -0.05em;
+			margin: 0 0 0.8em 0;
+		}
+
+	.box.post
+	{
+	}
+
+		.box.post .image
+		{
+			width: 10em;
+		}
+		
+		.box.post p
+		{
+			margin-left: 12.5em;
+		}
+		
+/*********************************************************************************/
+/* Wrappers                                                                      */
+/*********************************************************************************/
+
+	#header-wrapper
+	{
+		height: 13em;
+	}
+	
+		.homepage #header-wrapper
+		{
+			height: auto;
+		}
+	
+	#banner-wrapper
+	{
+	}
+	
+	#main-wrapper
+	{
+		padding: 0 0 4.5em 0;
+	}
+	
+	#footer-wrapper
+	{
+		padding: 4.5em 0 0 0;
+	}
+
+/*********************************************************************************/
+/* Header                                                                        */
+/*********************************************************************************/
+
+	#header
+	{
+		background: #2c2f34;
+		background: rgba(44,47,52,0.95);
+		border-radius: 6px;
+		position: relative;
+		margin-top: 3em;
+		height: 7em;
+		line-height: 7em;
+		padding-left: 2.5em;
+	}
+	
+		#header h1
+		{
+			font-size: 2.65em;
+			font-weight: 700;
+			text-transform: capitalize;
+			letter-spacing: -0.05em;
+		}
+
+			#header h1 a
+			{
+				color: #fff;
+			}
+
+/*********************************************************************************/
+/* Nav                                                                           */
+/*********************************************************************************/
+
+	#nav
+	{
+		position: absolute;
+		right: 2.5em;
+		top: 0;
+	}
+
+		#nav ul
+		{
+		}
+		
+			#nav ul li
+			{
+				float: left;
+				margin-left: 1.5em;
+				height: 7em;
+				line-height: 7em;
+			}
+			
+				#nav ul li a
+				{
+					color: #ccc;
+					text-decoration: none;
+					text-transform: ;
+					font-weight: 700;
+					padding: 0.55em 1.4em 0.55em 1.4em;
+					border-radius: 6px;
+					transition: color .25s ease-in-out;
+					-moz-transition: color .25s ease-in-out;
+					-webkit-transition: color .25s ease-in-out;
+					outline: 0;
+				}
+
+				#nav ul li a:hover
+				{
+					color: #fff;
+				}
+
+			#nav ul li.current_page_item,
+			#nav ul li.active
+			{
+			}
+			
+				#nav ul li.current_page_item a,
+				#nav ul li.active a
+				{
+					background: #20242A;
+					color: #fff;
+				}
+
+	#nav > ul > li > ul
+	{
+		display: none;
+	}
+	
+	.dropotron
+	{
+		background: #2c2f34;
+		background: rgba(44,47,52,0.95);
+		border-radius: 6px;
+		padding: 1.5em 0 1.5em 0;
+		min-width: 20em;
+		box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.15);
+	}
+
+		.dropotron.level-0
+		{
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
+			padding-top: 0;
+			font-size: 0.8em;
+		}
+		
+		.dropotron li
+		{
+			padding: 1em 1.75em 1em 1.75em;
+			transition: background-color .25s ease-in-out;
+			-moz-transition: background-color .25s ease-in-out;
+			-webkit-transition: background-color .25s ease-in-out;
+		}
+		
+			.dropotron li a,
+			.dropotron li span
+			{
+				color: #ccc;
+				text-decoration: none;
+				text-transform:  capitalize;
+				font-weight: 700;
+			}
+
+		.dropotron > li:hover
+		{
+			background: #20242A;
+			color: #fff;
+		}
+
+			.dropotron > li:hover > a,
+			.dropotron > li:hover > span
+			{
+				color: #fff;
+			}
+
+/*********************************************************************************/
+/* Banner                                                                        */
+/*********************************************************************************/
+
+	#banner
+	{
+		height: 30em;
+		margin-bottom: 8em;
+		position: relative;
+	}
+
+		#banner .caption
+		{
+			position: absolute;
+			left: 1.75em;
+			bottom: 3em;
+		}
+	
+			#banner .caption h2
+			{
+				font-size: 3em;
+				letter-spacing: -0.05em;
+				margin-bottom: 0.35em;
+			}
+			
+			#banner .caption p
+			{
+				font-size: 1.5em;
+				margin: 0;
+			}
+
+/*********************************************************************************/
+/* Main                                                                          */
+/*********************************************************************************/
+
+	#main
+	{
+		position: relative;
+		margin-top: 2em;
+	}
+	
+	.homepage #main
+	{
+		margin-top: -8.25em;
+	}
+
+/*********************************************************************************/
+/* Content                                                                       */
+/*********************************************************************************/
+
+	#content
+	{
+	}
+	
+		#content .box
+		{
+			padding-left: 2.75em;
+			padding-right: 2.75em;
+		}
+
+/*********************************************************************************/
+/* Footer                                                                        */
+/*********************************************************************************/
+
+	#footer
+	{
+	}
+	
+/*********************************************************************************/
+/* Copyright                                                                     */
+/*********************************************************************************/
+
+	#copyright
+	{
+		padding: 4em 0 8em 0;
+		margin: 4em 0 0 0;
+	}
