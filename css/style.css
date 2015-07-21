@@ -236,27 +236,71 @@
 		margin: 0.25em 0 0 0;
 	}
 	
-	#signupbtn
+        .passwordNone {
+            color:black;
+            font-family:verdana;
+            font-size:10px;
+            font-weight:bold;
+        }
+        
+        .passwordWeak {
+            color:red;
+            font-family:verdana;
+            font-size:10px;
+            font-weight:bold;
+        }
+        
+        .passwordOK {
+            color:orange;
+            font-family:verdana;
+            font-size:10px;
+            font-weight:bold;
+        }
+        
+        .passwordStrong {
+            color:green;
+            font-family:verdana;
+            font-size:10px;
+            font-weight:bold;
+        }
+        
+        .signupErr {
+            color:red;
+            font-family:verdana;
+            font-size:15px;
+            font-weight:bold;
+        }
+        
+        .loginErrStyle {
+            color:red;
+            font-family:verdana;
+            font-size:18px;
+            font-weight:bold;
+            background-color: black;
+            float: right;
+        }
+        
+	#signupBtn
 	{
-	background: #32353a;
-	color: #fff;
+            background: #32353a;
+            color: #fff;
 	}
 	
-	#signupbtn:hover
-		{
-			background: rgba(255,255,255,0.05);
-		}
+	#signupBtn:hover
+	{
+            background: rgba(255,255,255,0.05);
+	}
 		
-	#loginbtn
+	#loginBtn
 	{
-	background: #32353a;
-	color: #fff;
+            background: #32353a;
+            color: #fff;
 	}
 	
-	#loginbtn:hover
-		{
-			background: rgba(255,255,255,0.05);
-		}
+	#loginBtn:hover
+	{
+            background: rgba(255,255,255,0.05);
+	}
 	
 	.button
 	{
@@ -439,7 +483,6 @@
 	#header-wrapper
 	{
 		background-image: url('../images/controller.jpg');
-		background-position: ;
 		background-repeat: no-repeat;
 		background-size: cover;
 	}
@@ -562,7 +605,7 @@
 		margin: 0px 15px 0px 0px;
 	}
 	
-	#loginbtn{
+	#loginBtn{
 		font-size: .3em;
 		border-radius: .5em;
 		padding: .6em;
