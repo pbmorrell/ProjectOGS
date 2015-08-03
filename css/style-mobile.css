@@ -120,6 +120,7 @@
 		background: #10141A;
 		box-shadow: inset -4px 0px 5px 0px rgba(0,0,0,0.2);
 		text-decoration: none;
+		text-transform: ;
 		font-weight: 700;
 		font-size: 0.9em;
 	}
@@ -295,4 +296,9 @@
 	#copyright
 	{
 		padding: 2em 20px 2em 20px;
+	}
+	
+	#mobileOnly
+	{
+		display: block;
 	}
