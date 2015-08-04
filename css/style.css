@@ -577,6 +577,13 @@
 		padding: 10px;
 	}
 	
+	.newsletter input
+	{
+		margin: 5px 5px 5px 0px;
+		padding: 12px;
+		width: 22em;
+	}
+	
 	#autocenter
 	{
 		display: block;
