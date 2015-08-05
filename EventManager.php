@@ -87,7 +87,7 @@
 
 
 		<!-- Main Wrapper -->
-<div id="main-wrapper">
+			<div id="main-wrapper">
 				<div class="container">
 					<div class="row">
 						<div class="12u">
@@ -148,72 +148,7 @@
 			</div>
 
 		<!-- Footer Wrapper -->
-			
-				<div class="container">
-					<div class="row">
-						<div class="12u">
-
-							<!-- Footer -->
-								<!-- <footer id="footer">
-									<div class="row">
-										<!-- <div class="6u">
-											
-											<section>
-												<h2>Membership</h2>
-												<p>Want additional features? Tired of seeing ads? For just a dollar a month you can become a premium member.</p>
-												<a href="#" class="button icon fa-sign-in">Sign Up!</a>
-											</section>
-										
-										</div> 
-										<div class="6u">
-										
-											<section>
-												<h2>Quick Links</h2>
-												<ul class="style3">
-													<li>
-														<a href="" target="" style="text-decoration:none;">Recent News</a>
-													</li>
-													<li>
-														<a href="" target="" style="text-decoration:none;">Developer Blog</a>
-													</li>
-													<li>
-														<a href="" target="" style="text-decoration:none;">About Us</a>
-													</li>
-												</ul>
-											</section>
-										
-										</div>
-										<div class="6u">
-										
-											<section>
-												<h2>Contact Us</h2>
-												<ul class="contact">
-													<li class="icon fa-envelope">
-														<a href="" target="" style="text-decoration:none;">Email</a>
-													</li>
-													<li class="icon fa-youtube">
-														<a href="" target="" style="text-decoration:none;">YouTube</a>
-													</li>
-													<li class="icon fa-twitch">
-														<a href="" target="" style="text-decoration:none;">Twitch</a>
-													</li>
-												</ul>
-											</section>
-										
-										</div>
-									</div>
-								</footer> -->
-
-							<!-- Copyright -->
-								<div id="copyright">
-									&copy; <script>document.write(new Date().getFullYear());</script> Project OGS<br/> All Rights Reserved.<br/>
-								<a href="" target="" style="text-decoration:none;">Developed by<br/>Stephen Giles and Paul Morrell</a>&nbsp<i class="fa fa-cogs"></i>
-								</div>
-						
-						</div>
-					</div>
-				</div>
-			
+			<?php include("footer.php"); ?>
 		<!-- Footer Wrapper -->
 
 	</body>
