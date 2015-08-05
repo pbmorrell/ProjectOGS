@@ -6,7 +6,7 @@
 <html>
 	<head>
 	<meta charset="UTF-8">
-	<title>Project OGS | Stephen Giles</title>
+	<title>Project OGS | Event Manager</title>
 			<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 			<meta name="description" content="" />
 			<meta name="keywords" content="" />
@@ -26,6 +26,17 @@
 				<link rel="stylesheet" href="css/style-desktop.css" />
 			</noscript>
 			<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+			<script>
+				 $(function(){
+					$('#datepicker').datepicker({
+						inline: true,
+						changeYear: true,
+						showButtonPanel: true,
+						showOtherMonths: true,
+						dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+					});
+				});
+			</script>
 	</head>
 	<body class="">
 
@@ -75,111 +86,56 @@
 		<!-- Navigation Wrapper -->
 
 
-				<!-- Main Wrapper -->
-			<div id="main-wrapper">
+		<!-- Main Wrapper -->
+<div id="main-wrapper">
 				<div class="container">
 					<div class="row">
 						<div class="12u">
 							<div id="main">
 								<div class="row">
-									<div class="3u">
+									<div class="6u">
 										
 										<!-- Content -->
 											<div id="content">
 											
-												<section class="box ctaz">
+												<section class="box"> <!-- *remember to add class "main" to easily increase the font mark up if needed-->
 													<section>
-														<h2>Control Panel</h2>
-															<ul class="style3 contact">
-																<li class="icon fa-calendar">
-																	<a href="" target="" style="text-decoration:none;">Schedule Event</a>
-																</li>
-																<li class="icon fa-flask">
-																	<a href="" target="" style="text-decoration:none;">View My Events</a>
-																</li><br/><br/>
-																
-																	<input type="text" id="search" placeholder=" Search Events"/><br/><br/>
-																	<a href="" style="text-decoration:none;">Filters</a><br/>
-																	<input type="checkbox" name="platform" value="PS4"/>PS4<br/>
-																	<input type="checkbox" name="platform" value="PS3"/>PS3<br/>
-																	<input type="checkbox" name="platform" value="X1"/>Xbox One<br/>
-																	<input type="checkbox" name="platform" value="X360"/>Xbox 360<br/>
-																	<input type="checkbox" name="platform" value="PC"/>PC<br/>
-																	<input type="checkbox" name="platform" value="Mac"/>Mac<br/><br/>
-																	
-																	<button class="button icon fa-cogs" id="signupbtn">Start Search</button>
-																
-															</ul>
+														<p>Create an Event</p>
+																	<div class="inputLine">
+																		<p><i class="fa fa-gamepad"></i> &nbsp What game do you wish to schedule?<br/>
+																			<input type="text" maxlength="50" placeholder="exp: Rocket League" ></p>
+																		<p><i class="fa fa-calendar-o"></i> &nbsp Tell us a date<br/>
+																			<input type="text" id ="datepicker" maxlength="50" placeholder=" Date"></p>
+																		<p><i class="fa fa-clock-o"></i> &nbsp Time you want to play<br/>
+																			<input type="time" maxlength="50" placeholder=" Time"></p>
+																		<p><i class="fa fa-user"></i> &nbsp Number of players needed<br/>
+																			<input type="number" min="1" max="64"></p>
+																		<p><i class="fa fa-comments-o"></i> &nbsp Notes about your event<br/>
+																			<textarea name="message" id="message" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required></textarea></p>
+																		<button class="button icon fa-cogs" id="signupBtn">Create Event!</button>
+																	</div>
 													</section>
 												</section>
-											
-												
-												<!-- <article class="box style2">
-													<header>
-														<h2>My Scheduled Events</h2>
-														<span class="byline">(2) Scheduled</span>
-													</header>
-													<p><strong>Game:</strong> Destiny<br/><strong>Platform:</strong> PS4<br/><strong>Time:</strong> 10:00 pm edt<br/><strong>Date:</strong> June 6th 2015</p>
-													<h3>Notes:</h3>
-													<p>Looking to put a team together for the Vault of Glass Raid: Need 5 players to join. Must have a mic!</p>
-															<h3>Players currently signed up:</h3>
-															<p>SteGiles01<br/>
-															PBMorrell<br/>
-															Wil0791</p>
-													<footer>
-														<a href="#" class="button icon fa-wrench">Edit Event</a>
-													</footer><br/><br/>
-													<p><strong>Game:</strong> Mortal Kombat X<br/><strong>Platform:</strong> Xbox One<br/><strong>Time:</strong> 9:15 pm edt<br/><strong>Date:</strong> June 14th 2015</p>
-													<h3>Notes:</h3>
-													<p>Looking for some friends to battle against in the Faction Mode. I'll start a private lobby and send out invites to all members.</p>
-															<h3>Players currently signed up:</h3>
-															<p>SteGiles01<br/>
-															wrecks123<br/>
-															XxColeWxX<br/>
-															PerfectShot</p>
-													<footer>
-														<a href="#" class="button icon fa-wrench">Edit Event</a>
-													</footer><br/>
-												</article> -->
-												
 											</div>
-										
 									</div>
 								
-									<div class="9u">
+									<div class="6u">
 									
 										<!-- Sidebar 1 -->
 											<div id="content">
 
-												<section class="box style1">
-													<h2>Current Events</h2>
-													<span class="byline">(4,387) Need Joining!</span><br/><br/>
-													<article>
-														<p><strong>Game:</strong> Diablo III: Reaper of Souls<br/><strong>Platform:</strong> Mac<br/><strong>Time:</strong> 10:00 am gmt <br/><strong>Date:</strong> June 4th 2015<br/></p>
-														<h3>Notes:</h3>
-														<p>I would like to play the main campaign. Two players needed. This is my first play through, so please be patience.</p>
-														<h3>Players currently signed up:</h3>
-														<p>AlexTheGreat</p>
-														<a href="#" class="button icon fa-sign-in">Sign Up</a>
-													</article>
-													<article>
-														<p><strong>Game:</strong> Grand Theft Auto V<br/><strong>Platform:</strong>  PC<br/><strong>Time:</strong> 3:23 pm pst <br/><strong>Date:</strong> June 4th 2015</p>
-														<h3>Notes:</h3>
-														<p>Need three players to help with a heist! Must be experienced.</p>
-														<h3>Players currently signed up:</h3>
-														<p>DarthMaximus298<br/>
-														WhoShotYa092</p>
-														<a href="#" class="button icon fa-sign-in">Sign Up</a>
-													</article>
-													<article>
-														<p><strong>Game:</strong> Splatoon<br/><strong>Platform:</strong>  Wii U<br/><strong>Time:</strong> 10:00 am gmt <br/><strong>Date:</strong> June 4th 2015</p>
-														<h3>Notes:</h3>
-														<p>Looking for players to play against. Please no foul language, kids will be in the same room.</p>
-														<h3>Players currently signed up:</h3>
-														<p>AsianMan0111xx</p>
-														<a href="#" class="button icon fa-sign-in">Sign Up</a>
-													</article><br/><br/>
-													<a href="#" class="button icon fa-file-o">Load More</a>
+												<section class="box style1"> <!-- *remember to add class "main" to easily increase the font mark up if needed-->
+													<p>Edit Upcoming Event(s)</p>
+																	<div id="createNewEvent">
+																		<p><i class="fa fa-pencil"></i> &nbsp Click on your events to perform edits</p>
+																			<ul>
+																				<li><a href="">Diablo 3 Reaper of Souls 11-17-2015 7:30 PM EST</a></li>
+																				<li><a href="">Splatoon 11-22-2015 11:34 AM EST</a></li>
+																				<li><a href="">Street Fighter V 08-30-2015 6:45 PM EST</a></li>
+																				<li><a href="">Destiny 09-01-2015 7:45 PM EST</a></li>
+																				<li><a href="">Rocket League 09-11-2015 6:45 PM EST</a></li>
+																			</ul>
+																	</div>
 												</section><br/>
 
 											</div>

@@ -3,8 +3,8 @@
 @import url('font-awesome.min.css');
 
 /*
-	Battleborn
-	by PBM
+	Project OGS
+	by => Stephen Giles and Paul Morrell
 */
 
 /*********************************************************************************/
@@ -113,6 +113,11 @@
 		margin-bottom: 0;
 	}
 
+        section p
+        {
+            margin-bottom: 1em !important;
+        }
+        
 	.image
 	{
 		display: inline-block;
@@ -271,7 +276,17 @@
             font-weight:bold;
         }
         
-        .loginErrStyle {
+		.preLogin {
+			display: none;
+            color:blue;
+            font-family:verdana;
+            font-size:18px;
+            font-weight:bold;
+            background-color: black;
+            float: right;
+		}
+
+        .loginError {
             color:red;
             font-family:verdana;
             font-size:18px;
@@ -279,29 +294,102 @@
             background-color: black;
             float: right;
         }
+		
+        .deferOptionLinkStyle {
+            color:green;
+            font-family:verdana;
+            font-size:10px;
+            font-weight:bold;
+        }
+
         
 	#signupBtn
 	{
             background: #32353a;
             color: #fff;
 	}
-	
+        
 	#signupBtn:hover
 	{
             background: rgba(255,255,255,0.05);
 	}
+	
+        .submitFormDiv
+        {
+            float: right;
+            padding-right: 1em;
+            font-size: 0.4em;
+        }
+        
+        .preEditProfile {
+            float: right;
+            color:blue;
+            background-color: black;
+            font-family:verdana;
+            font-size: 1.1em;
+            font-weight:bold;
+        }
+        
+        .editProfileErr {
+            float: right;
+            color:red;
+            background-color: black;
+            font-family:verdana;
+            font-size: 1.1em;
+            font-weight:bold;
+        }
+        
+        .hidden {
+            display:none;
+        }
+		
+        .usernameStatusAvail {
+            font-family:verdana;
+            font-size: 0.9em;
+            font-weight:bold;
+            color:green;
+        }
+		
+        .usernameStatusTaken {
+            font-family:verdana;
+            font-size: 0.9em;
+            font-weight:bold;
+            color:red;
+        }
 		
 	#loginBtn
 	{
             background: #32353a;
             color: #fff;
+            line-height: 1em;
 	}
 	
-	#loginBtn:hover
-	{
-            background: rgba(255,255,255,0.05);
+    .captchaInput {
+		max-width:6em;
+    }
+	
+	.captchaImage {
+		border: 0%;
+		align:bottom;
 	}
 	
+    .captchaInputDiv {
+		margin-bottom: 0.5em;
+		display:inline-block;
+		vertical-align: middle;
+    }
+
+    .captchaImageDiv {
+		display:inline-block;
+		vertical-align: middle;
+    }	
+	
+        .offPage {
+          position: absolute;
+          bottom: 100%;
+          right: 100%;
+        }
+        
 	.button
 	{
 		position: relative;
@@ -412,6 +500,11 @@
 			padding-bottom: 2em;
 			margin-bottom: 2em;
 		}
+                
+                #signupForm section
+                {
+                    padding-bottom: 0em !important;
+                }
 
 		.box section:last-of-type,
 		.box article:last-of-type
@@ -575,6 +668,17 @@
 	{
 		margin: 5px 5px 5px 0px;
 		padding: 10px;
+	}
+	
+	#mobileLoginForm input
+	{
+		margin: 5px 5px 5px 0px;
+		padding: 10px;
+	}
+	
+	#loginForm input
+	{
+		min-height: 2.5em;
 	}
 	
 	#autocenter
@@ -772,4 +876,3 @@
 	#search{
 		width: 14em;
 	}
-

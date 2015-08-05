@@ -28,12 +28,11 @@ class DataAccess
         try{
             $this->curStatement = $this->dbHandler->prepare($query);
         }
-        catch(Exception $e){
+        catch(PDOException $e){
             $this->errorResult = 'Could not execute PDO::prepare(). Exception: ' . $e->getMessage();
             return false;
         }
 	
-        //var_dump($paramArray);
         if($paramArray != null){
             try {
                 foreach($paramArray as $queryParameter){
@@ -60,7 +59,7 @@ class DataAccess
                     $this->curStatement->bindValue($paramName, $paramVal, $paramType);
                 }
             }
-            catch(Exception $e){
+            catch(PDOException $e){
                 $this->errorResult = 'Could not bind query parameters. Exception: ' . $e->getMessage();
                 return false;
             }
@@ -117,7 +116,7 @@ class DataAccess
         try {
             return $this->curStatement->rowCount();
         }
-        catch(Exception $e) {
+        catch(PDOException $e) {
             $this->errorResult = 'Could not get row count for current query "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
             return -1;
         }
@@ -128,8 +127,8 @@ class DataAccess
         try {
             return $this->dbHandler->lastInsertId();
         }
-        catch(Exception $e) {
-            $this->errorResult = 'Could not get last insert ID for current query "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+        catch(PDOException $e) {
+            $this->errorResult = 'Could not get last insert ID for last query. Exception: ' . $e->getMessage();
             return -1;
         }
     }
@@ -139,8 +138,8 @@ class DataAccess
         try {
             return $this->dbHandler->beginTransaction();
         }
-        catch(Exception $e) {
-            $this->errorResult = 'Could not begin transaction for current query "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+        catch(PDOException $e) {
+            $this->errorResult = 'Could not begin transaction. Exception: ' . $e->getMessage();
             return null;
         }
     }
@@ -150,8 +149,8 @@ class DataAccess
         try {
             return $this->dbHandler->commit();
         }
-        catch(Exception $e) {
-            $this->errorResult = 'Could not commit transaction for current query "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+        catch(PDOException $e) {
+            $this->errorResult = 'Could not commit transaction. Exception: ' . $e->getMessage();
             return null;
         }
     }
@@ -161,8 +160,8 @@ class DataAccess
         try {
             return $this->dbHandler->rollBack();
         }
-        catch(Exception $e) {
-            $this->errorResult = 'Could not roll back transaction for current query "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+        catch(PDOException $e) {
+            $this->errorResult = 'Could not roll back transaction. Exception: ' . $e->getMessage();
             return null;
         }
     }
@@ -172,7 +171,7 @@ class DataAccess
         try {
             return $this->curStatement->debugDumpParams();
         }
-        catch(Exception $e) {
+        catch(PDOException $e) {
             $this->errorResult = 'Could not dump debug params. Exception: ' . $e->getMessage();
             return null;
         }

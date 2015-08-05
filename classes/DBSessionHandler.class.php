@@ -6,13 +6,11 @@ class DBSessionHandler implements SessionHandlerInterface
 {
     // Globals
     private $dataAccess;
-    private $logger;
 	
-    public function __construct($database, $log)
+    public function __construct($database)
     {
 	// Set data access and log handlers
 	$this->dataAccess = $database;
-        $this->logger = $log;
     }
 
     public function open($savePath, $sessionName)
@@ -26,6 +24,9 @@ class DBSessionHandler implements SessionHandlerInterface
     
     public function close()
     {
+	// Commit transaction, releasing lock on the session
+	$this->dataAccess->CommitTransaction();
+		
         if($this->dataAccess->close()) {
             return true;
         }
@@ -35,9 +36,11 @@ class DBSessionHandler implements SessionHandlerInterface
     
     public function read($id)
     {
+	// Lock the current session, to serialize access in the event of multiple concurrent user requests
+	$this->dataAccess->BeginTransaction();
         $sessionData = "";
         $readSessionDataQuery = "SELECT `SessionData` FROM `Security.UserSessions` " .
-                                "WHERE (`ID` = :sessionID);";
+                                "WHERE (`ID` = :sessionID) FOR UPDATE;";
 		
 	$parmSessionID = new QueryParameter(':sessionID', $id, PDO::PARAM_STR);
 	$queryParms = array($parmSessionID);
@@ -80,12 +83,14 @@ class DBSessionHandler implements SessionHandlerInterface
             }
 	}
         
+	// Commit transaction, releasing lock on the session
+	$this->dataAccess->CommitTransaction();
         return $success;
     }
     
     public function destroy($session_id) {
         $destroySessionDataQuery = "DELETE FROM `Security.UserSessions` WHERE (`ID` = :sessionID);";
-        $parmSessionID = new QueryParameter(':sessionID', $id, PDO::PARAM_STR);
+        $parmSessionID = new QueryParameter(':sessionID', $session_id, PDO::PARAM_STR);
 	$queryParms = array($parmSessionID);
 	
 	$errors = $this->dataAccess->CheckErrors();
@@ -97,6 +102,8 @@ class DBSessionHandler implements SessionHandlerInterface
             }
 	}
         
+	// Commit transaction, releasing lock on the session
+	$this->dataAccess->CommitTransaction();
         return $success;
     }
     
@@ -120,4 +127,3 @@ class DBSessionHandler implements SessionHandlerInterface
         return $success;
     }
 }
-?>

@@ -1,5 +1,6 @@
 <?php
     include_once 'classes/DataAccess.class.php';
+    include_once 'classes/User.class.php';
     $database = new DataAccess();    
 ?>
 <!DOCTYPE HTML>
@@ -10,7 +11,14 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="description" content="" />
 	<meta name="keywords" content="" />
-	<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+
+        <!-- For Skel framework -->
+        <noscript>
+            <link rel="stylesheet" href="css/skel.css" />
+            <link rel="stylesheet" href="css/style.css" />
+            <link rel="stylesheet" href="css/style-desktop.css" />
+        </noscript>
+	
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery.dropotron.min.js"></script>
 	<script src="js/skel.min.js"></script>
@@ -20,107 +28,73 @@
 	<script src="js/ajax.js"></script>
 	<script src="js/jquery-1.10.2.js"></script>
 	<script src="js/jquery-ui-1.10.4.custom.js"></script>
-        <script>
+        <script>		
             // JQuery functionality
             $(document).ready(function($) {
-                
-                    $('#signupPW').keyup(function() {
-                         var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
-                         var mediumRegex = new RegExp("^(?=.{7,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
-                         var enoughRegex = new RegExp("(?=.{6,}).*", "g");
-                         
-                         if($(this).val().length === 0) {
-                             $('#passwordStrength').attr('class', 'passwordNone');
-                             $('#passwordStrength').html('');
-                             $('#passwordMatch').html('');
-                         } else if (false === enoughRegex.test($(this).val())) {
-                                 $('#passwordStrength').attr('class', 'passwordWeak');
-                                 $('#passwordStrength').html('More Characters');
-                         } else if (strongRegex.test($(this).val())) {
-                                 $('#passwordStrength').attr('class', 'passwordStrong');
-                                 $('#passwordStrength').html('Strong!');
-                         } else if (mediumRegex.test($(this).val())) {
-                                 $('#passwordStrength').attr('class', 'passwordOK');
-                                 $('#passwordStrength').html('Medium');
-                         } else {
-                                 $('#passwordStrength').attr('class', 'passwordWeak');
-                                 $('#passwordStrength').html('Weak');
-                         }
-                         return true;
-                    });
+                $('#togglePassword').hide();
+                $('#togglePasswordConfirm').hide();
+					
+                $('#signupPW').keyup(function() {
+                    evaluateCurrentPWVal('#signupPW', '#signupPWConfirm', '#passwordStrength', '#passwordMatch', '#togglePassword');
+                });
                     
-                    $('#signupPWConfirm').keyup(function() {
-                        if(($(this).val().length === 0) && 
-                           ($('#signupPW').val().length === 0)) {
-                            $('#passwordMatch').html('');
-                        } else if($(this).val() !== $('#signupPW').val()) {
-                            $('#passwordMatch').attr('class', 'passwordWeak');
-                            $('#passwordMatch').html('Passwords do not match');
-                        } else {
-                            $('#passwordMatch').attr('class', 'passwordStrong');
-                            $('#passwordMatch').html('Passwords match!');
-                        }
-                    });
+                $('#signupPWConfirm').keyup(function() {
+                    evaluateCurrentPWConfirmVal('#signupPW', '#signupPWConfirm', '#passwordMatch', '#togglePasswordConfirm');
+                });
                     
-                    $('#signupBtn').click(function() {
-                            var username = $('#signupUsername').val();
-                            var password = $('#signupPW').val();
-                            var email = $('#signupEmail').val();
-                            
-                            $.ajax({
-                               type: "POST",
-                               url: "CreateBasicAccount.php",
-                               data: "signupUsername=" + username + "&signupPW=" + password + "&signupEmail=" + email,
-                               success: function(response){
-                                   if(response === 'true') {
-                                       window.location.href = "Signup.php";
-                                   }
-                                   else {
-                                       $('#signupPW').val('');
-                                       $('#signupPWConfirm').val('');
-                                       $('#passwordMatch').html('');
-                                       $('#passwordStrength').html('');
-                                       $('#signupErr').html(response);
-                                   }
-                               }
-                            });
-                            
-                            return false;
-                        }
-                    );
+                $('#signupBtn').click(function() {
+                    var email = $('#signupEmail').val();
+                    var password = $('#signupPW').val();
+                    var captcha = $('#captcha_code').val();
+                    var passwordConf = $('#signupPWConfirm').val();
+                    
+                    return OnSignupButtonClick(email, password, passwordConf, captcha, 'CreateBasicAccount.php', 'EditProfile.php', 
+                                               '#signupPW', '#signupPWConfirm', '#captcha_code', '#captcha', '#passwordMatch', 
+                                               '#passwordStrength', '#togglePassword', '#togglePasswordConfirm', '#signupErr');
+                });
             
-                    $('#loginBtn').click(function() {
-                            var username = $('#loginUsername').val();
-                            var password = $('#loginPassword').val();
-                            //alert('Logging in...');
-                            $.ajax({
-                               type: "POST",
-                               url: "ExecuteLogin.php",
-                               data: "loginUsername=" + username + "&loginPassword=" + password,
-                               success: function(response){
-                                   if(response === 'true') {
-                                       window.location.href = "MemberHome.php";
-                                   }
-                                   else {
-                                       $('#loginPassword').val('');
-                                       $('#loginErr').html(response);
-                                   }
-                               }
-                            });
-                            
-                            return false;
-                        }
-                    );
-                }
-            );
+                $('#loginBtn').click(function() {
+                    $('#loginErr').attr('class', 'preLogin');
+                    $('#loginErr').html("Logging In...");
+                    $('#loginErr').fadeIn(200);
+
+                    $.ajax({
+			type: "POST",
+			url: "ExecuteLogin.php",
+			data: $('#loginForm').serialize(),
+			success: function(response){
+                            if(response === 'true') {
+				window.location.href = "MemberHome.php";
+                            }
+                            else {
+				$('#loginErr').attr('class', 'loginError');
+				$('#loginErr').html(response);
+									
+				$('#loginPassword').val('');
+							
+				setTimeout(function() {
+                                    $('#loginErr').hide();
+                                    }, 3000
+                                );
+                            }
+			}
+                    });
+							
+                    return false;
+                });
+					
+		// Display auth failure redirection message, if present and valid
+		<?php
+                    if(isset($_GET['redirectMsg'])){
+			$onloadPopupJSCode = "alert('" . filter_var($_GET['redirectMsg'], FILTER_SANITIZE_STRING) . "');";
+			unset($_GET['redirectMsg']);
+			echo "window.history.pushState('Login', '', '/ogs/Login.php');";
+			echo $onloadPopupJSCode;
+                    }
+		?>
+            }
+        );
         </script>
-	<noscript>
-            <link rel="stylesheet" href="css/skel.css" />
-            <link rel="stylesheet" href="css/style.css" />
-            <link rel="stylesheet" href="css/style-desktop.css" />
-            <!--<link rel="stylesheet" href="css/strength.css" />-->
-	</noscript>
-	<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
     </head>
     <body class="">
         <!-- Navigation Wrapper -->
@@ -129,26 +103,26 @@
                 <div class="row">
                     <div class="12u">
                         <!-- Header -->
-			<header id="header">	
+                            <header id="header">	
                             <!-- Logo -->
                             <h1>
                                 <a href="#" id="logo">Project OGS</a>
                                 <div id="login">
-                                    <form name="loginForm" method="POST" action="">
-                                        <input id="loginUsername" type="text" maxlength="50" placeholder=" Username">
-                                        <input id="loginPassword" type="password" maxlength="50" placeholder=" Password">
-                                        <button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;
+                                    <form id="loginForm" name="loginForm" method="POST" action="">
+                                        <input id="loginUsername" name="loginUsername" type="text" maxlength="100" placeholder=" Username">
+                                        <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password">
+					<button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;
                                     </form>
                                 </div>
                             </h1>
                             <!-- Nav -->
                             <nav id="nav" style="display:none;">
                                 <ul>
-                                    <li><a href="">Log In</a></li>
+                                    <li><a href="MobileLogin.php">Log In</a></li>
                                 </ul>
                             </nav>
                         </header>
-                        <div id="loginErr" class="loginErrStyle">&nbsp;</div>
+                        <div id="loginErr" class="preLogin">&nbsp;</div>
                     </div>
                 </div>
             </div>
@@ -180,12 +154,31 @@
                                                     </header>
                                                     <div id="formexp1">
                                                         <form name="signupForm" method="POST" action="">
-                                                            <input id="signupUsername" type="text" maxlength="50" placeholder=" Username"><span></span><br/>
-                                                            <input id="signupEmail" type="text" maxlength="50" placeholder=" Email Address"><span></span><br/>
+                                                            <input id="signupEmail" type="text" maxlength="100" placeholder=" Email Address"><span></span><br/>
                                                             <input id="signupPW" type="password" maxlength="50" placeholder=" Password"><span></span>
+                                                            <span id="togglePasswordSpan">
+                                                                <a href="#" id="togglePassword" 
+                                                                   onclick="return togglePasswordField('#togglePassword', '#signupPW', '#signupPW', '#signupPWConfirm', 
+												' Password', false);">Show Password</a>
+                                                            </span>&nbsp;&nbsp;
                                                             <span id="passwordStrength" class="passwordNone"></span><br/>
                                                             <input id="signupPWConfirm" type="password" maxlength="50" placeholder=" Confirm Password"><span></span>
+                                                            <span id="togglePasswordConfirmSpan">
+                                                                <a href="#" id="togglePasswordConfirm" 
+                                                                   onclick="return togglePasswordField('#togglePasswordConfirm', '#signupPWConfirm', '#signupPW', '#signupPWConfirm', 
+												' Confirm Password', true);">Show Password</a>
+                                                            </span>&nbsp;&nbsp;
                                                             <span id="passwordMatch" class="passwordWeak"></span><br/><br/>
+								<div class="captchaInputDiv">
+                                                                    <input type="text" name="captcha_code" id="captcha_code" maxlength="6" class="captchaInput" placeholder="Code" />
+								</div>
+								<div class="captchaImageDiv">
+                                                                    <img id="captcha" src="securimage/securimage_show.php" alt="CAPTCHA Image" />
+                                                                    <a href="#" title="Refresh Image"  
+                                                                        onclick="document.getElementById('captcha').src = 'securimage/securimage_show.php?' + Math.random(); this.blur(); return false">
+									<img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
+								</div>
+								<br/><br/>
                                                             <button type="submit" class="button icon fa-cogs" id="signupBtn">Create Free Account</button>
                                                         </form>
                                                     </div>
