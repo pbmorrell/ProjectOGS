@@ -681,6 +681,13 @@
 		min-height: 2.5em;
 	}
 	
+	.newsletter input
+	{
+		margin: 5px 5px 5px 0px;
+		padding: 12px;
+		width: 22em;
+	}
+	
 	#autocenter
 	{
 		display: block;

@@ -119,7 +119,7 @@
 		background: #10141A;
 		box-shadow: inset -4px 0px 5px 0px rgba(0,0,0,0.2);
 		text-decoration: none;
-		text-transform: ;
+		text-transform: none;
 		font-weight: 700;
 		font-size: 0.9em;
 	}
