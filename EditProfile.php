@@ -1,249 +1,112 @@
 <?php
-    include_once 'classes/DataAccess.class.php';
-    include_once 'classes/SecurityHandler.class.php';
-    include_once 'classes/DBSessionHandler.class.php';
-    include_once 'classes/Logger.class.php';
-    include_once 'classes/User.class.php';
+    $curPageName = "EditProfile";
+    $authFailureRedirectPage = "Login.php";
     
-    $dataAccess = new DataAccess();
-    $logger = new Logger($dataAccess);
-    $securityHandler = new SecurityHandler();
+    // header.php retrieves user information from session, storing in $objUser variable
+    include "Header.php";
     
-    $sessionDataAccess = new DataAccess();
-    $sessionHandler = new DBSessionHandler($sessionDataAccess);
-    session_set_save_handler($sessionHandler, true);
-    session_start();
-    
-    $objUser = User::constructDefaultUser();
-    
-    // If user not logged in or unauthorized to view this page, redirect to login page
-    if($securityHandler->UserCanAccessThisPage($dataAccess, $logger, "EditProfile", "Login.php")) {
-        $objUser = $_SESSION['WebUser'];
-        $welcomeHeaderText = "Project OGS | " . $objUser->UserName;
-	$editProfileMsg = "<p>Update your profile...</p>";
-        $_SESSION['lastActivity'] = time();
-		
-	$userNameReadOnly = "readonly ";
-		
-	if(isset($_SESSION['JustCreatedAccount'])) {
-            if($_SESSION['JustCreatedAccount'] == true) {
-		$welcomeHeaderText = "Welcome " . $objUser->EmailAddress;
-		$userNameReadOnly = "";
-		$editProfileMsg = "<p>Let's finish filling out your profile. It only takes a moment!&nbsp;&nbsp;<a href='MemberHome.php' " . 
-                                  "id='upgradeLater' class='deferOptionLinkStyle' onclick='return DeferFullAccountCreation();'>I'll do this later</a></p>";
-		$_SESSION['JustCreatedAccount'] = false;
-            }
-	}
-	
-        // If username has not been set yet, allow it to be set now
-        if(strlen(trim($objUser->UserName)) == 0) {
-            $userNameReadOnly = "";
-        }
-        
-	/*** Pre-load form fields, if user has already updated their account before ***/
-		
-	// UserName
-	$userNameInputHTML = "<input id='userName' name='userName' type='text' maxlength='50' placeholder=' Username' " . 
-                             $userNameReadOnly . "/>";
+    $welcomeHeaderText = "Project OGS | " . $welcomeUserName;
+    $editProfileMsg = "<p>Update your profile...</p>";
 
-	if(strlen($objUser->UserName) > 0) {
-            $userNameInputHTML = "<input id='userName' name='userName' type='text' maxlength='50' placeholder=' Username' " . 
-				 $userNameReadOnly . " value='" . $objUser->UserName . "' />";
+    $userNameReadOnly = "readonly ";
+
+    if($justCreatedSession) {
+        $welcomeHeaderText = "Welcome " . $welcomeUserName;
+        $userNameReadOnly = "";
+        $editProfileMsg = "<p>Let's finish filling out your profile. It only takes a moment!&nbsp;&nbsp;<a href='MemberHome.php' " . 
+                          "id='upgradeLater' class='deferOptionLinkStyle' onclick='return DeferFullAccountCreation();'>I'll do this later</a></p>";
+    }
+
+    // If username has not been set yet, allow it to be set now
+    if(strlen(trim($objUser->UserName)) == 0) {
+        $userNameReadOnly = "";
+    }
+
+    /*** Pre-load form fields, if user has already updated their account before ***/
+
+    // UserName
+    $userNameInputHTML = "<input id='userName' name='userName' type='text' maxlength='50' placeholder=' Username' " . 
+                         $userNameReadOnly . "/>";
+
+    if(strlen($objUser->UserName) > 0) {
+        $userNameInputHTML = "<input id='userName' name='userName' type='text' maxlength='50' placeholder=' Username' " . 
+                             $userNameReadOnly . " value='" . $objUser->UserName . "' />";
+    }
+
+    // Name
+    $firstNameInputHTML = "First Name<input type='text' id='firstName' name='firstName' placeholder=' First name'><br/><br/>";
+    $lastNameInputHTML = "Last Name<input type='text' id='lastName' name='lastName' placeholder=' Last name'>";
+
+    if(strlen($objUser->FirstName) > 0) {
+        $firstNameInputHTML = "First Name&nbsp;<input type='text' id='firstName' name='firstName' placeholder=' First name' value='" .
+        $objUser->FirstName . "'><br/><br/>";
+    }
+    if(strlen($objUser->LastName) > 0) {
+        $lastNameInputHTML = "Last Name&nbsp;<input type='text' id='lastName' name='lastName' placeholder=' Last name' value='" .
+        $objUser->LastName . "'>";
+    }
+
+    // Gender
+    $genderInputHTML = "<input type='radio' id='fm' name='gender' value='F'>Female <br/>" . 
+                       "<input type='radio' id='m' name='gender' value='M'>Male";
+
+    if(strlen($objUser->Gender) > 0) {
+        $selValIdx = strpos($genderInputHTML, "value='" . $objUser->Gender);
+        if($selValIdx !== false) {
+            $genderInputHTML = substr($genderInputHTML, 0, $selValIdx) . "checked='checked' " . 
+                               substr($genderInputHTML, $selValIdx, strlen($genderInputHTML) - $selValIdx);
         }
-		
-	// Name
-        $firstNameInputHTML = "First Name<input type='text' id='firstName' name='firstName' placeholder=' First name'><br/><br/>";
-        $lastNameInputHTML = "Last Name<input type='text' id='lastName' name='lastName' placeholder=' Last name'>";
-                                                            
-        if(strlen($objUser->FirstName) > 0) {
-            $firstNameInputHTML = "First Name&nbsp;<input type='text' id='firstName' name='firstName' placeholder=' First name' value='" .
-            $objUser->FirstName . "'><br/><br/>";
-        }
-        if(strlen($objUser->LastName) > 0) {
-            $lastNameInputHTML = "Last Name&nbsp;<input type='text' id='lastName' name='lastName' placeholder=' Last name' value='" .
-            $objUser->LastName . "'>";
-        }
-		
-	// Gender
-	$genderInputHTML = "<input type='radio' id='fm' name='gender' value='F'>Female <br/>" . 
+    }
+    else {
+        $genderInputHTML = "<input type='radio' id='fm' name='gender' checked='checked' value='F'>Female <br/>" . 
                            "<input type='radio' id='m' name='gender' value='M'>Male";
-        
-	if(strlen($objUser->Gender) > 0) {
-            $selValIdx = strpos($genderInputHTML, "value='" . $objUser->Gender);
-            if($selValIdx !== false) {
-		$genderInputHTML = substr($genderInputHTML, 0, $selValIdx) . "checked='checked' " . 
-				   substr($genderInputHTML, $selValIdx, strlen($genderInputHTML) - $selValIdx);
-            }
-	}
-	else {
-            $genderInputHTML = "<input type='radio' id='fm' name='gender' checked='checked' value='F'>Female <br/>" . 
-                               "<input type='radio' id='m' name='gender' value='M'>Male";
-	}
-	
-        // Email
-        $emailAddressInputHTML = "<input id='emailAddress' name='emailAddress' type='text' maxlength='100' placeholder=' Email Address'>";
-        if(strlen($objUser->EmailAddress) > 0) {
-            $emailAddressInputHTML = "<input id='emailAddress' name='emailAddress' type='text' maxlength='100' placeholder=' Email Address' value='" . 
-                                     $objUser->EmailAddress . "'>";
-        }
-        
-	// Birthday
-	$dobHTML = "<input type='text' id='DOBDatePicker' name='DOBDatePicker'>";
-	if(strlen($objUser->Birthdate) > 0) {
-            $dobHTML = "<input type='text' id='DOBDatePicker' name='DOBDatePicker' value='" . $objUser->Birthdate . "'>";
-	}
-		
-	// Time zone
-	$selectedTimeZoneID = 15; // Default to EST
-	if($objUser->TimezoneID > 0) {
-            $selectedTimeZoneID = $objUser->TimezoneID;
-	}
-		
-	// Biography
-	$bioHTML = "<textarea name='message' id='message' placeholder='This is your bio! What are your favorite games? When do you do most of your online gaming? etc..' " . 
-		   "rows='6' required></textarea>";
-	if(strlen($objUser->Autobiography) > 0) {
-            $bioHTML = "<textarea name='message' id='message' placeholder='This is your bio! What are your favorite games? When do you do most of your online gaming? etc..' " . 
-                       "rows='6' required>" . $objUser->Autobiography . "</textarea>";
-	}
-		
-	session_write_close();
+    }
+
+    // Email
+    $emailAddressInputHTML = "<input id='emailAddress' name='emailAddress' type='text' maxlength='100' placeholder=' Email Address'>";
+    if(strlen($objUser->EmailAddress) > 0) {
+        $emailAddressInputHTML = "<input id='emailAddress' name='emailAddress' type='text' maxlength='100' placeholder=' Email Address' value='" . 
+                                 $objUser->EmailAddress . "'>";
+    }
+
+    // Birthday
+    $dobHTML = "<input type='text' id='DOBDatePicker' name='DOBDatePicker'>";
+    if(strlen($objUser->Birthdate) > 0) {
+        $dobHTML = "<input type='text' id='DOBDatePicker' name='DOBDatePicker' value='" . $objUser->Birthdate . "'>";
+    }
+
+    // Time zone
+    $selectedTimeZoneID = 15; // Default to EST
+    if($objUser->TimezoneID > 0) {
+        $selectedTimeZoneID = $objUser->TimezoneID;
+    }
+
+    // Biography
+    $bioHTML = "<textarea name='message' id='message' placeholder='This is your bio! What are your favorite games? When do you do most of your online gaming? etc..' " . 
+               "rows='6' required></textarea>";
+    if(strlen($objUser->Autobiography) > 0) {
+        $bioHTML = "<textarea name='message' id='message' placeholder='This is your bio! What are your favorite games? When do you do most of your online gaming? etc..' " . 
+                   "rows='6' required>" . $objUser->Autobiography . "</textarea>";
     }
 ?>
 <!DOCTYPE HTML>
+<!--
+	Project OGS
+	by => Stephen Giles and Paul Morrell
+-->
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>Project OGS | Welcome</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="description" content="" />
-        <meta name="keywords" content="" />
-        <!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-        <script src="js/jquery.min.js"></script>
-        <script src="js/jquery.dropotron.min.js"></script>
-        <script src="js/skel.min.js"></script>
-        <script src="js/skel-layers.min.js"></script>
-        <script src="js/init.js"></script>
-        <script src="js/main.js"></script>
-        <script src="js/ajax.js"></script>
-        <script src="js/jquery-1.10.2.js"></script>
-        <script src="js/jquery-ui-1.10.4.custom.js"></script>
-	
-        <!-- For Skel framework -->
-	<noscript>
-            <link rel="stylesheet" href="css/skel.css" />
-            <link rel="stylesheet" href="css/style.css" />
-            <link rel="stylesheet" href="css/style-desktop.css" />
-	</noscript>
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+        <?php echo $pageHeaderHTML; ?>
         <script>
             // JQuery functionality
             $(document).ready(function($) {
-                $('#DOBDatePicker').datepicker({
-                    inline: true,
-                    yearRange: '-125:-2',
-                    changeYear: true,
-                    constrainInput: true,
-                    showButtonPanel: true,
-                    showOtherMonths: true,
-                    dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                    defaultDate: '-2y',
-                    dateFormat: 'yy-mm-dd'
-		});
-		
-                $('#togglePassword').hide();
-                $('#togglePasswordConfirm').hide();
-                
-                $('#pwd').keyup(function() {
-                    evaluateCurrentPWVal('#pwd', '#pwdConfirm', '#passwordStrength', '#passwordMatch', '#togglePassword');
-                });
-                    
-                $('#pwdConfirm').keyup(function() {
-                    evaluateCurrentPWConfirmVal('#pwd', '#pwdConfirm', '#passwordMatch', '#togglePasswordConfirm');
-                });
-				
-		$('#userName').blur(function() {
-                    evaluateUserNameAvailability('#userName', '#userNameTakenIndicator', 'CheckUsernameAvailability.php');
-		});
-                
-                $('#signupBtn').click(function() {
-                    var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-                    
-                    var email = $('#emailAddress').val();
-                    var password = $('#pwd').val();
-                    var passwordConf = $('#pwdConfirm').val();
-                    var userName = $('#userName').val();
-                    var dob = $('#DOBDatePicker').val();
-                    var bio = $('#message').val();
-                    var checkedPlatforms = $("input[name='platforms[]']:checked").length;
-
-                    if (validEmailRegEx.test(email) === false) {
-                        alert("Unable to update account: Please enter a valid email address");
-                    }
-                    else if (password !== passwordConf) {
-                        alert("Unable to update account: Your Password does not match the Password Confirmation");
-                    }
-                    else if (userName.trim().length === 0) {
-                        alert("Unable to update account: The Username field must be filled");
-                    }
-                    else if((email.trim().length === 0) || (dob.trim().length === 0) || (bio.trim().length === 0)) {
-			alert("Unable to update account: The Email, Birthdate and Autobiography fields must be filled");
-                    } 
-                    else if ((checkedPlatforms > 0) || ((checkedPlatforms === 0) && (confirm("No game platforms selected...proceed with update?")))) {
-                        $('#editProfileStatus').attr('class', 'preEditProfile');
-                        $('#editProfileStatus').html("Updating Account...");
-                        $('#editProfileStatus').fadeIn(200);
-            
-                        // Make AJAX call to update user account
-			$.ajax({
-                            type: "POST",
-                            url: "UpdateAccount.php",
-                            data: $('#signupForm').serialize(),
-                            success: function(response){
-				if(response === 'true') {
-                                    window.location.href = "MemberHome.php";
-				}
-				else {
-                                    $('#editProfileStatus').attr('class', 'editProfileErr');
-                                    $('#editProfileStatus').html(response);
-                                    
-                                    setTimeout(function() {
-                                        $('#editProfileStatus').hide();
-                                        }, 3000
-                                    );
-				}
-                            }
-			});
-                    }
-                            
-                    return false;
-                });
+                displayHiddenAdsByBrowsingDevice();
+                EditProfileOnReady();
             });
         </script>
     </head>
     <body class="">
-        <!-- Navigation Wrapper -->
-        <div id="header-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="12u">				
-			<!-- Header -->
-			<header id="header">		
-                            <!-- Logo -->
-                            <h1><a href="#" id="logo">Project OGS</a></h1>				
-                            <!-- Nav -->
-                            <nav id="nav">
-                                <ul>
-                                    <li><a href="MemberHome.php">Home</a></li>
-                                    <li><a href="ExecuteLogout.php">Log Out</a></li>
-				</ul>
-                            </nav>
-			</header>
-                    </div>
-		</div>
-            </div>
-	</div>
-	<!-- Navigation Wrapper -->
+        <?php echo $headerHTML; ?>
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">
             <div class="container">
@@ -407,61 +270,7 @@
             </div>
 	</div>
 	<!-- Footer Wrapper -->		
-	<div class="container">
-            <div class="row">
-                <div class="12u">
-                    <!-- Footer -->
-                    <!-- <footer id="footer">
-                        <div class="row">
-                            <!-- <div class="6u">									
-                                <section>
-                                    <h2>Membership</h2>
-                                    <p>Want additional features? Tired of seeing ads? For just a dollar a month you can become a premium member.</p>
-                                    <a href="#" class="button icon fa-sign-in">Sign Up!</a>
-                                </section>							
-                            </div> 
-                            <div class="6u">								
-                                <section>
-                                    <h2>Quick Links</h2>
-                                    <ul class="style3">
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">Recent News</a>
-                                        </li>
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">Developer Blog</a>
-                                        </li>
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">About Us</a>
-                                        </li>
-                                    </ul>
-                                </section>								
-                            </div>
-                            <div class="6u">								
-                                <section>
-                                    <h2>Contact Us</h2>
-                                    <ul class="contact">
-                                        <li class="icon fa-envelope">
-                                            <a href="" target="" style="text-decoration:none;">Email</a>
-                                        </li>
-                                        <li class="icon fa-youtube">
-                                            <a href="" target="" style="text-decoration:none;">YouTube</a>
-                                        </li>
-                                        <li class="icon fa-twitch">
-                                            <a href="" target="" style="text-decoration:none;">Twitch</a>
-                                        </li>
-                                    </ul>
-                                </section>								
-                            </div>
-                        </div>
-                    </footer> -->
-                    <!-- Copyright -->
-                    <div id="copyright">
-			&copy; <script>document.write(new Date().getFullYear());</script> Project OGS<br/> All Rights Reserved.<br/>
-			<a href="" target="" style="text-decoration:none;">Developed by<br/>Stephen Giles and Paul Morrell</a>&nbsp<i class="fa fa-cogs"></i>
-                    </div>			
-		</div>
-            </div>
-	</div>		
+        <?php include 'Footer.php'; ?>
 	<!-- Footer Wrapper -->
     </body>
 </html>

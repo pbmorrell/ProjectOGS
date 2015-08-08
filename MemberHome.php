@@ -1,92 +1,26 @@
 <?php
-    include_once 'classes/DataAccess.class.php';
-    include_once 'classes/SecurityHandler.class.php';
-    include_once 'classes/DBSessionHandler.class.php';
-    include_once 'classes/Logger.class.php';
-    include_once 'classes/User.class.php';
-    
-    $dataAccess = new DataAccess();
-    $logger = new Logger($dataAccess);
-    $securityHandler = new SecurityHandler();
-    
-    $sessionDataAccess = new DataAccess();
-    $sessionHandler = new DBSessionHandler($sessionDataAccess);
-    session_set_save_handler($sessionHandler, true);
-    session_start();
-    
-    $objUser = User::constructDefaultUser();
-    // If user not logged in or unauthorized to view this page, redirect to login page
-    if($securityHandler->UserCanAccessThisPage($dataAccess, $logger, "MemberHome", "Login.php")) {
-        $objUser = $_SESSION['WebUser'];
-        $_SESSION['lastActivity'] = time();
-	session_write_close();
-    }
+    $curPageName = "MemberHome";
+    $authFailureRedirectPage = "Login.php";
+    include "Header.php";
 ?>
+<!DOCTYPE HTML>
+<!--
+	Project OGS
+	by => Stephen Giles and Paul Morrell
+-->
 <html>
     <head>
-        <meta charset="UTF-8">
-        <?php echo "<title>Project OGS | " . $objUser->FirstName . " " . $objUser->LastName . "</title>"; ?>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="description" content="" />
-        <meta name="keywords" content="" />
-
-        <!-- For Skel framework -->
-        <noscript>
-            <link rel="stylesheet" href="css/skel.css" />
-            <link rel="stylesheet" href="css/style.css" />
-            <link rel="stylesheet" href="css/style-desktop.css" />
-        </noscript>
-
-        <script src="js/jquery.min.js"></script>
-        <script src="js/jquery.dropotron.min.js"></script>
-        <script src="js/skel.min.js"></script>
-        <script src="js/skel-layers.min.js"></script>
-        <script src="js/init.js"></script>
-        <script src="js/main.js"></script>
-        <script src="js/ajax.js"></script>
-        <script src="js/jquery-1.10.2.js"></script>
-        <script src="js/jquery-ui-1.10.4.custom.js"></script>
-        <!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+        <?php echo $pageHeaderHTML; ?>
+        <script>
+            // JQuery functionality
+            $(document).ready(function($) {
+                displayHiddenAdsByBrowsingDevice();
+                MemberHomeOnReady();
+            });
+        </script>
     </head>
     <body class="">
-	<!-- Navigation Wrapper -->
-	<div id="header-wrapper">
-            <div class="container">
-		<div class="row">
-                    <div class="12u">				
-			<!-- Header -->
-			<header id="header">						
-                            <!-- Logo -->
-                            <?php echo "<h1><a href='#' id='logo'>Project OGS | " . ((strlen($objUser->FirstName) > 0) ? ($objUser->FirstName . " " . $objUser->LastName) : $objUser->EmailAddress) . "</a></h1>"; ?>
-                            <!-- Nav -->
-                            <nav id="nav">
-                                <ul>
-                                    <li>
-                                        <?php echo "<a href='' class='arrow'>" . ((strlen($objUser->UserName) > 0) ? $objUser->UserName : $objUser->EmailAddress) . "</a>"; ?>
-                                        <ul>
-                                            <li><a href="#">Become a Premium Member</a></li>
-                                            <li><a href="EditProfile.php">Edit Profile</a></li>
-                                            <li><a href="#">Find Friends</a></li>
-                                            <li><a href="ExecuteLogout.php">Log Out</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="" class="arrow">Menu</a>
-                                        <ul>
-                                            <li><a href="#">Recent News</a></li>
-                                            <li><a href="#">Developer Blog</a></li>
-                                            <li><a href="#">About Us</a></li>
-                                            <li><a href="#">Contact Us</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav> 
-                        </header>
-                    </div>
-		</div>
-            </div>
-	</div>
-	<!-- Navigation Wrapper -->
+        <?php echo $headerHTML; ?>
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">
             <div class="container">
@@ -190,61 +124,7 @@
             </div>
 	</div>
 	<!-- Footer Wrapper -->
-	<div class="container">
-            <div class="row">
-		<div class="12u">
-                    <!-- Footer -->
-                    <!-- <footer id="footer">
-                        <div class="row">
-                            <!-- <div class="6u">							
-                                <section>
-                                    <h2>Membership</h2>
-                                    <p>Want additional features? Tired of seeing ads? For just a dollar a month you can become a premium member.</p>
-                                    <a href="#" class="button icon fa-sign-in">Sign Up!</a>
-				</section>
-                            </div> 
-                            <div class="6u">
-                                <section>
-                                    <h2>Quick Links</h2>
-                                    <ul class="style3">
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">Recent News</a>
-                                        </li>
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">Developer Blog</a>
-                                        </li>
-                                        <li>
-                                            <a href="" target="" style="text-decoration:none;">About Us</a>
-                                        </li>
-                                    </ul>
-                                </section>
-                            </div>
-                            <div class="6u">
-                                <section>
-                                    <h2>Contact Us</h2>
-                                    <ul class="contact">
-                                        <li class="icon fa-envelope">
-                                            <a href="" target="" style="text-decoration:none;">Email</a>
-                                        </li>
-                                        <li class="icon fa-youtube">
-                                            <a href="" target="" style="text-decoration:none;">YouTube</a>
-                                        </li>
-                                        <li class="icon fa-twitch">
-                                            <a href="" target="" style="text-decoration:none;">Twitch</a>
-                                        </li>
-                                    </ul>
-                                </section>
-                            </div>
-                        </div>
-                    </footer> -->
-                    <!-- Copyright -->
-                    <div id="copyright">
-                        &copy; <script>document.write(new Date().getFullYear());</script> Project OGS<br/> All Rights Reserved.<br/>
-                        <a href="" target="" style="text-decoration:none;">Developed by<br/>Stephen Giles and Paul Morrell</a>&nbsp<i class="fa fa-cogs"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php include 'Footer.php'; ?>
         <!-- Footer Wrapper -->
     </body>
 </html>

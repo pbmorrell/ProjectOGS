@@ -201,3 +201,13 @@ function evaluateUserNameAvailability(userNameField, availIndicatorField, action
 
     return false;
 }
+
+function displayHiddenAdsByBrowsingDevice()
+{   
+    // If viewing device has screen width > 650px, treat as desktop device
+    if (!window.matchMedia("(max-width: 650px)").matches)
+    {
+        $('.mobileAdStyle').attr('class', 'hiddenMobileAds');
+        $('.hiddenDesktopAds').attr('class', 'desktopAdStyle');
+    }
+}

@@ -32,7 +32,7 @@
             // JQuery functionality
             $(document).ready(function($) {
             
-                $('#loginBtn').click(function() {
+                $('#mobileLoginBtn').click(function() {
                     $('#loginErr').attr('class', 'preLogin');
                     $('#loginErr').html("Logging In...");
                     $('#loginErr').fadeIn(200);
@@ -105,7 +105,7 @@
                                                     <header>
                                                         <h2>Log In</h2>
                                                         <div id="mobileLogin">
-                                                            <form name="mobileLoginForm" method="POST" action="">
+                                                            <form id="mobileLoginForm" name="mobileLoginForm" method="POST" action="">
                                                                 <input id="loginUsername" name="loginUsername" type="text" maxlength="50" placeholder=" Username"><br/>
                                                                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password"><br/><br/>
                                                                 <button type="submit" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</button>&nbsp;
@@ -127,18 +127,7 @@
             </div>
 	</div>
 	<!-- Footer Wrapper -->			
-	<div class="container">
-            <div class="row">
-                <div class="12u">
-                    <!-- Footer -->
-                    <!-- Copyright -->
-                    <div id="copyright">
-                        &copy; <script>document.write(new Date().getFullYear());</script> Project OGS<br/> All Rights Reserved.<br/>
-                        <a href="" target="" style="text-decoration:none;">Developed by<br/>Stephen Giles and Paul Morrell</a>&nbsp<i class="fa fa-cogs"></i>
-                    </div>				
-                </div>
-            </div>
-        </div>			
-    <!-- Footer Wrapper -->
+        <?php include 'Footer.php'; ?>
+        <!-- Footer Wrapper -->
     </body>
 </html>

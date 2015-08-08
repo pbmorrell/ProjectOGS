@@ -12,7 +12,7 @@ class User
     public $FirstName = "";
     public $LastName = "";
     public $EmailAddress = "";
-    public $IsPremiumMember = false;
+    public $IsPremiumMember = 0;
     public $Gender = "";
     public $Birthdate = "";
     public $Autobiography = "";
@@ -36,7 +36,7 @@ class User
     
     public static function constructDefaultUser()
     {
-        $instance = new self(-1, -1, -1, "", "", "", "", false, "", "", "", array());
+        $instance = new self(-1, -1, -1, "", "", "", "", 0, "", "", "", array());
         return $instance;
     }
 }
