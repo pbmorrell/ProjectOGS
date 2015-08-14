@@ -130,7 +130,7 @@
                                             '<ul>'.
                                                 '<li><a href="#">Recent News</a></li>'.
                                                 '<li><a href="#">Developer Blog</a></li>'.
-                                                '<li><a href="#">About Us</a></li>'.
+                                                '<li><a href="About.php">About Us</a></li>'.
                                                 '<li><a href="#">Contact Us</a></li>'.
                                             '</ul>'.
                                         '</li>'.
