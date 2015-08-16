@@ -45,7 +45,7 @@
                                                         <input type="number" min="1" max="64"></p>
                                                     <p><i class="fa fa-comments-o"></i> &nbsp Notes about your event<br/>
                                                         <textarea name="message" id="message" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required></textarea></p>
-                                                    <button class="button icon fa-cogs" id="signupBtn">Create Event!</button>
+                                                    <button class="controlBtn button icon fa-cogs" id="createEventBtn">Create Event!</button>
                                                 </div>
                                             </section>
                                         </section>

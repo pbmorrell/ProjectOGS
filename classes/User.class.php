@@ -1,10 +1,6 @@
 <?php
-include_once 'classes/DataAccess.class.php';
-include_once 'classes/Logger.class.php';
-
 class User
 {
-    // Globals
     public $UserID = -1;
     public $SecurityLevel = -1;
     public $TimezoneID = -1;

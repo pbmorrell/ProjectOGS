@@ -302,20 +302,40 @@
             font-weight:bold;
         }
 
-        
-	#signupBtn
-	{
+        .controlBtn
+		{
             background: #32353a;
             color: #fff;
-	}
-        
-	#signupBtn:hover
-	{
-            background: rgba(255,255,255,0.05);
-	}
+        }
+		
+		.memberHomeBtn {
+			background: rgba(255,255,255,0.05);
+			position: relative;
+			display: inline-block;
+			color: #fff;
+			border-radius: 6px;
+			box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
+			padding: 1em 2em 1em 1.5em;
+			text-decoration: none;
+			font-weight: 700;
+			font-size: 1.05em;
+			text-transform: uppercase;
+			letter-spacing: -0.05em;
+			transition: background-color .25s ease-in-out;
+			-moz-transition: background-color .25s ease-in-out;
+			-webkit-transition: background-color .25s ease-in-out;
+		}
+		
+        .memberHomeBtn:hover{
+            background: rgba(255,255,255,0.2);
+        }
+		
+        .memberHomeBtn:before{
+            margin-right: 1em;
+        }
 	
         .submitFormDiv
-        {
+		{
             float: right;
             padding-right: 1em;
             font-size: 0.4em;
@@ -364,6 +384,39 @@
             font-weight:bold;
             color:red;
         }
+
+		.globalGameOption {
+			background-color: #F0F0F0;
+		}
+		
+		.userGameOption {
+			background-color: #66CCFF;
+		}
+		
+		.custom-combobox {
+			position: relative;
+			display: inline-block;
+		}
+
+		.custom-combobox-toggle {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			margin-left: -1px;
+			padding: 0;
+		}
+
+		.custom-combobox-input {
+			margin: 0;
+			padding: 5px 10px;
+		}
+		
+		.ui-autocomplete {
+			max-height: 150px;
+			overflow-y: auto;
+			overflow-x: hidden;
+			z-index:1000 !important;
+		}
 		
 	#loginBtn
 	{
@@ -402,7 +455,30 @@
         min-width: 100%;
         max-width: 100%;        
     }
+	
+	.fixedHeightScrollableContainer  {
+		border:2px solid #ccc;
+		width: 250px;
+		height: 100px;
+		overflow-y: scroll;
+	}
     
+	.sectionHeader
+	{
+		font-size: 1.2em;
+		color: #fff;
+	}
+	
+	.hiddenDiv
+	{
+		width: 0px;
+	}
+        
+/*        .timeInput
+        {
+            min-height: 2.3em;
+        }*/
+	
         .offPage {
           position: absolute;
           bottom: 100%;

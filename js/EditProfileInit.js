@@ -24,7 +24,7 @@ function EditProfileOnReady()
     });
 
     $('#userName').blur(function() {
-        evaluateUserNameAvailability('#userName', '#userNameTakenIndicator', 'CheckUsernameAvailability.php');
+        evaluateUserNameAvailability('#userName', '#userNameTakenIndicator', 'AJAXHandler.php');
     });
 
     $('#signupBtn').click(function() {

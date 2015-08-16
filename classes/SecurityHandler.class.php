@@ -92,37 +92,6 @@ class SecurityHandler
         
         return $userPlatforms;
     }
-	
-    public function LoadUserGames($dataAccess, $logger, $userID)
-    {
-        $getUserGamesQuery = "SELECT `FK_Game_ID` FROM `Gaming.UserGames` " .
-                             "WHERE `FK_User_ID` = :userID;";
-        
-        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-        $queryParms = array($parmUserId);
-	$userGames = array();
-        
-        $errors = $dataAccess->CheckErrors();
-        
-	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
-		$results = $dataAccess->GetResultSet();
-					
-		if($results != null){
-                    foreach($results as $row) {
-			array_push($userGames, $row['FK_Game_ID']);
-                    }
-		}
-            }
-	}
-        
-        $errors = $dataAccess->CheckErrors();
-	if(strlen($errors) > 0) {
-            $logger->LogError("Could not retrieve user games. " . $errors);
-	}
-        
-        return $userGames;
-	}
     
     public function UserCanAccessThisPage($dataAccess, $logger, $pageName, $redirectPageOnFailure)
     {
@@ -173,7 +142,7 @@ class SecurityHandler
     public function LogoutUser($redirectPage)
     {
         if(isset($_SESSION['WebUser'])) {
-			session_unset();
+            session_unset();
             session_destroy();
         }
 		
@@ -344,7 +313,7 @@ class SecurityHandler
 	$parmTimeZone = new QueryParameter(':timeZone', $objUserIn->TimezoneID, PDO::PARAM_INT);
 	$parmFirstName = new QueryParameter(':firstName', $objUserIn->FirstName, PDO::PARAM_STR);
 	$parmLastName = new QueryParameter(':lastName', $objUserIn->LastName, PDO::PARAM_STR);
-    $parmEmail = new QueryParameter(':emailAddress', strtolower($objUserIn->EmailAddress), PDO::PARAM_STR);
+        $parmEmail = new QueryParameter(':emailAddress', strtolower($objUserIn->EmailAddress), PDO::PARAM_STR);
 	$parmUserId = new QueryParameter(':userId', $objUserIn->UserID, PDO::PARAM_INT);
 	$queryParms = array($parmUserName, $parmBio, $parmDOB, $parmGender, $parmTimeZone, $parmFirstName, $parmLastName, $parmEmail, $parmUserId);
 	
@@ -511,34 +480,33 @@ class SecurityHandler
 	
     public function UsernameIsAvailable($dataAccess, $logger, $userName)
     {        
-		$userNameIsAvailable = true;
-		$checkUserNameQuery = "SELECT COUNT(ID) AS userNameCnt FROM `Security.Users` WHERE LOWER(`UserName`) = :userName;";
+	$userNameIsAvailable = true;
+	$checkUserNameQuery = "SELECT COUNT(ID) AS userNameCnt FROM `Security.Users` WHERE LOWER(`UserName`) = :userName;";
 				
-		$parmUserName = new QueryParameter(':userName', strtolower($userName), PDO::PARAM_STR);
-		$queryParms = array($parmUserName);
+	$parmUserName = new QueryParameter(':userName', strtolower($userName), PDO::PARAM_STR);
+	$queryParms = array($parmUserName);
 			
-		$errors = $dataAccess->CheckErrors();
-		$count = 0;
+	$errors = $dataAccess->CheckErrors();
+	$count = 0;
 		
-		if(strlen($errors) == 0) {
-		
+	if(strlen($errors) == 0) {
             if($dataAccess->BuildQuery($checkUserNameQuery, $queryParms)){
-				$results = $dataAccess->GetSingleResult();
+                $results = $dataAccess->GetSingleResult();
 
-				if($results != null){
-					$count = $results['userNameCnt'];
-				}
-			}
+                if($results != null){
+                    $count = $results['userNameCnt'];
+                }
+            }
+
+            if($count == -1){
+                $errors = $dataAccess->CheckErrors();
+                $logger->LogError("Could not check existing accounts for username '" . $userName . "'. " . $errors);
+            }
+	}
+	else {
+            $logger->LogError("Could not check existing accounts for username '" . $userName . "'. " . $errors);
+	}
 				
-			if($count == -1){
-				$errors = $dataAccess->CheckErrors();
-				$logger->LogError("Could not check existing accounts for username '" . $userName . "'. " . $errors);
-			}
-		}
-		else {
-			$logger->LogError("Could not check existing accounts for username '" . $userName . "'. " . $errors);
-		}
-				
-		return $count == 0;
+	return $count == 0;
     }
 }

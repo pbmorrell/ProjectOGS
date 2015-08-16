@@ -183,7 +183,7 @@
 									<img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
 								</div>
 								<br/><br/>
-                                                            <button type="submit" class="button icon fa-cogs" id="signupBtn">Create Free Account</button>
+                                                            <button type="submit" class="controlBtn button icon fa-cogs" id="signupBtn">Create Free Account</button>
                                                         </form>
                                                     </div>
                                                     <div id="signupErr" class="signupErr" />

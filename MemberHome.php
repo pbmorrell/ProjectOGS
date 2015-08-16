@@ -27,32 +27,37 @@
                 <div class="row">
                     <div class="12u">
 			<div id="main">
-                            <div class="row">
-                                <div class="3u">						
-                                    <!-- Content -->
-                                    <div id="content">							
-                                        <section class="box ctaz">
-                                            <section>
-						<h2>Control Panel</h2>
-						<ul class="style3 contact">
-                                                    <li class="icon fa-calendar">
-							<a href="" target="" style="text-decoration:none;">Schedule Event</a>
-                                                    </li>
-                                                    <li class="icon fa-flask">
-							<a href="" target="" style="text-decoration:none;">View My Events</a>
-                                                    </li><br/><br/>										
-                                                    <input type="text" id="search" placeholder=" Search Events"/><br/><br/>
-                                                    <a href="" style="text-decoration:none;">Filters</a><br/>
-                                                    <input type="checkbox" name="platform" value="PS4"/>PS4<br/>
-                                                    <input type="checkbox" name="platform" value="PS3"/>PS3<br/>
-                                                    <input type="checkbox" name="platform" value="X1"/>Xbox One<br/>
-                                                    <input type="checkbox" name="platform" value="X360"/>Xbox 360<br/>
-                                                    <input type="checkbox" name="platform" value="PC"/>PC<br/>
-                                                    <input type="checkbox" name="platform" value="Mac"/>Mac<br/><br/>										
-                                                    <button class="button icon fa-cogs" id="signupbtn">Start Search</button>										
-						</ul>
-                                            </section>
-					</section>												
+				<div class="row">
+					<div class="3u">						
+						<!-- Content -->
+						<div id="content">							
+							<section class="box ctaz">
+								<section>
+									<h2>Control Panel</h2>
+									<ul class="style3 contact">
+										<?php if($objUser->IsPremiumMember) : ?>
+											<li class="icon fa-calendar">
+												<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.EventScheduler, 0);" style="text-decoration:none;">Schedule Event</a>
+											</li>
+										<?php endif; ?>
+										<li class="icon fa-flask">
+											<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">View My Events</a>
+										</li>
+										<li class="icon fa-flask">
+											<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">Event Feed</a>
+										</li><br/><br/>
+										<input type="text" id="search" placeholder=" Search Events"/><br/><br/>
+										<a href="" style="text-decoration:none;">Filters</a><br/>
+										<input type="checkbox" name="platform" value="PS4"/>PS4<br/>
+										<input type="checkbox" name="platform" value="PS3"/>PS3<br/>
+										<input type="checkbox" name="platform" value="X1"/>Xbox One<br/>
+										<input type="checkbox" name="platform" value="X360"/>Xbox 360<br/>
+										<input type="checkbox" name="platform" value="PC"/>PC<br/>
+										<input type="checkbox" name="platform" value="Mac"/>Mac<br/><br/>										
+										<button class="controlBtn button icon fa-cogs" id="searchBtn">Start Search</button>
+									</ul>
+								</section>
+							</section>						
 					<!-- <article class="box style2">
                                             <header>
                                                 <h2>My Scheduled Events</h2>
@@ -81,9 +86,24 @@
                                             </footer><br/>
 					</article> -->				
                                     </div>
+				</div>
+				<?php if($objUser->IsPremiumMember) : ?>
+					<div id="scheduleEventDiv" class="9u">
+						<section class="box style1">
+							<h2>Schedule an Event</h2>
+							<div id="scheduleEventContent">
+							</div>
+						</section>
+					</div>
+				<?php endif; ?>
+				<div id="viewEventsDiv" class="9u">
+					<div id="viewEventContent">
+						<section class="box style1">
+							<h2>View Your Events</h2>
+						</section>
+					</div>
 				</div>				
-				<div class="9u">					
-                                    <!-- Sidebar 1 -->
+				<div id="currentEventsDiv" class="9u">					
                                     <div id="content">
                                         <section class="box style1">
                                             <h2>Current Events</h2>

@@ -124,7 +124,7 @@
                                                         echo $welcomeHeaderText;
                                                     ?>&nbsp;
                                                     <div class="submitFormDiv">
-                                                        <button type="submit" class="button icon fa-wrench" id="signupBtn">Update Profile</button>
+                                                        <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtn">Update Profile</button>
                                                     </div>
                                                 </h2>
                                                 <h3>
