@@ -1,6 +1,9 @@
 <?php
-    $curPageName = "About";
-    $authFailureRedirectPage = "Login.php";
+    $curPageName = "Index";
+    $mobileLoginPage = false;
+    $welcomeUserName = "Sign Up";
+    $sessionRequired = false;
+    $sessionAllowed = true;
     include "Header.php";
 ?>
 <!DOCTYPE HTML>
@@ -15,7 +18,10 @@
             // JQuery functionality
             $(document).ready(function($) {
                 displayHiddenAdsByBrowsingDevice();
-                EventManagerOnReady();
+                IndexOnReady();
+                
+		// Display auth failure redirection message, if present and valid
+		<?php echo $onloadPopupJSCode; ?>
             });
         </script>
     </head>

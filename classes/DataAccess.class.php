@@ -140,8 +140,14 @@ class DataAccess
         }
         catch(PDOException $e) {
             $this->errorResult = 'Could not begin transaction. Exception: ' . $e->getMessage();
-            return null;
         }
+        
+        return false;
+    }
+	
+    public function CheckIfInTransaction()
+    {
+        return $this->dbHandler->inTransaction();
     }
 	
     public function CommitTransaction()

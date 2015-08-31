@@ -1,6 +1,9 @@
 <?php
     $curPageName = "MemberHome";
-    $authFailureRedirectPage = "Login.php";
+    $mobileLoginPage = false;
+    $authFailureRedirectPage = "Index.php";
+    $sessionRequired = true;
+    $sessionAllowed = true;
     include "Header.php";
 ?>
 <!DOCTYPE HTML>
@@ -11,6 +14,10 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
+        <script src="js/moment.min.js"></script>
+        <script src="js/moment-timezone-with-data.min.js"></script>
+	<script src="js/jTable/jquery.jtable.min.js"></script>
+	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
         <script>
             // JQuery functionality
             $(document).ready(function($) {
@@ -27,82 +34,56 @@
                 <div class="row">
                     <div class="12u">
 			<div id="main">
-				<div class="row">
-					<div class="3u">						
-						<!-- Content -->
-						<div id="content">							
-							<section class="box ctaz">
-								<section>
-									<h2>Control Panel</h2>
-									<ul class="style3 contact">
-										<?php if($objUser->IsPremiumMember) : ?>
-											<li class="icon fa-calendar">
-												<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.EventScheduler, 0);" style="text-decoration:none;">Schedule Event</a>
-											</li>
-										<?php endif; ?>
-										<li class="icon fa-flask">
-											<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">View My Events</a>
-										</li>
-										<li class="icon fa-flask">
-											<a href="#" target="" onclick="return ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">Event Feed</a>
-										</li><br/><br/>
-										<input type="text" id="search" placeholder=" Search Events"/><br/><br/>
-										<a href="" style="text-decoration:none;">Filters</a><br/>
-										<input type="checkbox" name="platform" value="PS4"/>PS4<br/>
-										<input type="checkbox" name="platform" value="PS3"/>PS3<br/>
-										<input type="checkbox" name="platform" value="X1"/>Xbox One<br/>
-										<input type="checkbox" name="platform" value="X360"/>Xbox 360<br/>
-										<input type="checkbox" name="platform" value="PC"/>PC<br/>
-										<input type="checkbox" name="platform" value="Mac"/>Mac<br/><br/>										
-										<button class="controlBtn button icon fa-cogs" id="searchBtn">Start Search</button>
-									</ul>
-								</section>
-							</section>						
-					<!-- <article class="box style2">
-                                            <header>
-                                                <h2>My Scheduled Events</h2>
-                                                <span class="byline">(2) Scheduled</span>
-                                            </header>
-                                            <p><strong>Game:</strong> Destiny<br/><strong>Platform:</strong> PS4<br/><strong>Time:</strong> 10:00 pm edt<br/><strong>Date:</strong> June 6th 2015</p>
-                                            <h3>Notes:</h3>
-                                            <p>Looking to put a team together for the Vault of Glass Raid: Need 5 players to join. Must have a mic!</p>
-                                            <h3>Players currently signed up:</h3>
-                                            <p>SteGiles01<br/>
-                                            PBMorrell<br/>
-                                            Wil0791</p>
-                                            <footer>
-                                                <a href="#" class="button icon fa-wrench">Edit Event</a>
-                                            </footer><br/><br/>
-                                            <p><strong>Game:</strong> Mortal Kombat X<br/><strong>Platform:</strong> Xbox One<br/><strong>Time:</strong> 9:15 pm edt<br/><strong>Date:</strong> June 14th 2015</p>
-                                            <h3>Notes:</h3>
-                                            <p>Looking for some friends to battle against in the Faction Mode. I'll start a private lobby and send out invites to all members.</p>
-                                            <h3>Players currently signed up:</h3>
-                                            <p>SteGiles01<br/>
-                                            wrecks123<br/>
-                                            XxColeWxX<br/>
-                                            PerfectShot</p>
-                                            <footer>
-                                                <a href="#" class="button icon fa-wrench">Edit Event</a>
-                                            </footer><br/>
-					</article> -->				
+                            <div class="row">
+                                <div class="3u">						
+                                    <!-- Content -->
+                                    <div id="content">							
+                                        <section class="box ctaz">
+                                                <section>
+                                                        <h2>Control Panel</h2>
+                                                        <ul class="style3 contact">
+                                                            <li class="icon fa-calendar">
+                                                                <a href="#scheduleEventDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.EventScheduler, 0);" style="text-decoration:none;">Schedule Event</a>
+                                                            </li>
+                                                            <li class="icon fa-gamepad">
+                                                                <a href="#manageEventsDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage My Events</a>
+                                                            </li>
+                                                            <li class="icon fa-flask">
+                                                                <a href="#currentEventsDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">Event Feed</a>
+                                                            </li><br/><br/>
+                                                            <input type="text" id="search" placeholder=" Search Events"/><br/><br/>
+                                                            <a href="" style="text-decoration:none;">Filters</a><br/>
+                                                            <input type="checkbox" name="platform" value="PS4"/>PS4<br/>
+                                                            <input type="checkbox" name="platform" value="PS3"/>PS3<br/>
+                                                            <input type="checkbox" name="platform" value="X1"/>Xbox One<br/>
+                                                            <input type="checkbox" name="platform" value="X360"/>Xbox 360<br/>
+                                                            <input type="checkbox" name="platform" value="PC"/>PC<br/>
+                                                            <input type="checkbox" name="platform" value="Mac"/>Mac<br/><br/>										
+                                                            <button class="controlBtn button icon fa-cogs" id="searchBtn">Start Search</button>
+                                                        </ul>
+                                                </section>
+                                        </section>				
                                     </div>
 				</div>
-				<?php if($objUser->IsPremiumMember) : ?>
-					<div id="scheduleEventDiv" class="9u">
-						<section class="box style1">
-							<h2>Schedule an Event</h2>
-							<div id="scheduleEventContent">
-							</div>
-						</section>
-					</div>
-				<?php endif; ?>
-				<div id="viewEventsDiv" class="9u">
-					<div id="viewEventContent">
-						<section class="box style1">
-							<h2>View Your Events</h2>
-						</section>
-					</div>
-				</div>				
+				<div id="scheduleEventDiv" class="9u">
+                                    <section class="box style1">
+                                        <h2>
+                                            Schedule an Event
+                                            <div id="scheduleEventSubmitDiv" class="memberHomeSubmitDiv">
+                                                <button type="submit" class="memberHomeBtn icon fa-cogs" id="createEventBtn">Create Event!</button>
+                                            </div>
+                                        </h2>
+                                        <div id="scheduleEventContent">
+                                        </div>
+                                    </section>
+				</div>
+				<div id="manageEventsDiv" class="9u">
+                                    <section class="box style1">
+                                        <h2>Manage Your Events</h2>
+                                        <div id="manageEventsContent">
+                                        </div>
+                                    </section>
+                                </div>
 				<div id="currentEventsDiv" class="9u">					
                                     <div id="content">
                                         <section class="box style1">

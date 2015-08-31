@@ -54,7 +54,7 @@ class SecurityHandler
             }
 	}
         
-        if(!success) {
+        if(!$success) {
             $errors = $dataAccess->CheckErrors();
             $logger->LogError("Could not authenticate user '" . $userName . "'. " . $errors);
         }
@@ -139,15 +139,12 @@ class SecurityHandler
         return true;
     }
     
-    public function LogoutUser($redirectPage)
+    public function LogoutUser()
     {
         if(isset($_SESSION['WebUser'])) {
             session_unset();
             session_destroy();
         }
-		
-        header("Location: " . $redirectPage);
-        exit();
     }
 	
     private function UserAuthorizedForThisPage($dataAccess, $logger, $pageName, $userSecurityLevel)

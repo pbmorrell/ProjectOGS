@@ -92,7 +92,7 @@ class DBSessionHandler implements SessionHandlerInterface
         $destroySessionDataQuery = "DELETE FROM `Security.UserSessions` WHERE (`ID` = :sessionID);";
         $parmSessionID = new QueryParameter(':sessionID', $session_id, PDO::PARAM_STR);
 	$queryParms = array($parmSessionID);
-	
+        
 	$errors = $this->dataAccess->CheckErrors();
         $success = false;
 

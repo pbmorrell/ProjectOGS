@@ -1,93 +1,28 @@
 <?php
-    include_once 'classes/DataAccess.class.php';
-    $database = new DataAccess();    
+    $curPageName = "MobileLogin";
+    $mobileLoginPage = true;
+    $welcomeUserName = "Log In";
+    $sessionRequired = false;
+    $sessionAllowed = false;
+    include "Header.php";
 ?>
 <!DOCTYPE HTML>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>Project OGS | Log In</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<meta name="description" content="" />
-	<meta name="keywords" content="" />
-	
-        <!-- For Skel framework -->
-	<noscript>
-            <link rel="stylesheet" href="css/skel.css" />
-            <link rel="stylesheet" href="css/style.css" />
-            <link rel="stylesheet" href="css/style-desktop.css" />
-	</noscript>
-	
-	<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/jquery.dropotron.min.js"></script>
-	<script src="js/skel.min.js"></script>
-	<script src="js/skel-layers.min.js"></script>
-	<script src="js/init.js"></script>
-	<script src="js/main.js"></script>
-	<script src="js/ajax.js"></script>
-	<script src="js/jquery-1.10.2.js"></script>
-	<script src="js/jquery-ui-1.10.4.custom.js"></script>
+        <?php echo $pageHeaderHTML; ?>
         <script>
             // JQuery functionality
             $(document).ready(function($) {
-            
-                $('#mobileLoginBtn').click(function() {
-                    $('#loginErr').attr('class', 'preLogin');
-                    $('#loginErr').html("Logging In...");
-                    $('#loginErr').fadeIn(200);
-
-                    $.ajax({
-                        type: "POST",
-                        url: "ExecuteLogin.php",
-                        data: $('#mobileLoginForm').serialize(),
-                        success: function(response){
-                            if(response === 'true') {
-                                window.location.href = "MemberHome.php";
-                            }
-                            else {
-				$('#loginErr').attr('class', 'loginError');
-				$('#loginErr').html(response);
-										
-				$('#loginPassword').val('');
-								
-				setTimeout(function() {
-                                    $('#loginErr').hide();
-                                    }, 
-                                    3000
-                                );
-                            }
-                        }
-                    });
-                            
-                    return false;
-                });
+                displayHiddenAdsByBrowsingDevice();
+                MobileLoginOnReady();
+                
+		// Display auth failure redirection message, if present and valid
+		<?php echo $onloadPopupJSCode; ?>
             });
         </script>
     </head>
     <body class="">
-        <!-- Navigation Wrapper -->
-	<div id="header-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="12u">
-                        <!-- Header -->
-			<header id="header">	
-                            <!-- Logo -->
-                            <h1>
-                                <a href="#" id="logo">Project OGS</a>
-                            </h1>
-                            <!-- Nav -->
-                            <nav id="nav" style="display:none;">
-                                <ul>
-                                    <li><a href="Login.php">Sign Up</a></li>
-                                </ul>
-                            </nav>
-                        </header>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php echo $headerHTML; ?>
 	<!-- Navigation Wrapper -->
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">

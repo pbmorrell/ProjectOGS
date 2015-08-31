@@ -1,6 +1,9 @@
 <?php
     $curPageName = "EventManager";
-    $authFailureRedirectPage = "Login.php";
+    $mobileLoginPage = false;
+    $authFailureRedirectPage = "Index.php";
+    $sessionRequired = true;
+    $sessionAllowed = true;
     include "Header.php";
 ?>
 <!DOCTYPE HTML>

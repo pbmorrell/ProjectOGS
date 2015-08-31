@@ -11,438 +11,448 @@
 /* Basic                                                                         */
 /*********************************************************************************/
 
-	body,input,textarea,select
-	{
-		background: #191d23;
-		color: #979797;
-		font-family: 'Open Sans', sans-serif;
-		font-weight: 400;
-	}
-	
-	a
-	{
-		color: #fff;
-		text-decoration: underline;
-	}
-	
-	strong
-	{
-		font-weight: 700;
-	}
-	
-	h1 a, h2 a, h3 a, h4 a, h5 a, h6 a
-	{
-		text-decoration: none;
-		color: #fff;
-	}
-	
-	h1, h2, h3, h4, h5, h6
-	{
-		font-weight: 700;
-		color: #fff;
-		text-transform: capitalize;
-	}
-	
-	h1 span, h2 span, h3 span, h4 span, h5 span, h6 span
-	{
-		font-weight: 400;
-	}
-	
-	h2
-	{
-		font-size: 1.5em;
-		margin: 0 0 1.5em 0;
-	}
-	
-	h3
-	{
-		font-size: 1em;
-		margin: 0 0 1em 0;
-	}
-	
-	a:hover
-	{
-		text-decoration: none;
-	}
+    body,input,textarea,select
+    {
+        background: #191d23;
+        color: #979797;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 400;
+    }
 
-	form
-	{
-	}
-	
-		form input,
-		form select,
-		form textarea
-		{
-			-webkit-appearance: none;
-		}
-		
-		input,select{
-			background: #fff;
-			color: #000;
-			border-radius: .5em;
-			line-height: 1.75em;
-			width: 18em;
-		}
+    a
+    {
+        color: #fff;
+        text-decoration: underline;
+    }
 
-			
-	br.clear
-	{
-		clear: both;
-	}
-	
-	p, ul, ol, dl, table
-	{
-		margin-bottom: 2em;
-	}
-	
-	section,
-	article
-	{
-		margin-bottom: 2em;
-	}
-	
-	section > :last-child,
-	article > :last-child
-	{
-		margin-bottom: 0;
-	}
+    strong
+    {
+        font-weight: 700;
+    }
 
-	section:last-child,
-	article:last-child
-	{
-		margin-bottom: 0;
-	}
+    h1 a, h2 a, h3 a, h4 a, h5 a, h6 a
+    {
+        text-decoration: none;
+        color: #fff;
+    }
 
-        section p
-        {
-            margin-bottom: 1em !important;
-        }
-        
-	.image
-	{
-		display: inline-block;
-	}
-	
-		.image img
-		{
-			display: block;
-			width: 100%;
-			border-radius: 6px;
-		}
+    h1, h2, h3, h4, h5, h6
+    {
+        font-weight: 700;
+        color: #fff;
+        text-transform: capitalize;
+    }
 
-		.image.full
-		{
-			display: block;
-			width: 100%;
-			margin: 0 0 2em 0;
-		}
-		
-		.image.left
-		{
-			float: left;
-			margin: 0em 2.5em 2.5em 0;
-		}
+    h1 span, h2 span, h3 span, h4 span, h5 span, h6 span
+    {
+        font-weight: 400;
+    }
 
-	ul.style1
-	{
-		list-style: disc;
-		padding-left: 1em;
-	}
-	
-	ul.style2
-	{
-	}
+    h2
+    {
+        font-size: 1.5em;
+        margin: 0 0 1.5em 0;
+    }
 
-		ul.style2 p
-		{
-			margin-bottom: 0;
-		}
+    h3
+    {
+        font-size: 1em;
+        margin: 0 0 1em 0;
+    }
 
-		ul.style2 li
-		{
-			border-top: solid 1px rgba(255,255,255,0.1);
-			padding-top: 0.725em;
-			margin-top: 0.725em;
-		}
+    a:hover
+    {
+        text-decoration: none;
+    }
 
-		ul.style2 li:first-child
-		{
-			border-top: 0;
-			padding-top: 0;
-			margin-top: 0;
-		}
+    form
+    {
+    }
 
-	ul.style3
-	{
-	}
+    form input,
+    form select,
+    form textarea
+    {
+        -webkit-appearance: none;
+    }
 
-		ul.style3 p
-		{
-			margin-bottom: 0;
-		}
+    input,select{
+        background: #fff;
+        color: #000;
+        border-radius: .5em;
+        line-height: 1.75em;
+        width: 18em;
+    }
 
-		ul.style3 li
-		{
-			position: relative;
-			border-top: solid 1px rgba(255,255,255,0.1);
-			padding: 1.5em 0 0 0;
-			margin-top: 1.5em;
-		}
+    br.clear
+    {
+        clear: both;
+    }
 
-		ul.style3 li:first-child
-		{
-			border-top: 0;
-			padding-top: 0;
-			margin-top: 0;
-		}
+    p, ul, ol, dl, table
+    {
+        margin-bottom: 2em;
+    }
 
-	ul.contact
-	{
-	}
+    section,
+    article
+    {
+        margin-bottom: 2em;
+    }
 
-		ul.contact p
-		{
-			margin-bottom: 0;
-		}
+    section > :last-child,
+    article > :last-child
+    {
+        margin-bottom: 0;
+    }
 
-		ul.contact li
-		{
-			position: relative;
-			border-top: solid 1px rgba(255,255,255,0.1);
-			padding: 1.25em 0 0 2.75em;
-			margin-top: 1.25em;
-		}
+    section:last-child,
+    article:last-child
+    {
+        margin-bottom: 0;
+    }
 
-			ul.contact li:before
-			{
-				position: absolute;
-				left: 0;
-				top: 1.2em;
-				color: #fff;
-			}
+    section p
+    {
+        margin-bottom: 1em !important;
+    }
 
-		ul.contact li:first-child
-		{
-			border-top: 0;
-			padding-top: 0;
-			margin-top: 0;
-		}
+    .image
+    {
+        display: inline-block;
+    }
 
-			ul.contact li:first-child:before
-			{
-				top: 0.1em;
-			}
-	
-	.timestamp
-	{
-		font-size: 0.8em;
-		display: block;
-		opacity: 0.5;
-		margin: 0.25em 0 0 0;
-	}
-	
-        .passwordNone {
-            color:black;
-            font-family:verdana;
-            font-size:10px;
-            font-weight:bold;
-        }
-        
-        .passwordWeak {
-            color:red;
-            font-family:verdana;
-            font-size:10px;
-            font-weight:bold;
-        }
-        
-        .passwordOK {
-            color:orange;
-            font-family:verdana;
-            font-size:10px;
-            font-weight:bold;
-        }
-        
-        .passwordStrong {
-            color:green;
-            font-family:verdana;
-            font-size:10px;
-            font-weight:bold;
-        }
-        
-        .signupErr {
-            color:red;
-            font-family:verdana;
-            font-size:15px;
-            font-weight:bold;
-        }
-        
-		.preLogin {
-			display: none;
-            color:blue;
-            font-family:verdana;
-            font-size:18px;
-            font-weight:bold;
-            background-color: black;
-            float: right;
-		}
+    .image img
+    {
+        display: block;
+        width: 100%;
+        border-radius: 6px;
+    }
 
-        .loginError {
-            color:red;
-            font-family:verdana;
-            font-size:18px;
-            font-weight:bold;
-            background-color: black;
-            float: right;
-        }
-		
-        .deferOptionLinkStyle {
-            color:green;
-            font-family:verdana;
-            font-size:10px;
-            font-weight:bold;
-        }
+    .image.full
+    {
+        display: block;
+        width: 100%;
+        margin: 0 0 2em 0;
+    }
 
-        .controlBtn
-		{
-            background: #32353a;
-            color: #fff;
-        }
-		
-		.memberHomeBtn {
-			background: rgba(255,255,255,0.05);
-			position: relative;
-			display: inline-block;
-			color: #fff;
-			border-radius: 6px;
-			box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
-			padding: 1em 2em 1em 1.5em;
-			text-decoration: none;
-			font-weight: 700;
-			font-size: 1.05em;
-			text-transform: uppercase;
-			letter-spacing: -0.05em;
-			transition: background-color .25s ease-in-out;
-			-moz-transition: background-color .25s ease-in-out;
-			-webkit-transition: background-color .25s ease-in-out;
-		}
-		
-        .memberHomeBtn:hover{
-            background: rgba(255,255,255,0.2);
-        }
-		
-        .memberHomeBtn:before{
-            margin-right: 1em;
-        }
-	
-        .submitFormDiv
-		{
-            float: right;
-            padding-right: 1em;
-            font-size: 0.4em;
-        }
-        
-        .preEditProfile {
-            float: right;
-            color:blue;
-            background-color: black;
-            font-family:verdana;
-            font-size: 1.1em;
-            font-weight:bold;
-        }
-        
-        .editProfileErr {
-            float: right;
-            color:red;
-            background-color: black;
-            font-family:verdana;
-            font-size: 1.1em;
-            font-weight:bold;
-        }
-        
-        .hidden {
-            display:none;
-        }
-        
-        .hiddenDesktopAds {
-            display:none;
-        }
-        
-        .hiddenMobileAds {
-            display:none;
-        }
-		
-        .usernameStatusAvail {
-            font-family:verdana;
-            font-size: 0.9em;
-            font-weight:bold;
-            color:green;
-        }
-		
-        .usernameStatusTaken {
-            font-family:verdana;
-            font-size: 0.9em;
-            font-weight:bold;
-            color:red;
-        }
+    .image.left
+    {
+        float: left;
+        margin: 0em 2.5em 2.5em 0;
+    }
 
-		.globalGameOption {
-			background-color: #F0F0F0;
-		}
-		
-		.userGameOption {
-			background-color: #66CCFF;
-		}
-		
-		.custom-combobox {
-			position: relative;
-			display: inline-block;
-		}
+    ul.style1
+    {
+        list-style: disc;
+        padding-left: 1em;
+    }
 
-		.custom-combobox-toggle {
-			position: absolute;
-			top: 0;
-			bottom: 0;
-			margin-left: -1px;
-			padding: 0;
-		}
+    ul.style2
+    {
+    }
 
-		.custom-combobox-input {
-			margin: 0;
-			padding: 5px 10px;
-		}
-		
-		.ui-autocomplete {
-			max-height: 150px;
-			overflow-y: auto;
-			overflow-x: hidden;
-			z-index:1000 !important;
-		}
-		
-	#loginBtn
-	{
-            background: #32353a;
-            color: #fff;
-            line-height: 1em;
-	}
-	
-    .captchaInput {
-		max-width:6em;
+    ul.style2 p
+    {
+        margin-bottom: 0;
+    }
+
+    ul.style2 li
+    {
+        border-top: solid 1px rgba(255,255,255,0.1);
+        padding-top: 0.725em;
+        margin-top: 0.725em;
+    }
+
+    ul.style2 li:first-child
+    {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    ul.style3
+    {
+    }
+
+    ul.style3 p
+    {
+        margin-bottom: 0;
+    }
+
+    ul.style3 li
+    {
+        position: relative;
+        border-top: solid 1px rgba(255,255,255,0.1);
+        padding: 1.5em 0 0 0;
+        margin-top: 1.5em;
+    }
+
+    ul.style3 li:first-child
+    {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    ul.contact
+    {
+    }
+
+    ul.contact p
+    {
+        margin-bottom: 0;
+    }
+
+    ul.contact li
+    {
+        position: relative;
+        border-top: solid 1px rgba(255,255,255,0.1);
+        padding: 1.25em 0 0 2.75em;
+        margin-top: 1.25em;
+    }
+
+    ul.contact li:before
+    {
+        position: absolute;
+        left: 0;
+        top: 1.2em;
+        color: #fff;
+    }
+
+    ul.contact li:first-child
+    {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    ul.contact li:first-child:before
+    {
+        top: 0.1em;
+    }
+
+    .timestamp
+    {
+        font-size: 0.8em;
+        display: block;
+        opacity: 0.5;
+        margin: 0.25em 0 0 0;
+    }
+
+    .passwordNone {
+        color:black;
+        font-family:verdana;
+        font-size:10px;
+        font-weight:bold;
+    }
+
+    .passwordWeak {
+        color:red;
+        font-family:verdana;
+        font-size:10px;
+        font-weight:bold;
+    }
+
+    .passwordOK {
+        color:orange;
+        font-family:verdana;
+        font-size:10px;
+        font-weight:bold;
+    }
+
+    .passwordStrong {
+        color:green;
+        font-family:verdana;
+        font-size:10px;
+        font-weight:bold;
+    }
+
+    .signupErr {
+        color:red;
+        font-family:verdana;
+        font-size:15px;
+        font-weight:bold;
+    }
+
+    .preLogin {
+        display: none;
+        color:blue;
+        font-family:verdana;
+        font-size:18px;
+        font-weight:bold;
+        background-color: black;
+        float: right;
+    }
+
+    .loginError {
+        color:red;
+        font-family:verdana;
+        font-size:18px;
+        font-weight:bold;
+        background-color: black;
+        float: right;
+    }
+
+    .deferOptionLinkStyle {
+        color:green;
+        font-family:verdana;
+        font-size:10px;
+        font-weight:bold;
+    }
+
+    .controlBtn
+    {
+        background: #32353a;
+        color: #fff;
+    }
+
+    .memberHomeBtn {
+        background: rgba(255,255,255,0.05);
+        position: relative;
+        display: inline-block;
+        color: #fff;
+        border-radius: 6px;
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
+        padding: 1em 2em 1em 1.5em;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.05em;
+        text-transform: uppercase;
+        letter-spacing: -0.05em;
+        transition: background-color .25s ease-in-out;
+        -moz-transition: background-color .25s ease-in-out;
+        -webkit-transition: background-color .25s ease-in-out;
+    }
+
+    .memberHomeBtn:hover{
+        background: rgba(255,255,255,0.2);
+    }
+
+    .memberHomeBtn:before{
+        margin-right: 1em;
+    }
+
+    .submitFormDiv
+    {
+        float: right;
+        padding-right: 1em;
+        font-size: 0.4em;
+    }
+
+    .memberHomeSubmitDiv
+    {
+        float: right;
+        padding-right: 1em;
+        font-size: 0.6em;
+    }
+
+    .preEditProfile {
+        float: right;
+        color:blue;
+        background-color: black;
+        font-family:verdana;
+        font-size: 1.1em;
+        font-weight:bold;
+    }
+
+    .editProfileErr {
+        float: right;
+        color:red;
+        background-color: black;
+        font-family:verdana;
+        font-size: 1.1em;
+        font-weight:bold;
+    }
+
+    .hidden {
+        display:none;
+    }
+
+    .hiddenDesktopAds {
+        display:none;
+    }
+
+    .hiddenMobileAds {
+        display:none;
+    }
+
+    .usernameStatusAvail {
+        font-family:verdana;
+        font-size: 0.9em;
+        font-weight:bold;
+        color:green;
+    }
+
+    .usernameStatusTaken {
+        font-family:verdana;
+        font-size: 0.9em;
+        font-weight:bold;
+        color:red;
+    }
+
+    .selectAllCheckbox {
+        margin-left: 5em;
+    }
+
+    .globalGameOption {
+        background-color: #F0F0F0;
+    }
+
+    .userGameOption {
+        background-color: #66CCFF;
+    }
+
+    .custom-combobox {
+        position: relative;
+        display: inline-block;
+    }
+
+    .custom-combobox-toggle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin-left: -1px;
+        padding: 0;
+    }
+
+    .custom-combobox-input {
+        margin: 0;
+        padding: 5px 10px;
+    }
+
+    .ui-autocomplete {
+        max-height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index:1000 !important;
+    }
+
+    #loginBtn
+    {
+        background: #32353a;
+        color: #fff;
+        line-height: 1em;
     }
 	
-	.captchaImage {
-            border: 0%;
-            vertical-align:bottom;
-	}
+    .captchaInput {
+	max-width:6em;
+    }
+	
+    .captchaImage {
+        border: 0%;
+        vertical-align:bottom;
+    }
 	
     .captchaInputDiv {
-		margin-bottom: 0.5em;
-		display:inline-block;
-		vertical-align: middle;
+	margin-bottom: 0.5em;
+	display:inline-block;
+	vertical-align: middle;
     }
 
     .captchaImageDiv {
-		display:inline-block;
-		vertical-align: middle;
+	display:inline-block;
+	vertical-align: middle;
     }	
 	
     .desktopAdStyle {
@@ -456,532 +466,543 @@
         max-width: 100%;        
     }
 	
-	.fixedHeightScrollableContainer  {
-		border:2px solid #ccc;
-		width: 250px;
-		height: 100px;
-		overflow-y: scroll;
-	}
+    .fixedHeightScrollableContainer  {
+        border:2px solid #ccc;
+        box-sizing: border-box;
+        padding: 0.5em;
+        width: 250px;
+        height: 100px;
+        overflow-y: scroll;
+    }
+
+    .fixedHeightScrollableContainerLarge  {
+        border:2px solid #ccc;
+        box-sizing: border-box;
+        padding: 0em 1em 0em;
+        width: 100%;
+        height: 400px;
+        overflow-y: scroll;
+    }
     
-	.sectionHeader
-	{
-		font-size: 1.2em;
-		color: #fff;
-	}
-	
-	.hiddenDiv
-	{
-		width: 0px;
-	}
-        
-/*        .timeInput
-        {
-            min-height: 2.3em;
-        }*/
-	
-        .offPage {
-          position: absolute;
-          bottom: 100%;
-          right: 100%;
-        }
-        
-	.button
-	{
-		position: relative;
-		display: inline-block;
-		color: #fff;
-		border-radius: 6px;
-		box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
-		padding: 1em 2em 1em 1.5em;
-		text-decoration: none;
-		font-weight: 700;
-		font-size: 1.05em;
-		text-transform: uppercase;
-		letter-spacing: -0.05em;
-		transition: background-color .25s ease-in-out;
-		-moz-transition: background-color .25s ease-in-out;
-		-webkit-transition: background-color .25s ease-in-out;
-	}
-	
-		.button:hover
-		{
-			background: rgba(255,255,255,0.05);
-		}
-	
-		.button:before
-		{
-			margin-right: 1em;
-		}
+    .sectionHeader
+    {
+        font-size: 1.2em;
+        color: #fff;
+    }
 
-	.bigbutton
-	{
-		position: relative;
-		display: inline-block;
-		background: #32353a;
-		color: #fff;
-		border-radius: 6px;
-		box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
-		padding: 0.85em 1.75em 0.85em 1em;
-		text-decoration: none;
-		font-weight: 700;
-		font-size: 1.5em;
-		text-transform: uppercase;
-		letter-spacing: -0.05em;
-		transition: background-color .25s ease-in-out;
-		-moz-transition: background-color .25s ease-in-out;
-		-webkit-transition: background-color .25s ease-in-out;
-	}
+    .hiddenDiv
+    {
+        width: 0px;
+    }
+
+    /*.timeInput
+    {
+        min-height: 2.3em;
+    }*/
+
+    .offPage {
+        position: absolute;
+        bottom: 100%;
+        right: 100%;
+    }
+
+    .button
+    {
+        position: relative;
+        display: inline-block;
+        color: #fff;
+        border-radius: 6px;
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.15);
+        padding: 1em 2em 1em 1.5em;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.05em;
+        text-transform: uppercase;
+        letter-spacing: -0.05em;
+        transition: background-color .25s ease-in-out;
+        -moz-transition: background-color .25s ease-in-out;
+        -webkit-transition: background-color .25s ease-in-out;
+    }
 	
-		.bigbutton:hover
-		{
-			background: #2d3238;
-		}
+    .button:hover
+    {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .button:before
+    {
+        margin-right: 1em;
+    }
+
+    .bigbutton
+    {
+        position: relative;
+        display: inline-block;
+        background: #32353a;
+        color: #fff;
+        border-radius: 6px;
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
+        padding: 0.85em 1.75em 0.85em 1em;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.5em;
+        text-transform: uppercase;
+        letter-spacing: -0.05em;
+        transition: background-color .25s ease-in-out;
+        -moz-transition: background-color .25s ease-in-out;
+        -webkit-transition: background-color .25s ease-in-out;
+    }
+
+    .bigbutton:hover
+    {
+            background: #2d3238;
+    }
+
+    .bigbutton:before
+    {
+            position: relative;
+            top: 0.1em;
+            margin-right: 0.65em;
+    }
+
+    .bigbutton.style1
+    {
+            background: #32AECF;
+    }
+
+    .bigbutton.style1:hover
+    {
+        background: #32BADB;
+    }
+
+    .bigbutton.style2
+    {
+            background: #7B915B;
+    }
+
+    .bigbutton.style2:hover
+    {
+        background: #8BA16B;
+    }
+
+    .box
+    {
+        background: #2c2f34;
+        background: rgba(44,47,52,0.95);
+        border-radius: 6px;
+        padding: 3em 2em 3em 2em;
+        overflow: hidden;
+    }
+	
+    .box header
+    {
+        margin-bottom: 2em;
+    }
+
+    .box header h2
+    {
+        margin-bottom: 0.5em;
+    }
+
+    .box footer
+    {
+        clear: both;
+    }
+
+    .box section,
+    .box article
+    {
+        /*border-bottom: solid 1px rgba(255,255,255,0.1);*/
+        padding-bottom: 2em;
+        margin-bottom: 2em;
+    }
+
+    #signupForm section
+    {
+        padding-bottom: 0em !important;
+    }
+
+    .box section:last-of-type,
+    .box article:last-of-type
+    {
+        border-bottom: 0 !important;
+        margin-bottom: 0!important;
+        padding-bottom: 0!important;
+    }
+
+    .box.style1
+    {
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
+        color: #fff;
+        color: rgba(255,255,255,0.75);
+        /*background: #32AECF;*/
+        background: #1E90FF;
+    }
+
+    .box.style2
+    {
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
+        color: #fff;
+        color: rgba(255,255,255,0.75);
+        background: #7B915B;
+    }
+
+    .box.main
+    {
+    }
+
+    .box.main p
+    {
+        color: #fff;
+        font-size: 1.4em;
+    }
+
+    .box.main h2
+    {
+        line-height: 1.2em;
+    }
+
+    .box.main i
+    {
+        color: #A0A0A0;
+    }
+
+    .box.cta
+    {
+    }
 		
-		.bigbutton:before
-		{
-			position: relative;
-			top: 0.1em;
-			margin-right: 0.65em;
-		}
-	
-		.bigbutton.style1
-		{
-			background: #32AECF;
-		}
-		
-			.bigbutton.style1:hover
-			{
-				background: #32BADB;
-			}
-
-		.bigbutton.style2
-		{
-			background: #7B915B;
-		}
-		
-			.bigbutton.style2:hover
-			{
-				background: #8BA16B;
-			}
-
-	.box
-	{
-		background: #2c2f34;
-		background: rgba(44,47,52,0.95);
-		border-radius: 6px;
-		padding: 3em 2em 3em 2em;
-		overflow: hidden;
-	}
-	
-		.box header
-		{
-			margin-bottom: 2em;
-		}
-		
-			.box header h2
-			{
-				margin-bottom: 0.5em;
-			}
-
-		.box footer
-		{
-			clear: both;
-		}
-
-		.box section,
-		.box article
-		{
-			/*border-bottom: solid 1px rgba(255,255,255,0.1);*/
-			padding-bottom: 2em;
-			margin-bottom: 2em;
-		}
-                
-                #signupForm section
-                {
-                    padding-bottom: 0em !important;
-                }
-
-		.box section:last-of-type,
-		.box article:last-of-type
-		{
-			border-bottom: 0 !important;
-			margin-bottom: 0!important;
-			padding-bottom: 0!important;
-		}
-
-		.box.style1
-		{
-			box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
-			color: #fff;
-			color: rgba(255,255,255,0.75);
-			/*background: #32AECF;*/
-			background: #1E90FF;
-		}
-
-		.box.style2
-		{
-			box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
-			color: #fff;
-			color: rgba(255,255,255,0.75);
-			background: #7B915B;
-		}
-
-		.box.main
-		{
-		}
-
-			.box.main p
-			{
-				color: #fff;
-				font-size: 1.4em;
-			}
+    .box.cta p
+    {
+        color: #c9c9c9;
+    }
 			
-			.box.main h2
-			{
-				line-height: 1.2em;
-			}
-			
-			.box.main i
-			{
-				color: #A0A0A0;
-			}
+    .box.features
+    {
+    }
 
-		.box.cta
-		{
-		}
-		
-			.box.cta p
-			{
-				color: #c9c9c9;
-			}
-			
-		.box.features
-		{
-		}
-
-			.box.features .button
-			{
-				margin-top: 2em;
-			}
+    .box.features .button
+    {
+        margin-top: 2em;
+    }
 
 /*********************************************************************************/
 /* Wrappers                                                                      */
 /*********************************************************************************/
 
-	#header-wrapper
-	{
-		background-image: url('../images/controller.jpg');
-		background-repeat: no-repeat;
-		background-size: cover;
-	}
-	
-	#banner-wrapper
-	{
-	}
-	
-	#main-wrapper
-	{
-		background: rgb(206,220,231); /* Old browsers */
-		background: -moz-linear-gradient(top,  rgba(206,220,231,1) 0%, rgba(89,106,114,1) 100%); /* FF3.6+ */
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(206,220,231,1)), color-stop(100%,rgba(89,106,114,1))); /* Chrome,Safari4+ */
-		background: -webkit-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Chrome10+,Safari5.1+ */
-		background: -o-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Opera 11.10+ */
-		background: -ms-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* IE10+ */
-		background: linear-gradient(to bottom,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* W3C */
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#596a72',GradientType=0 ); /* IE6-9 */
-	}
-	
-	#footer-wrapper
-	{
-	}
+    #header-wrapper
+    {
+        background-image: url('../images/controller.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    #banner-wrapper
+    {
+    }
+
+    #main-wrapper
+    {
+        background: rgb(206,220,231); /* Old browsers */
+        background: -moz-linear-gradient(top,  rgba(206,220,231,1) 0%, rgba(89,106,114,1) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(206,220,231,1)), color-stop(100%,rgba(89,106,114,1))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#596a72',GradientType=0 ); /* IE6-9 */
+    }
+
+    #footer-wrapper
+    {
+    }
 
 /*********************************************************************************/
 /* Banner                                                                        */
 /*********************************************************************************/
 
-	#banner
-	{
-	}
+    #banner
+    {
+    }
 
-		#banner .caption
-		{
-		}
-	
-			#banner .caption h2
-			{
-				font-weight: 700;
-				text-transform: capitalize;
-				color: #fff;
-			}
-			
-			#banner .caption p
-			{
-				color: #ddd;
-				color: rgba(255,255,255,0.65);
-			}
+    #banner .caption
+    {
+    }
+
+    #banner .caption h2
+    {
+        font-weight: 700;
+        text-transform: capitalize;
+        color: #fff;
+    }
+
+    #banner .caption p
+    {
+        color: #ddd;
+        color: rgba(255,255,255,0.65);
+    }
 	
 /*********************************************************************************/
 /* Copyright                                                                     */
 /*********************************************************************************/
 
-	#copyright
-	{
-		text-align: center;
-		border-top: solid 1px rgba(255,255,255,0.1);
-		color: #555;
-		color: rgba(255,255,255,0.25);
-	}
+    #copyright
+    {
+        text-align: center;
+        border-top: solid 1px rgba(255,255,255,0.1);
+        color: #555;
+        color: rgba(255,255,255,0.25);
+    }
 
 /*********************************************************************************/
 /* Icons                                                                         */
 /*********************************************************************************/
 
-	.icon
-	{
-		text-decoration: none;
-	}
+    .icon
+    {
+        text-decoration: none;
+    }
 
-		.icon:before
-		{
-			display: inline-block;
-			font-family: FontAwesome;
-			font-size: 1.25em;
-			text-decoration: none;
-			font-style: normal;
-			font-weight: normal;
-			line-height: 1;
-			-webkit-font-smoothing:antialiased;
-			-moz-osx-font-smoothing:grayscale;
-		}
+    .icon:before
+    {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: 1.25em;
+        text-decoration: none;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+    }
 		
 		
 /*********************************************************************************/
 /* Add-Ons for Mock up Examples                                     */
 /*********************************************************************************/
 
-	#formexp1 input
-	{
-		margin: 5px 5px 5px 0px;
-		padding: 10px;
-	}
-	
-	#mobileLoginForm input
-	{
-		margin: 5px 5px 5px 0px;
-		padding: 10px;
-	}
-	
-	#loginForm input
-	{
-		min-height: 2.5em;
-	}
-	
-	.newsletter input
-	{
-		margin: 5px 5px 5px 0px;
-		padding: 12px;
-		width: 22em;
-	}
-	
-	.newsletter input
-	{
-		margin: 5px 5px 5px 0px;
-		padding: 12px;
-		width: 22em;
-	}
-	
-	#autocenter
-	{
-		display: block;
-		margin-left: auto;
-		margin-right: auto;
-	}
-	
-	::-webkit-input-placeholder {
-		color: #000;
-	}
+    #signupFormDiv input
+    {
+        margin: 5px 5px 5px 0px;
+        padding: 10px;
+    }
 
-	:-moz-placeholder { /* Firefox 18- */
-		color: #000;
-	}
+    #mobileLoginForm input
+    {
+        margin: 5px 5px 5px 0px;
+        padding: 10px;
+    }
 
-	::-moz-placeholder {  /* Firefox 19+ */
-		color: #000;  
-	}
+    #loginForm input
+    {
+        min-height: 2.5em;
+    }
 
-	:-ms-input-placeholder {  
-		color: #000;  
-	}
-	
-	#login{
-		float:right;
-		margin: 0px 15px 0px 0px;
-	}
-	
-	#loginBtn{
-		font-size: .3em;
-		border-radius: .5em;
-		padding: .6em;
-	}
-	
-	input[type=checkbox] {
-		padding-left:5px;
-		padding-right:5px;
-		border-radius:15px;
-		-webkit-appearance:button;
-		border: double 2px #fff;
-		background-color:#fff;
-		color:#FFF;
-		white-space: nowrap;
-		overflow:hidden;
-		width:15px;
-		height:15px;
-	}
+    .newsletter input
+    {
+        margin: 5px 5px 5px 0px;
+        padding: 12px;
+        width: 22em;
+    }
 
-	input[type=checkbox]:checked {
-		background-color:#000;
-		border-left-color:#06F;
-		border-right-color:#06F;
-	}
+    .newsletter input
+    {
+        margin: 5px 5px 5px 0px;
+        padding: 12px;
+        width: 22em;
+    }
 
-	input[type=checkbox]:hover {
-		box-shadow:0px 0px 10px #1300ff;
-	}
-	
-	input[type=radio] {
-		padding-left:5px;
-		padding-right:5px;
-		border-radius:15px;
-		-webkit-appearance:button;
-		border: double 2px #fff;
-		background-color:#fff;
-		color:#FFF;
-		white-space: nowrap;
-		overflow:hidden;
-		width:15px;
-		height:15px;
-	}
+    #autocenter
+    {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-	input[type=radio]:checked {
-		background-color:#000;
-		border-left-color:#06F;
-		border-right-color:#06F;
-	}
+    ::-webkit-input-placeholder {
+        color: #000;
+    }
 
-	input[type=radio]:hover {
-		box-shadow:0px 0px 10px #1300ff;
-	}
-	
-	textarea{
-			background: #fff;
-			color: #000;
-			border-radius: .5em;
-			line-height: 1.75em;
-			width: 28em;		
-	}
-	
-		select{
-			background: #fff;
-			color: #000;
-			border-radius: .5em;
-			line-height: 1.75em;
-			height: 2.3em;
-	}
-	
-	.ui-datepicker {
-    width: 216px;
-    height: auto;
-    margin: 5px auto 0;
-    font: 9pt Arial, sans-serif;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-	}
-	
-	.ui-datepicker a {
-    text-decoration: none;
-	}
-	
-	.ui-datepicker table {
-    width: 100%;
-	}
-	
-	.ui-datepicker-header {
-    background: #000;
-    color: #e0e0e0;
-    font-weight: bold;
-    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, 2);
-    -moz-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    text-shadow: 1px -1px 0px #000;
-    filter: dropshadow(color=#000, offx=1, offy=-1);
-    line-height: 30px;
-    border-width: 1px 0 0 0;
-    border-style: solid;
-    border-color: #111;
-	}
-	
-	.ui-datepicker-prev {
-    float: left;
-    background-position: center -30px;
-	}
-	
-	.ui-datepicker-next {
-    float: right;
-    background-position: center 0px;
-	}
-	
-	.ui-datepicker th {
-    text-transform: uppercase;
-    font-size: 6pt;
-    padding: 5px 0;
-    color: #666666;
-    background: #fff;
-	}
+    :-moz-placeholder { /* Firefox 18- */
+        color: #000;
+    }
 
-	.ui-datepicker tbody td {
-    padding: 0;
-    border-right: 1px solid #bbb;
-	}
+    ::-moz-placeholder {  /* Firefox 19+ */
+        color: #000;  
+    }
+
+    :-ms-input-placeholder {  
+        color: #000;  
+    }
+
+    #login{
+        float:right;
+        margin: 0px 15px 0px 0px;
+    }
+
+    #loginBtn{
+        font-size: .3em;
+        border-radius: .5em;
+        padding: .6em;
+    }
+
+    input[type=checkbox] {
+        padding-left:5px;
+        padding-right:5px;
+        border-radius:15px;
+        -webkit-appearance:button;
+        border: double 2px #fff;
+        background-color:#fff;
+        color:#FFF;
+        white-space: nowrap;
+        overflow:hidden;
+        width:15px;
+        height:15px;
+    }
+
+    input[type=checkbox]:checked {
+        background-color:#000;
+        border-left-color:#06F;
+        border-right-color:#06F;
+    }
+
+    input[type=checkbox]:hover {
+        box-shadow:0px 0px 10px #1300ff;
+    }
+
+    input[type=radio] {
+        padding-left:5px;
+        padding-right:5px;
+        border-radius:15px;
+        -webkit-appearance:button;
+        border: double 2px #fff;
+        background-color:#fff;
+        color:#FFF;
+        white-space: nowrap;
+        overflow:hidden;
+        width:15px;
+        height:15px;
+    }
+
+    input[type=radio]:checked {
+        background-color:#000;
+        border-left-color:#06F;
+        border-right-color:#06F;
+    }
+
+    input[type=radio]:hover {
+        box-shadow:0px 0px 10px #1300ff;
+    }
+
+    textarea{
+        background: #fff;
+        color: #000;
+        border-radius: .5em;
+        line-height: 1.75em;
+        width: 28em;		
+    }
+
+    select{
+        background: #fff;
+        color: #000;
+        border-radius: .5em;
+        line-height: 1.75em;
+        height: 2.3em;
+    }
+	
+    .ui-datepicker {
+        width: 216px;
+        height: auto;
+        margin: 5px auto 0;
+        font: 9pt Arial, sans-serif;
+        -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+        -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    }
+	
+    .ui-datepicker a {
+        text-decoration: none;
+    }
+	
+    .ui-datepicker table {
+        width: 100%;
+    }
+	
+    .ui-datepicker-header {
+        background: #000;
+        color: #e0e0e0;
+        font-weight: bold;
+        -webkit-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, 2);
+        -moz-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
+        box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
+        text-shadow: 1px -1px 0px #000;
+        filter: dropshadow(color=#000, offx=1, offy=-1);
+        line-height: 30px;
+        border-width: 1px 0 0 0;
+        border-style: solid;
+        border-color: #111;
+    }
+	
+    .ui-datepicker-prev {
+        float: left;
+        background-position: center -30px;
+    }
+	
+    .ui-datepicker-next {
+        float: right;
+        background-position: center 0px;
+    }
+	
+    .ui-datepicker th {
+        text-transform: uppercase;
+        font-size: 6pt;
+        padding: 5px 0;
+        color: #666666;
+        background: #fff;
+    }
+
+    .ui-datepicker tbody td {
+        padding: 0;
+        border-right: 1px solid #bbb;
+    }
 	
 	
-	.ui-datepicker-title {
-    text-align: center;
-	}
+    .ui-datepicker-title {
+        text-align: center;
+    }
 	
-	.ui-datepicker select {
-    width: 5em;
+    .ui-datepicker select {
+        width: 5em;
 	height: 1.5em;
-	}
+    }
 	
-	.ui-datepicker tbody td:last-child {
-    border-right: 0px;
-	}
+    .ui-datepicker tbody td:last-child {
+        border-right: 0px;
+    }
 
-	.ui-datepicker tbody tr {
-		border-bottom: 1px solid #bbb;
-	}
-	.ui-datepicker tbody tr:last-child {
-		border-bottom: 0px;
-	}
+    .ui-datepicker tbody tr {
+        border-bottom: 1px solid #bbb;
+    }
+    .ui-datepicker tbody tr:last-child {
+        border-bottom: 0px;
+    }
 
-	.ui-datepicker-calendar .ui-state-hover {
-		background: #f7f7f7;
-	}
+    .ui-datepicker-calendar .ui-state-hover {
+        background: #f7f7f7;
+    }
 
-	.ui-datepicker-calendar .ui-state-active {
-		background: #6eafbf;
-		-webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-		-moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-		box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-		color: #e0e0e0;
-		text-shadow: 0px 1px 0px #4d7a85;
-		filter: dropshadow(color=#4d7a85, offx=0, offy=1);
-		border: 1px solid #55838f;
-		position: relative;
-		margin: -1px;
-	}
-	
-	#search{
-		width: 14em;
-	}
+    .ui-datepicker-calendar .ui-state-active {
+        background: #6eafbf;
+        -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+        -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+        box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+        color: #e0e0e0;
+        text-shadow: 0px 1px 0px #4d7a85;
+        filter: dropshadow(color=#4d7a85, offx=0, offy=1);
+        border: 1px solid #55838f;
+        position: relative;
+        margin: -1px;
+    }
+
+    #search{
+        width: 14em;
+    }

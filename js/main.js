@@ -3,6 +3,17 @@ function _(x) {
     return document.getElementById(x);	
 }
 
+function StringPadLeft(string, padChar, requiredLength)
+{
+    var outputString = string;
+    
+    for(i = 0; i < (requiredLength - string.length); i++) {
+        outputString = padChar + outputString;
+    }
+    
+    return outputString;
+}
+
 function togglePasswordField(targetToggle, targetPWField, pwField, pwConfirmField, targetPWPlaceholder, thisIsConfirmField) {
     var $input = $(targetPWField);
     var change = "password";
@@ -108,8 +119,8 @@ function DeferFullAccountCreation() {
 	// Make AJAX call to update username to email address
 	$.ajax({
             type: "POST",
-            url: "UpdateUsername.php",
-            data: "",
+            url: "AJAXHandler.php",
+            data: "action=UpdateUsername",
             success: function(response){
 		if(response === 'true') {
                     return true;
@@ -121,58 +132,6 @@ function DeferFullAccountCreation() {
         });
     }
     else  return false;
-}
-
-function OnSignupButtonClick(email, password, passwordConf, captcha, actionURL, successURL, pwField, 
-                             pwConfirmField, captchaCodeField, captchaImage, pwMatchField, pwStrengthField, 
-                             pwToggleField, pwConfirmToggleField, errField)
-{
-    var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-
-    if((email.trim().length === 0) || (password.trim().length === 0)) {
-        alert("Unable to create account: The Email Address and Password fields must be filled");
-    }
-    else if (validEmailRegEx.test(email) === false) {
-        alert("Unable to create account: Please enter a valid email address");
-    }
-    else if (password !== passwordConf) {
-        alert("Unable to create account: Your Password does not match the Password Confirmation");
-    }
-    else if (captcha.trim().length === 0) {
-        alert("Unable to create account: Please enter the code displayed in the CAPTCHA image");
-    }
-    else {
-        $.ajax({
-            type: "POST",
-            url: actionURL,
-            data: "signupPW=" + password + "&signupEmail=" + email + "&captcha_code=" + captcha,
-            success: function(response){
-                if(response === 'true') {
-                    window.location.href = successURL;
-                }
-                else {
-                    // Clear input fields, except for email
-                    $(pwField).val('');
-                    $(pwConfirmField).val('');
-                    $(captchaCodeField).val('');
-
-                    // Clear password strength and password-confirm-match indicators
-                    $(pwMatchField).html('');
-                    $(pwStrengthField).html('');
-                    $(pwToggleField).hide();
-                    $(pwConfirmToggleField).hide();
-
-                    // Display error message from server
-                    $(errField).html(response);
-
-                    // Refresh captcha image
-                    $(captchaImage).attr('src', 'securimage/securimage_show.php?' + Math.random());
-                }
-            }
-        });
-    }
-
-    return false;
 }
 
 function evaluateUserNameAvailability(userNameField, availIndicatorField, actionURL)

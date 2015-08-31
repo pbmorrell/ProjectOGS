@@ -3,6 +3,7 @@ include_once 'classes/DataAccess.class.php';
 include_once 'classes/Logger.class.php';
 include_once 'classes/User.class.php';
 include_once 'classes/Game.class.php';
+include_once 'classes/Utils.class.php';
 
 class GamingHandler
 {    
@@ -82,12 +83,47 @@ class GamingHandler
 	
     public function EventEditorLoad($dataAccess, $logger, $userID, $eventId)
     {
+        // If this is called for existing event, apply styles and call JS for modal dialog instance of this editor
+        $additionalCSS = "";
+        $formName = "eventCreateForm";
+        $formButtonName = "createEventBtnMobile";
+        $formButtonText = "Create Event!";
+        $gameDateValue = "";
+        $gameTimeValue = "";
+        $eventInfo = null;
+        
+        if(strlen($eventId) > 0) {
+            $additionalCSS = "class='box style1'";
+            $formName = "eventEditForm"  . $eventId;
+            $formButtonName = "editEventBtn" . $eventId;
+            $formButtonText = "Update Event";
+            
+            // Load information about this event
+            $eventArray = $this->GetUserScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", 
+                                                       false, "0", "10", $eventId);
+            if(count($eventArray) > 0) {
+                $eventInfo = $eventArray[0];
+                $gameDateValue = 'value="' . $eventInfo->ScheduledDate . '" ';
+                $gameTimeValue = 'value="' . $eventInfo->ScheduledTime . '" ';
+            }
+            else {
+                $logger->LogError("Event " . $eventId . " could not be loaded for editing");
+                return "ERROR: Event not found";
+            }
+        }
+        
 	// Build game-players-needed selector
-	$gamePlayersNeededSelect = '<select id="gamePlayersNeeded" name="gamePlayersNeeded" >';
-	$selected = 'selected="true"';
+	$gamePlayersNeededSelect = '<select id="gamePlayersNeeded' . $eventId . '" name="gamePlayersNeeded' . $eventId . '" >';
+	$selected = '';
 		
 	for($i = 1; $i < 65; $i++) {
-            if($i > 1)  $selected = '';
+            $selected = '';
+            if($eventInfo != null) {
+                if($i == $eventInfo->RequiredPlayersCount)  $selected = 'selected="true"';
+            }
+            else if($i == 2) {
+                $selected = 'selected="true"';
+            }
 			
             $gamePlayersNeededSelect .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
 	}
@@ -96,111 +132,626 @@ class GamingHandler
 		
 	// Build friends list selector
 	$privateEventOptionDisabled = " disabled";
+        $privateEventOptionChecked = "";
 	$userFriendList = $this->LoadUserFriends($dataAccess, $logger, $userID);
 	$friendListSelect = 'Your friends list is empty';
 		
 	if(count($userFriendList) > 0){
             $privateEventOptionDisabled = "";
             $friendListSelect = '';
+            if(($eventInfo != null) && ($eventInfo->IsPublicGame)) {
+                $privateEventOptionChecked = "checked='checked'";
+            }
             
             foreach($userFriendList as $userFriend) {
 		$userDisplayName = (strlen($userFriend->FirstName) == 0) ? $userFriend->UserName : $userFriend->FirstName . ' ' . $userFriend->LastName;
 				
 		$userFriendSelected = '';
-		if(($eventId > 0) /*&&(thisFriendSelected)*/) {
+		if((strlen($eventId) > 0) /*&&(thisFriendSelected)*/) {
                     $userFriendSelected = "checked='checked'";
 		}
 				
 		$userFriendDisabled = ' disabled';
-		if(($eventId > 0) /*&& (isPrivateEvent)*/) {
+		if(($eventInfo != null) && (!$eventInfo->IsPublicGame)) {
                     $userFriendDisabled = '';
 		}
 				
-		$friendListSelect .= '<input type="checkbox" name="pvtEventFriends[]" value="' . $userFriend->UserID . '" ' . $userFriendSelected . 
+		$friendListSelect .= '<input type="checkbox" name="pvtEventFriends' . $eventId . '[]" value="' . $userFriend->UserID . '" ' . $userFriendSelected . 
                                      ' ' . $userFriendDisabled . ' /> ' . $userDisplayName . '</br>';
             }
 	}
 		
-	// Construct game selection dropdown list
-	$gameSelector = '<select id="ddlGameTitles" name="ddlGameTitles">';
-	$userGames = $this->LoadUserGames($dataAccess, $logger, $userID);
-		
-	foreach($userGames as $userGame) {
-            $class = "userGameOption";
-            if($userGame->$IsGlobalGameTitle) {
-		$class = "globalGameOption";
-            }
-			
-            $gameSelector .= '<option value="' . $userGame->GameID . '" class="' . $class . '">' . $userGame->Name . '</option>';
-	}
-	$gameSelector .= '</select>';
-		
 	// Return Event Scheduler HTML
 	return
-            '<section>'.
-		'<form id="eventCreateForm" name="eventCreateForm" method="POST" action="">'.
+            '<section ' . $additionalCSS . '>'.
+		'<form id="' . $formName . '" name="' . $formName . '" method="POST" action="">'.
                     '<div class="inputLine">'.
 			'<p><i class="fa fa-gamepad"></i> &nbsp; What game do you wish to schedule?<br/>'.
-			$gameSelector .
+			'<div id="gameSelectorDiv' . $eventId . '">'.
+                            $this->ConstructGameTitleSelectorHTML($dataAccess, $logger, $userID, $eventId, (($eventInfo != null) ? $eventInfo->Name : '')) .
+			'</div><br />'.
 			'<p><i class="fa fa-calendar-o"></i> &nbsp; Tell us a date<br/>'.
-                            '<input id="gameDate" name="gameDate" type="text" id ="datepicker" maxlength="50" placeholder=" Date"></p>'.
+                            '<input id="gameDate' . $eventId . '" name="gameDate' . $eventId . '" ' . $gameDateValue .
+                            'type="text" maxlength="50" placeholder=" Date"></p>'.
 			'<p><i class="fa fa-clock-o"></i> &nbsp; Time you want to play<br/>'.
-                            '<input id="gameTime" name="gameTime" type="text" maxlength="9" placeholder=" Time"></p>'.
-			'<p><i class="fa fa-user"></i> &nbsp; Number of players needed<br/>'. 
+                            '<input id="gameTime' . $eventId . '" name="gameTime' . $eventId . '" ' . $gameTimeValue .
+                            'type="text" maxlength="9" placeholder=" Time">&nbsp;&nbsp;'.
+                            $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : -1), $eventId) .
+                        '</p>'.
+			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>'. 
                             $gamePlayersNeededSelect .
+                        '<p><i class="fa fa-gamepad"></i> &nbsp; Choose a platform for this game<br/>'. 
+                            $this->GetPlatformDropdownList($dataAccess, (($eventInfo != null) ? $eventInfo->SelectedPlatformID : -1), $eventId) .
+                        '</p>'.
 			'<p><i class="fa fa-comments-o"></i> &nbsp; Notes about your event<br/>'.
-                            '<textarea name="message" id="message" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required></textarea></p>'.
-			'<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event<br/>'.
-                            '<input type="checkbox" id="privateEvent" name="privateEvent" value="private" ' . $privateEventOptionDisabled . 
-                                '>Private Event</input>&nbsp;&nbsp;'.
+                            '<textarea name="message' . $eventId . '" id="message' . $eventId .
+                            '" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required>'.
+                            (($eventInfo != null) ? ($eventInfo->Notes) : '') . '</textarea>'.
+                        '</p>'.
+			'<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event</p>'.
+                            '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
+                                $privateEventOptionChecked . ' ' . $privateEventOptionDisabled . 
+                                '>Private Event</input>&nbsp;<input class="selectAllCheckbox" type="checkbox" id="selectAllFriends' . $eventId . '" value="all" ' . 
+                                ((($eventId === 0) || (!$privateEventOptionChecked)) ? 'disabled ' : '') . '>Select all</input>'.
                             '<div class="fixedHeightScrollableContainer">'. 
                                 $friendListSelect .
-                            '</div><br/>'.
-			'<button type="submit" class="memberHomeBtn icon fa-cogs" id="createEventBtn">Create Event!</button><br/>'.
+                            '</div>'.
+                            '<br /><br /><button type="submit" class="memberHomeBtn icon fa-cogs" id="' . $formButtonName . '">' . $formButtonText . '</button><br/>'.
                     '</div>'.
 		'</form>'.
             '</section>';
+    }
+    
+    public function ConstructGameTitleSelectorHTML($dataAccess, $logger, $userID, $eventId, $selectedGameTitle = "")
+    {
+        $gameSelector = '<select id="ddlGameTitles' . $eventId . '" name="ddlGameTitles' . $eventId . '">';
+        $userGames = $this->LoadUserGames($dataAccess, $logger, $userID);
+
+        foreach($userGames as $userGame) {
+            $class = "userGameOption";
+            $selected = "";
+            if($userGame->IsGlobalGameTitle) {
+                $class = "globalGameOption";
+            }
+            if((strlen($selectedGameTitle) > 0) && ($userGame->Name === $selectedGameTitle)) {
+                $selected = '" selected="true';
+            }
+
+            $gameSelector .= '<option value="' . $userGame->GameID . $selected . '" class="' . $class . '">' . $userGame->Name . '</option>';
+        }
+        $gameSelector .= '</select>';
+
+        return $gameSelector;
+    }
+	
+    public function EventManagerLoad($dataAccess, $logger, $userID)
+    {
+        $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID);
+        $scheduledGamesHTML = '<div class="fixedHeightScrollableContainerLarge">';
+        
+        $gameMetadataFormat = '<p><strong>Game:</strong> %s<br/><strong>Platform:</strong> %s<br/><strong>Date:</strong> %s<br/><strong>Time:</strong> %s</p>'.
+                              '<strong>Notes:</strong><br />%s<br /><br />';
+        
+        $playersSignedUpFormat = '<h3>(%d) players currently signed up:</h3>'.
+                                 '<p><div class="fixedHeightScrollableContainer">';
+        $playerFormat = '%s<br>';
+	
+        $footerFormat = '</div></p>'.
+                        '<footer>'.
+                            '<a onclick="return EditEvent(%d);" href="#" class="button icon fa-wrench">Edit Event</a>'.
+                        '</footer><br/><br/>';
+        
+        foreach($scheduledGames as $game) {
+            $scheduledGamesHTML .= sprintf($gameMetadataFormat, $game->Name, $game->SelectedPlatformText, $game->ScheduledDate,
+                                           $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText, $game->Notes);
+            
+            $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $game->EventID);
+            $scheduledGamesHTML .= sprintf($playersSignedUpFormat, count($playersSignedUp));
+            
+            $playersHTML = '';
+            foreach($playersSignedUp as $player) {
+                $playersHTML .= sprintf($playerFormat, $player);
+            }
+            
+            $scheduledGamesHTML .= $playersHTML;
+            $scheduledGamesHTML .= sprintf($footerFormat, $game->EventID);
+        }
+		
+	// Return Event Manager HTML
+	return
+            '<section>'.
+                '<article class="box style2">'.
+                    '<span class="byline">(' . count($scheduledGames) . ') Scheduled</span><br /><br />'.
+                    $scheduledGamesHTML . '</div>'.
+                '</article>'.
+            '</section>';
+    }
+	
+    public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize)
+    {
+        $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+
+        $rows = [];
+        foreach($scheduledGames as $game) {
+            $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $game->EventID);
+
+            $row = array (
+                "ID" => $game->EventID,
+                "GameTitle" => $game->Name,
+                "Platform" => $game->SelectedPlatformText,
+                "DisplayDate" => $game->ScheduledDate,
+                "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
+                "Notes" => $game->Notes,
+                "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
+                "Edit" => ''
+            );
+
+            array_push($rows, $row);
+        }
+
+        $jTableResult = [];
+        $jTableResult['Result'] = 'OK';
+        $jTableResult['TotalRecordCount'] = $this->GetTotalCountUserScheduledGames($dataAccess, $logger, $userID);
+        $jTableResult['Records'] = $rows;
+        return json_encode($jTableResult);
     }
 	
     public function EventEditorCreateEvent($dataAccess, $logger, $userID, $eventGame)
     {
         $gameIDCol = "`FK_UserGames_ID`";
-        if($eventGame->IsGlobalGameTitle) {
+        $genreID = NULL;
+        $genreParamType = PDO::PARAM_NULL;
+		
+	// If user entered a game title that doesn't currently exist in the system,
+	// add it to the UserGames table and retrieve the inserted ID
+        if(!$eventGame->IsExistingTitle) {
+            // Wrap UserGames, Events, and EventMembers inserts in transaction
+            if($dataAccess->BeginTransaction()) {
+		$eventGame->GameID = $this->AddNewGameToUserGameList($dataAccess, $logger, $userID, $eventGame->Name);
+            }
+            else {
+		$logger->LogError("Could not begin transaction to add user game title to UserGames. Exception: " . $dataAccess->CheckErrors());
+            }
+        }
+        else if($eventGame->IsGlobalGameTitle) {
             $gameIDCol = "`FK_Game_ID`";
+            
+            // If user selected a system game title, get the genre associated with this title (if available)
+            $genreID = $this->GetGameTitleAssociatedGenre($dataAccess, $logger, $eventGame->GameID);
         }
         
+        if(($genreID != NULL) && ($genreID >= 0)) {
+            $genreParamType = PDO::PARAM_INT;
+        }
+		
+	// Format display time: convert to military time (24-hr clock) for DB storage
+	$eventGame->ScheduledTime = Utils::ConvertStandardTimeToMilitaryTime($eventGame->ScheduledTime);
+        
+        // Build query to create event
         $createEventQuery = "INSERT INTO `Gaming.Events` (`FK_User_ID_EventCreator`," . $gameIDCol .", `FK_Genre_ID`," .
                             "`FK_Platform_ID`, `FK_Timezone_ID`, `EventCreatedDate`, `EventModifiedDate`, `EventScheduledForDate`," .
-                            "`RequiredMemberCount`, `IsActive`, `IsPublic`) " .
-                            "VALUES (:FKUserEventCreator,:FKGameId,:FKGenreID,:FKPlatformID,:FKTimezoneID,:EventCreatedDate," . 
-                            ":EventModifiedDate,:EventScheduledForDate,:RequiredMemberCount,:IsActive,:IsPublic);";
+                            "`RequiredMemberCount`, `IsActive`, `IsPublic`,`Notes`, `DisplayDate`, `DisplayTime`) " .
+                            "VALUES (:FKUserEventCreator,:FKGameId,:FKGenreID,:FKPlatformID,:FKTimezoneID,SYSDATE()," . 
+                            "SYSDATE(),:EventScheduledForDate,:RequiredMemberCount,1,:IsPublic,:notes, :displayDate, :displayTime);";
 		
 	$parmEventCreatorUserId = new QueryParameter(':FKUserEventCreator', $userID, PDO::PARAM_INT);
 	$parmGameId = new QueryParameter(':FKGameId', $eventGame->GameID, PDO::PARAM_INT);
+        $parmGenreId = new QueryParameter(':FKGenreID', $genreID, $genreParamType);
+        $parmPlatformId = new QueryParameter(':FKPlatformID', $eventGame->SelectedPlatformID, PDO::PARAM_INT);
+        $parmTimezoneId = new QueryParameter(':FKTimezoneID', $eventGame->ScheduledTimeZoneID, PDO::PARAM_INT);
+        $parmEventScheduledForDate = new QueryParameter(':EventScheduledForDate', $eventGame->ScheduledDateUTC, PDO::PARAM_STR);
+        $parmRequiredMemberCount = new QueryParameter(':RequiredMemberCount', $eventGame->RequiredPlayersCount, PDO::PARAM_INT);
+        $parmIsPublicEvent = new QueryParameter(':IsPublic', $eventGame->IsPublicGame ? 1 : 0, PDO::PARAM_INT);
+        $parmNotes = new QueryParameter(':notes', $eventGame->Notes, PDO::PARAM_STR);
+	$parmDisplayDate = new QueryParameter(':displayDate', $eventGame->ScheduledDate, PDO::PARAM_STR);
+	$parmDisplayTime = new QueryParameter(':displayTime', $eventGame->ScheduledTime, PDO::PARAM_STR);
         
-        
-	$queryParms = array($parmEventCreatorUserId, $parmGameId);
+	$queryParms = array($parmEventCreatorUserId, $parmGameId, $parmGenreId, $parmPlatformId, $parmTimezoneId, $parmEventScheduledForDate,
+                            $parmRequiredMemberCount, $parmIsPublicEvent, $parmNotes, $parmDisplayDate, $parmDisplayTime);
 			
 	$errors = $dataAccess->CheckErrors();
 
 	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($createEventQuery, $queryParms)){
+            if(!$dataAccess->CheckIfInTransaction())
+            {
+		if(!$dataAccess->BeginTransaction()) {
+                    $errors .= "Could not begin transaction...unable to create event";
+		}
+            }
+				
+            $errors .= $dataAccess->CheckErrors();
+			
+            if(strlen($errors) == 0) {
+                if($dataAccess->BuildQuery($createEventQuery, $queryParms)){
+                    $dataAccess->ExecuteNonQuery();
+
+                    // Insert current user as first joined member for the new event
+                    $eventID = $dataAccess->GetLastInsertId();
+                    $joinedUsers = [ $userID ];
+
+                    if($this->AddUsersToEvent($dataAccess, $logger, $eventID, $joinedUsers))
+                    {
+                        if($dataAccess->CommitTransaction())    return "true";
+                        else                                    $errors .= "Could not commit transaction...rolling back";
+                    }
+                }
+            }
+        }
+	
+        // Failed to add new game title, event, and/or initial event member -- roll back everything
+        if($dataAccess->CheckIfInTransaction())
+        {
+            $dataAccess->RollbackTransaction();
+        }
+	
+        $logger->LogError("Could not schedule event for game '" . $eventGame->Name . "'. " . $errors);
+	return "System Error: Could not schedule event for game '" . $eventGame->Name . "'. Please try again later";
+    }
+
+    private function GetGameTitleAssociatedGenre($dataAccess, $logger, $gameID)
+    {
+        $getGameGenreQuery = "SELECT `FK_Genre_ID` FROM `Configuration.GameGenres` " .
+                             "WHERE `FK_Game_ID` = :gameID;";
+        
+        $parmGameId = new QueryParameter(':gameID', $gameID, PDO::PARAM_INT);
+        $queryParms = array($parmGameId);
+        $genreID = -1;
+        
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getGameGenreQuery, $queryParms)){
+		$results = $dataAccess->GetSingleResult();
+					
+		if($results != null){
+                    $genreID = $results['FK_Genre_ID'];
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve genre associated with game ID " . $gameID . ". " . $errors);
+	}
+        
+        return $genreID;
+    }
+    
+    private function AddNewGameToUserGameList($dataAccess, $logger, $userID, $gameName)
+    {
+        $addNewUserGameQuery = "INSERT INTO `Gaming.UserGames` (`FK_User_ID`,`Name`) " .
+                               "VALUES (:FKUserId, :gameName);";
+		
+	$parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
+	$parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
+	$queryParms = array($parmUserId, $parmGameName);
+			
+	$errors = $dataAccess->CheckErrors();
+
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($addNewUserGameQuery, $queryParms)){
 		$dataAccess->ExecuteNonQuery();
             }
 				
             $errors = $dataAccess->CheckErrors();
 
             if(strlen($errors) == 0) {
-		return "true";
+		return $dataAccess->GetLastInsertId();
             }
 	}
 	
-        $logger->LogError("Could not schedule event for game '". $eventGame->Name . "'. " . $errors);
-	return "System Error: Could not schedule event for game '". $eventGame->Name . "'. Please try again later";
+        $logger->LogError("Could not add new user game title '". $gameName . "' for userID " . $userID . ". " . $errors);
+	return -1;
     }
-
-    private function GetGameTitleAssociatedGenre($gameID)
+    
+    public function AddUsersToEvent($dataAccess, $logger, $eventID, $joinedUsers)
     {
+        $addUsersToEventQuery = "INSERT INTO `Gaming.EventMembers` (`FK_Event_ID`,`FK_User_ID`) VALUES ";
+		
+        $valuesClauseFormat = "(%s, %s)";
+        $eventParmNameFormat = ":eventId%d";
+        $userParmNameFormat = ":FKUserId%d";
+        $queryParms = [];
+
+        // Build insert statement
+        for($i = 0; $i < count($joinedUsers); $i++) {
+            $valuesClauseSuffix = ", ";
+            if($i === (count($joinedUsers) - 1)) {
+                $valuesClauseSuffix = ";";
+            }
+
+            $eventParmName = sprintf($eventParmNameFormat, $i);
+            $userParmName = sprintf($userParmNameFormat, $i);
+            $addUsersToEventQuery .= (sprintf($valuesClauseFormat, $eventParmName, $userParmName) . $valuesClauseSuffix);
+
+            $parmEventId = new QueryParameter($eventParmName, $eventID, PDO::PARAM_INT);
+            $parmUserId = new QueryParameter($userParmName, $joinedUsers[$i], PDO::PARAM_INT);
+            array_push($queryParms, $parmEventId, $parmUserId);
+        }
+		
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($addUsersToEventQuery, $queryParms)){
+		$dataAccess->ExecuteNonQuery();
+            }
+				
+            $errors = $dataAccess->CheckErrors();
+
+            if(strlen($errors) == 0) {
+		return true;
+            }
+	}
+	
+        $logger->LogError("Could not add users to new event [ID = " . $eventID . "]. " . $errors);
+	return false;
+    }
+	
+    public function GetTimezoneList($dataAccess, $selectedTimeZoneID, $eventId = '')
+    {
+        $timeZoneListId = ((strlen($eventId) == 0) ? 'ddlTimeZones' : ('ddlTimeZones' . $eventId));
         
+        $timeZoneQuery = "SELECT `ID`, `Description` FROM `Configuration.TimeZones` ORDER BY `SortOrder`;";
+        $ddlTimeZonesHTML = "";
+        $ddlTimeZonesErrorHTML = "<select id='" . $timeZoneListId . "' name='" . $timeZoneListId . 
+                                 "'><option value='-1'>Cannot load time zones, please try later</option></select><br/><br/>";
+
+        $errors = $dataAccess->CheckErrors();
+        
+        if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($timeZoneQuery)){
+                $results = $dataAccess->GetResultSet();
+                if($results != null){
+                    $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<select id='" . $timeZoneListId . "' name='" . $timeZoneListId . "'>";
+                    foreach($results as $row){
+                        if($row['ID'] == $selectedTimeZoneID) {
+                            $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<option value='" . $row['ID'] . "' selected='true'>" . $row['Description'] . "</option>";
+                        }
+                        else {
+                            $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<option value='" . $row['ID'] . "'>" . $row['Description'] . "</option>";
+                        }
+                    }
+                    $ddlTimeZonesHTML = $ddlTimeZonesHTML . "</select>";
+                }
+            }
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            return $ddlTimeZonesHTML;
+        }
+        else { 
+            return $ddlTimeZonesErrorHTML;
+        }
+    }
+    
+    public function GetPlatformCheckboxList($dataAccess, $selectedPlatforms)
+    {
+        $platformQuery = "SELECT `ID`, `Name` FROM `Configuration.Platforms` ORDER BY `Name`;";
+        $ddlPlatformsHTML = "";
+        $ddlPlatformsErrorHTML = "<p>Cannot load console list, please try later</p>";
+
+        $errors = $dataAccess->CheckErrors();
+        
+        if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($platformQuery)){
+                $results = $dataAccess->GetResultSet();
+                if($results != null){
+                    foreach($results as $row){
+                        $selected = "";
+                        if(in_array($row['ID'], $selectedPlatforms)) {
+                            $selected = "checked='checked'";
+                        }
+
+                        $ddlPlatformsHTML = $ddlPlatformsHTML . "<input type='checkbox' name='platforms[]' " . 
+                                            $selected . " value='" . $row['ID'] . "'>" . $row['Name'] . "</input><br/>";
+                    }
+                }
+            }
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            return $ddlPlatformsHTML;
+        }
+        else { 
+            return $ddlPlatformsErrorHTML;
+        }
+    }
+    
+    public function GetPlatformDropdownList($dataAccess, $selectedPlatform, $eventId = '')
+    {
+        $platformListId = ((strlen($eventId) == 0) ? 'ddlPlatforms' : ('ddlPlatforms' . $eventId));
+        
+        $platformQuery = "SELECT `ID`, `Name` FROM `Configuration.Platforms` ORDER BY `Name`;";
+        $ddlPlatformsHTML = "";
+        $ddlPlatformsErrorHTML = "<select id='" . $platformListId . "' name='" . $platformListId . 
+                                 "'><option value='-1'>Cannot load console list, please try later</option></select><br/><br/>";
+
+        $errors = $dataAccess->CheckErrors();
+        
+        if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($platformQuery)){
+                $results = $dataAccess->GetResultSet();
+                if($results != null){
+                    $ddlPlatformsHTML .= "<select id='" . $platformListId . "' name='" . $platformListId . "'>";
+                    foreach($results as $row){
+                        if($row['ID'] == $selectedPlatform) {
+                            $ddlPlatformsHTML .= "<option value='" . $row['ID'] . "' selected='true'>" . $row['Name'] . "</option>";
+                        }
+                        else {
+                            $ddlPlatformsHTML .= "<option value='" . $row['ID'] . "'>" . $row['Name'] . "</option>";
+                        }
+                    }
+                    $ddlPlatformsHTML .= "</select>";
+                }
+            }
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            return $ddlPlatformsHTML;
+        }
+        else { 
+            return $ddlPlatformsErrorHTML;
+        }
+    }
+    
+    private function TranslateOrderByToQueryOrderByClause($orderBy)
+    {
+        $queryOrderByClause = "";
+        $orderByColumn = "";
+        $orderByDirection = "";
+
+        sscanf($orderBy, "%s %s", $orderByColumn, $orderByDirection);
+
+        // Always sort by event scheduled date at minimum, or after game name or platform 
+        //  when there are games of same name or same platform
+        switch($orderByColumn) {
+            case "GameTitle":
+                $queryOrderByClause = "(COALESCE(cg.`Name`, ug.`Name`)) " . $orderByDirection . ", e.`EventScheduledForDate`";
+                break;
+            case "Platform":
+                $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
+                break;
+            case "DisplayDate":
+                $queryOrderByClause = "e.`EventScheduledForDate` " . $orderByDirection;
+                break;
+        }
+
+        return $queryOrderByClause;
+    }
+	
+    public function GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
+                                          $paginationEnabled = false, $startIndex = "0", $pageSize = "10", $eventId = -1)
+    {
+	$limitClause = "";
+	if($paginationEnabled) {
+            $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
+	}
+        
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+        
+        $eventWhereClause = "";
+        $parmEventId = null;
+	if($eventId > -1) {
+            $eventWhereClause = "AND (e.`ID` = :eventId) ";
+            $parmEventId = new QueryParameter(':eventId', $eventId, PDO::PARAM_INT);
+            array_push($queryParms, $parmEventId);
+        }
+        
+	$orderByClause = "ORDER BY " . $this->TranslateOrderByToQueryOrderByClause($orderBy);
+		
+        $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
+                             "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
+                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID " .
+                             "FROM `Gaming.Events` AS e ".
+                             "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
+                             "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+                             "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+                             "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
+                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " .
+                             "AND (e.`IsActive` = 1) " . $eventWhereClause .
+                             "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) " . // Only show future events
+                             $orderByClause . " " . $limitClause . ";";
+        
+	$userGames = array();
+        
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
+		$results = $dataAccess->GetResultSet();
+					
+		if($results != null){
+                    foreach($results as $row) {
+			// Show event scheduled date to user in standard time format, with no seconds shown, and AM/PM indicator
+			$displayTime = Utils::ConvertMilitaryTimeToStandardTime($row['DisplayTime']);
+						
+                        $userGame = Game::ConstructGameForEvent($row['GameID'], $row['DisplayDate'], $displayTime, $row['RequiredMemberCount'], $row['Notes'], [], 
+                                                                false, $row['TimezoneID'], $row['PlatformID'], $row['GameTitle'], $row['EventScheduledForDate'], $row['Platform'], 
+                                                                $row['TimeZone'], $row['ID']);
+			array_push($userGames, $userGame);
+                    }
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve user scheduled games. " . $errors);
+	}
+        
+        return $userGames;
+    }
+	
+    private function GetTotalCountUserScheduledGames($dataAccess, $logger, $userID)
+    {
+	$userTotalScheduledGamesCnt = 0;
+        $getUserGamesQuery = "SELECT COUNT(e.`ID`) AS Cnt " .
+                             "FROM `Gaming.Events` AS e ".
+                             "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
+                             "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " .
+                             "AND (e.`IsActive` = 1) " .
+                             "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP());";
+        
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+	$userGames = array();
+        
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
+		$results = $dataAccess->GetSingleResult();
+					
+		if($results != null){
+                    $userTotalScheduledGamesCnt = $results['Cnt'];
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve count of user scheduled games. " . $errors);
+	}
+        
+        return $userTotalScheduledGamesCnt;
+    }
+    
+    public function GetEventAttendeeNames($dataAccess, $logger, $eventID)
+    {
+        $getEventMembersQuery = "SELECT u.`UserName`, CASE WHEN e.`FK_User_ID_EventCreator` = em.`FK_User_ID` THEN ' (Creator)' ELSE '' END AS EventCreator " .
+				"FROM `Gaming.EventMembers` AS em " .
+                                "INNER JOIN `Security.Users` AS u ON em.`FK_User_ID` = u.`ID` " .
+				"INNER JOIN `Gaming.Events` AS e ON e.`ID` = em.`FK_Event_ID` " .
+                                "WHERE em.`FK_Event_ID` = :eventID " .
+				"ORDER BY u.`UserName`;";
+        
+        $parmEventId = new QueryParameter(':eventID', $eventID, PDO::PARAM_INT);
+        $queryParms = array($parmEventId);
+	$userNames = array();
+        
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getEventMembersQuery, $queryParms)){
+		$results = $dataAccess->GetResultSet();
+					
+		if($results != null){
+                    foreach($results as $row) {
+			array_push($userNames, $row['UserName'] . $row['EventCreator']);
+                    }
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve attendees for event " . $eventID . ". " . $errors);
+	}
+        
+        return $userNames;
     }
 }

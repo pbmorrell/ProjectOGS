@@ -1,6 +1,9 @@
 <?php
     $curPageName = "EditProfile";
-    $authFailureRedirectPage = "Login.php";
+    $mobileLoginPage = false;
+    $authFailureRedirectPage = "Index.php";
+    $sessionRequired = true;
+    $sessionAllowed = true;
     
     // header.php retrieves user information from session, storing in $objUser variable
     include "Header.php";
@@ -80,7 +83,11 @@
     if($objUser->TimezoneID > 0) {
         $selectedTimeZoneID = $objUser->TimezoneID;
     }
-
+    
+    $dataAccess = new DataAccess();
+    $gamingHandler = new GamingHandler();
+    $timeZoneHTML = $gamingHandler->GetTimezoneList($dataAccess, $selectedTimeZoneID);
+    
     // Biography
     $bioHTML = "<textarea name='message' id='message' placeholder='This is your bio! What are your favorite games? When do you do most of your online gaming? etc..' " . 
                "rows='6' required></textarea>";
@@ -154,7 +161,7 @@
                                                         <span id="togglePasswordSpan">
                                                             <a href="#" id="togglePassword" 
                                                                onclick="return togglePasswordField('#togglePassword', '#pwd', '#pwd', '#pwdConfirm', 
-                                                                                            ' Password', false);">Show Password</a>
+                                                                                                   ' Password', false);">Show Password</a>
                                                         </span>&nbsp;&nbsp;
                                                         <span id="passwordStrength" class="passwordNone"></span><br/><br/>
                                                         
@@ -162,7 +169,7 @@
                                                         <span id="togglePasswordConfirmSpan">
                                                             <a href="#" id="togglePasswordConfirm" 
                                                                onclick="return togglePasswordField('#togglePasswordConfirm', '#pwdConfirm', '#pwd', '#pwdConfirm', 
-                                                                                            ' Confirm Password', true);">Show Password</a>
+                                                                                                   ' Confirm Password', true);">Show Password</a>
                                                         </span>&nbsp;<br/>
                                                         <span id="passwordMatch" class="passwordWeak"></span>
                                                         <button type="submit" id="hiddenBtn" style="display:none">Update Profile</button>
@@ -184,77 +191,17 @@
 							?>
 							<br/><br/>
                                                         <p><i class="fa fa-clock-o"></i>&nbsp;&nbsp;What is your time zone?</p>
-                                                        <?php
-                                                            $errors = $dataAccess->CheckErrors();
-                                                            $ddlTimeZonesHTML = "";
-                                                            $ddlTimeZonesErrorHTML = "<select id='ddlTimeZones' name='ddlTimeZones'><option value='-1'>Cannot load time zones, please try later</option></select><br/><br/>";
-
-                                                            if(strlen($errors) == 0) {
-                                                                $timeZoneQuery = "SELECT `ID`, `Abbreviation` FROM `Configuration.TimeZones` ORDER BY `SortOrder`;";
-                                                                if($dataAccess->BuildQuery($timeZoneQuery)){
-                                                                    $results = $dataAccess->GetResultSet();
-                                                                    if($results != null){
-                                                                        $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<select id='ddlTimeZones' name='ddlTimeZones'>";
-                                                                        foreach($results as $row){
-                                                                            if($row['ID'] == $selectedTimeZoneID) {
-                                                                                $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<option value='" . $row['ID'] . "' selected='true'>" . $row['Abbreviation'] . "</option>";
-                                                                            }
-                                                                            else {
-                                                                                $ddlTimeZonesHTML = $ddlTimeZonesHTML . "<option value='" . $row['ID'] . "'>" . $row['Abbreviation'] . "</option>";
-                                                                            }
-                                                                        }
-                                                                        $ddlTimeZonesHTML = $ddlTimeZonesHTML . "</select>";
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            $errors = $dataAccess->CheckErrors();
-                                                            if(strlen($errors) == 0) {
-                                                                echo $ddlTimeZonesHTML;
-                                                            }
-                                                            else { 
-                                                                echo $ddlTimeZonesErrorHTML;
-                                                            }
-                                                        ?>
+                                                        <?php echo $timeZoneHTML; ?>
                                                     </section>
                                                     <section class="6u">
                                                         <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on? (check all that apply)</p>
-                                                        <?php
-                                                            $errors = $dataAccess->CheckErrors();
-                                                            $ddlPlatformsHTML = "";
-                                                            $ddlPlatformsErrorHTML = "<p>Cannot load console list, please try later</p>";
-
-                                                            if(strlen($errors) == 0) {
-                                                                $platformQuery = "SELECT `ID`, `Name` FROM `Configuration.Platforms` ORDER BY `Name`;";
-                                                                if($dataAccess->BuildQuery($platformQuery)){
-                                                                    $results = $dataAccess->GetResultSet();
-                                                                    if($results != null){
-                                                                        foreach($results as $row){
-                                                                            $selected = "";
-                                                                            if(in_array($row['ID'], $objUser->GamePlatforms)) {
-										$selected = "checked='checked'";
-                                                                            }
-																	
-                                                                            $ddlPlatformsHTML = $ddlPlatformsHTML . "<input type='checkbox' name='platforms[]' " . 
-                                                                                                $selected . " value='" . $row['ID'] . "'>" . $row['Name'] . "</input><br/>";
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            $errors = $dataAccess->CheckErrors();
-                                                            if(strlen($errors) == 0) {
-                                                                echo $ddlPlatformsHTML;
-                                                            }
-                                                            else { 
-                                                                echo $ddlPlatformsErrorHTML;
-                                                            }
-                                                        ?><br/><br/>
+                                                        <?php echo $gamingHandler->GetPlatformCheckboxList($dataAccess, $objUser->GamePlatforms); ?><br/><br/>
                                                         <p><i class="fa fa-comment"></i>&nbsp;&nbsp;Tell us about yourself.</p>
                                                         <?php
                                                             echo $bioHTML;
 							?>
 							<br/><br/>
+                                                        <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtnMobile">Update Profile</button>
                                                     </section>
                                                 </div>
                                             </form>
