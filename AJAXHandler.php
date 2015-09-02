@@ -329,7 +329,7 @@
             case "EventEditorLoad":
 		$eventId = '';
 		if(isset($_GET['EventID'])) {
-                    $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
+            $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
 		}             
 
 		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);

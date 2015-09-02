@@ -84,6 +84,14 @@
         width: 18em;
     }
 
+    .box.style1 input[type=text],select{
+        height: 2.15em !important; /* Fix for IE display of textboxes */
+    }
+    
+    #ddlTimeZones{
+        width: auto !important;
+    }
+    
     br.clear
     {
         clear: both;

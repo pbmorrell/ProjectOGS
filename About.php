@@ -1,7 +1,6 @@
 <?php
-    $curPageName = "Index";
+    $curPageName = "About";
     $mobileLoginPage = false;
-    $welcomeUserName = "Sign Up";
     $sessionRequired = false;
     $sessionAllowed = true;
     include "Header.php";
@@ -37,11 +36,41 @@
                                 <div class="12u">
                                     <!-- Content -->
                                     <div id="content">
-                                        <section class="box"> <!-- *remember to add class "main" to easily increase the font mark up if needed-->
-                                            <section>
-                                                <h1>What is Project OGS?</h1>
-                                            </section>
-                                        </section>
+                                        <article class="box">
+                                                <div class="row double">
+                                                    <section class="8u">
+                                                        <h2>Our Goal</h2>
+                                                        <p>Help gamers from all over, meet and engage with other like minded gamers to enrich their online game experience.</p><br/>
+                                                        <h2>What our site offers</h2>
+                                                        <p>
+                                                            - The ability to schedule games that your friends can join<br/>
+                                                            - When creating an event, select from an array of game titles, or enter your own<br/>
+                                                            - An event feed that allows you to view and sign up for as many games as you desire<br/>
+                                                            - Subscribe to events created for particular game titles, platforms, etc.<br/>
+                                                            - Defeat your archnemesis in any game<br/>
+                                                            - OK, that last one is still in the works...<br/>
+                                                        <p /><br/>
+                                                        <h2>Why?</h2>
+                                                        <p>Have you ever started a new game only to wind up in a lobby with unfamiliar gamer tags?<br/>Are your current friends still playing a game you no longer have
+                                                           interest in?<br/>Do you need help with a particular game but are unsure where to turn?<br/><br/>...We have and our aim to correct that.</p>
+                                                    </section>
+                                                    <!-- Second Main Div -->
+                                                    <section class="4u box style3">
+                                                        <br/>
+                                                        <h2>Stephen Giles</h2>
+                                                            <div class="image">
+                                                                <img src="images/author1.jpg"  />
+                                                            </div>
+                                                            <p>The master of all things programming, Stephen has graciously given much of his time to make this site a reality. When not hammering away on a keyboard, Stephen enjoys crafting ninja blades made of the rare Ultima material.</p>
+                                                        <br />
+                                                        <h2>Paul Morrell</h2>
+                                                            <div class="image">
+                                                                <img src="images/author2.png"  />
+                                                            </div>
+                                                            <p>The mold was broken when Paul entered this world. All joking aside, Paul enjoys all types of video games. From the FPS genre to an involving RPG. Lets not forget the indies! Have you played Axiom Verge?! As you can see in the picture above, he has his hands full with this little one. A second PS4 will be needed soon.</p>
+                                                    </section>
+                                                </div>
+                                        </article>
                                     </div>
                                 </div>
                             </div>

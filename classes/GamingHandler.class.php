@@ -7,16 +7,26 @@ include_once 'classes/Utils.class.php';
 
 class GamingHandler
 {    
-    public function LoadUserFriends($dataAccess, $logger, $userID)
+    public function LoadUserFriends($dataAccess, $logger, $userID, $eventId = -1)
     {
+	$eventWhereClause = "";
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+	$parmEventId = null;
+	$queryParms = array($parmUserId);
+		
+	if($eventId > -1) {
+            $eventWhereClause = "AND ((COALESCE(em.`FK_Event_ID`, -1)) = :eventId) ";
+            $parmEventId = new QueryParameter(':eventId', $eventId, PDO::PARAM_INT);
+            array_push($queryParms, $parmEventId);
+	}
+		
         $getUserFriendsQuery = "SELECT uf.`FK_User_ID_Friend` as FriendID, u.`FirstName`, u.`LastName`, u.`UserName` FROM `Gaming.UserFriends` as uf " .
                                "INNER JOIN `Security.Users` as u ON uf.`FK_User_ID_Friend` = u.`ID` " .
-                               "WHERE uf.`FK_User_ID_ThisUser` = :userID " .
+                               "LEFT JOIN `Gaming.EventAllowedMembers` as em ON u.`ID` = em.`FK_User_ID` " .
+                               "WHERE (uf.`FK_User_ID_ThisUser` = :userID) " . $eventWhereClause .
                                "ORDER BY CASE WHEN ((u.`FirstName` IS NOT NULL) AND (LENGTH(u.`FirstName`) > 0)) THEN u.`FirstName` ELSE u.`UserName` END, " .
                                "CASE WHEN ((u.`FirstName` IS NOT NULL) AND (LENGTH(u.`FirstName`) > 0)) THEN u.`LastName` ELSE u.`UserName` END;";
         
-        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-        $queryParms = array($parmUserId);
 	$userFriends = array();
         
         $errors = $dataAccess->CheckErrors();
@@ -42,7 +52,7 @@ class GamingHandler
 	if(strlen($errors) > 0) {
             $logger->LogError("Could not retrieve user friends. " . $errors);
 	}
-			
+				
 	return $userFriends;
     }
 	
@@ -91,12 +101,14 @@ class GamingHandler
         $gameDateValue = "";
         $gameTimeValue = "";
         $eventInfo = null;
+	$eventEditorLineBreak = "";
         
         if(strlen($eventId) > 0) {
             $additionalCSS = "class='box style1'";
             $formName = "eventEditForm"  . $eventId;
             $formButtonName = "editEventBtn" . $eventId;
             $formButtonText = "Update Event";
+            $eventEditorLineBreak = "<br />";
             
             // Load information about this event
             $eventArray = $this->GetUserScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", 
@@ -139,7 +151,7 @@ class GamingHandler
 	if(count($userFriendList) > 0){
             $privateEventOptionDisabled = "";
             $friendListSelect = '';
-            if(($eventInfo != null) && ($eventInfo->IsPublicGame)) {
+            if(($eventInfo != null) && (!$eventInfo->IsPublicGame)) {
                 $privateEventOptionChecked = "checked='checked'";
             }
             
@@ -147,7 +159,7 @@ class GamingHandler
 		$userDisplayName = (strlen($userFriend->FirstName) == 0) ? $userFriend->UserName : $userFriend->FirstName . ' ' . $userFriend->LastName;
 				
 		$userFriendSelected = '';
-		if((strlen($eventId) > 0) /*&&(thisFriendSelected)*/) {
+		if(($eventInfo != null) && (Utils::SearchUserArrayByID($eventInfo->FriendsAllowed, $userFriend->UserID) !== null)) {
                     $userFriendSelected = "checked='checked'";
 		}
 				
@@ -175,7 +187,7 @@ class GamingHandler
                             'type="text" maxlength="50" placeholder=" Date"></p>'.
 			'<p><i class="fa fa-clock-o"></i> &nbsp; Time you want to play<br/>'.
                             '<input id="gameTime' . $eventId . '" name="gameTime' . $eventId . '" ' . $gameTimeValue .
-                            'type="text" maxlength="9" placeholder=" Time">&nbsp;&nbsp;'.
+                            'type="text" maxlength="9" placeholder=" Time">&nbsp;&nbsp;'. $eventEditorLineBreak .
                             $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : -1), $eventId) .
                         '</p>'.
 			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>'. 
@@ -189,19 +201,19 @@ class GamingHandler
                             (($eventInfo != null) ? ($eventInfo->Notes) : '') . '</textarea>'.
                         '</p>'.
 			'<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event</p>'.
-                            '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
-                                $privateEventOptionChecked . ' ' . $privateEventOptionDisabled . 
-                                '>Private Event</input>&nbsp;<input class="selectAllCheckbox" type="checkbox" id="selectAllFriends' . $eventId . '" value="all" ' . 
-                                ((($eventId === 0) || (!$privateEventOptionChecked)) ? 'disabled ' : '') . '>Select all</input>'.
-                            '<div class="fixedHeightScrollableContainer">'. 
-                                $friendListSelect .
-                            '</div>'.
-                            '<br /><br /><button type="submit" class="memberHomeBtn icon fa-cogs" id="' . $formButtonName . '">' . $formButtonText . '</button><br/>'.
+                        '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
+                            $privateEventOptionChecked . ' ' . $privateEventOptionDisabled . 
+                        '>Private Event</input>&nbsp;<input class="selectAllCheckbox" type="checkbox" id="selectAllFriends' . $eventId . '" value="all" ' . 
+                            ((($eventId === 0) || (!$privateEventOptionChecked)) ? 'disabled ' : '') . '>Select all</input>'.
+                        '<div class="fixedHeightScrollableContainer">'. 
+                            $friendListSelect .
+                        '</div>'.
+                        '<br /><br /><button type="submit" class="memberHomeBtn icon fa-cogs" id="' . $formButtonName . '">' . $formButtonText . '</button><br/>'.
                     '</div>'.
 		'</form>'.
             '</section>';
     }
-    
+	
     public function ConstructGameTitleSelectorHTML($dataAccess, $logger, $userID, $eventId, $selectedGameTitle = "")
     {
         $gameSelector = '<select id="ddlGameTitles' . $eventId . '" name="ddlGameTitles' . $eventId . '">';
@@ -371,8 +383,16 @@ class GamingHandler
 
                     if($this->AddUsersToEvent($dataAccess, $logger, $eventID, $joinedUsers))
                     {
-                        if($dataAccess->CommitTransaction())    return "true";
-                        else                                    $errors .= "Could not commit transaction...rolling back";
+			// Add allowed users for this event, if a private event
+			$addedAllowedUsersToEvent = true;
+			if(!$eventGame->IsPublicGame) {
+                            $addedAllowedUsersToEvent = $this->AddAllowedUsersToEvent($dataAccess, $logger, $eventID, $eventGame->FriendsAllowed);
+			}
+						
+			if($addedAllowedUsersToEvent) {
+                            if($dataAccess->CommitTransaction())    return "true";
+                            else                                    $errors .= "Could not commit transaction...rolling back";
+			}
                     }
                 }
             }
@@ -483,6 +503,48 @@ class GamingHandler
 	}
 	
         $logger->LogError("Could not add users to new event [ID = " . $eventID . "]. " . $errors);
+	return false;
+    }
+	
+    public function AddAllowedUsersToEvent($dataAccess, $logger, $eventID, $allowedUsers)
+    {
+        $addAllowedUsersToEventQuery = "INSERT INTO `Gaming.EventAllowedMembers` (`FK_Event_ID`,`FK_User_ID`) VALUES ";
+		
+        $valuesClauseFormat = "(%s, %s)";
+        $eventParmNameFormat = ":eventId%d";
+        $userParmNameFormat = ":FKUserId%d";
+        $queryParms = [];
+
+        // Build insert statement
+        for($i = 0; $i < count($allowedUsers); $i++) {
+            $valuesClauseSuffix = ", ";
+            if($i === (count($allowedUsers) - 1)) {
+                $valuesClauseSuffix = ";";
+            }
+
+            $eventParmName = sprintf($eventParmNameFormat, $i);
+            $userParmName = sprintf($userParmNameFormat, $i);
+            $addAllowedUsersToEventQuery .= (sprintf($valuesClauseFormat, $eventParmName, $userParmName) . $valuesClauseSuffix);
+
+            $parmEventId = new QueryParameter($eventParmName, $eventID, PDO::PARAM_INT);
+            $parmUserId = new QueryParameter($userParmName, $allowedUsers[$i], PDO::PARAM_INT);
+            array_push($queryParms, $parmEventId, $parmUserId);
+        }
+		
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($addAllowedUsersToEventQuery, $queryParms)){
+		$dataAccess->ExecuteNonQuery();
+            }
+				
+            $errors = $dataAccess->CheckErrors();
+
+            if(strlen($errors) == 0) {
+		return true;
+            }
+	}
+	
+        $logger->LogError("Could not add allowed users to new event [ID = " . $eventID . "]. " . $errors);
 	return false;
     }
 	
@@ -644,7 +706,7 @@ class GamingHandler
 		
         $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
                              "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
-                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID " .
+                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsPublic` " .
                              "FROM `Gaming.Events` AS e ".
                              "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
                              "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
@@ -665,10 +727,16 @@ class GamingHandler
 					
 		if($results != null){
                     foreach($results as $row) {
+			// Get user friends allowed to sign up for this event, if it's private
+			$eventAllowedFriends = [];
+			if($row['IsPublic'] == 0) {
+                            $eventAllowedFriends = $this->LoadUserFriends($dataAccess, $logger, $userID, $row['ID']);
+			}
+						
 			// Show event scheduled date to user in standard time format, with no seconds shown, and AM/PM indicator
 			$displayTime = Utils::ConvertMilitaryTimeToStandardTime($row['DisplayTime']);
 						
-                        $userGame = Game::ConstructGameForEvent($row['GameID'], $row['DisplayDate'], $displayTime, $row['RequiredMemberCount'], $row['Notes'], [], 
+                        $userGame = Game::ConstructGameForEvent($row['GameID'], $row['DisplayDate'], $displayTime, $row['RequiredMemberCount'], $row['Notes'], $eventAllowedFriends, 
                                                                 false, $row['TimezoneID'], $row['PlatformID'], $row['GameTitle'], $row['EventScheduledForDate'], $row['Platform'], 
                                                                 $row['TimeZone'], $row['ID']);
 			array_push($userGames, $userGame);

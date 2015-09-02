@@ -19,10 +19,10 @@
                                 <h2>Quick Links</h2>
                                 <ul class="style3">
                                     <li class="icon fa-newspaper-o">
-                                        <a href="" target="" style="text-decoration:none;"> &nbsp Recent News</a>
+                                        <a href="" style="text-decoration:none;"> &nbsp Recent News</a>
                                     </li>
                                     <li class="icon fa-cubes">
-                                        <a href="" target="" style="text-decoration:none;"> &nbsp About Us</a>
+                                        <a href="About.php" style="text-decoration:none;"> &nbsp About Us</a>
                                     </li>
                                 </ul>
                             </section>
@@ -32,10 +32,10 @@
                                 <h2>Contact Us</h2>
                                 <ul class="style3">
                                     <li class="icon fa-envelope">
-                                        <a href="mailto:ProjectOGS@placeholder.com" target="" style="text-decoration:none;"> &nbsp Email</a>
+                                        <a href="mailto:ProjectOGS@placeholder.com" style="text-decoration:none;"> &nbsp Email</a>
                                     </li>
                                     <li class="icon fa-twitch">
-                                        <a href="http://www.twitch.tv/pbmorrell" target="_blank" style="text-decoration:none;"> &nbsp Twitch</a>
+                                        <a href="http://www.twitch.tv/pbmorrell" style="text-decoration:none;"> &nbsp Twitch</a>
                                     </li>
                                 </ul>
                             </section>

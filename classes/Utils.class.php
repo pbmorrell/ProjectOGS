@@ -53,5 +53,19 @@ class Utils
 		
 		return $standardTime;
 	}
+	
+	public static function SearchUserArrayByID($userArray, $id)
+	{
+		$foundUser = null;
+		foreach($userArray as $user)
+		{
+			if($user->UserID === $id) {
+				$foundUser = $user;
+				break;
+			}
+		}
+		
+		return $foundUser;
+	}
 }
 

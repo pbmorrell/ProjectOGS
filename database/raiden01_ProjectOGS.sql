@@ -290,6 +290,16 @@ INSERT INTO `Gaming.EventMembers` (`ID`, `FK_Event_ID`, `FK_User_ID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Gaming.EventAllowedMembers`
+--
+
+CREATE TABLE IF NOT EXISTS `Gaming.EventAllowedMembers` (
+  `ID` bigint(20) NOT NULL,
+  `FK_Event_ID` bigint(20) NOT NULL,
+  `FK_User_ID` bigint(20) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `Gaming.Events`
 --
 
@@ -620,6 +630,12 @@ ALTER TABLE `Gaming.EventMembers`
   ADD PRIMARY KEY (`ID`), ADD KEY `IDX_EventMembers_EventID` (`FK_Event_ID`), ADD KEY `IDX_EventMembers_UserID` (`FK_User_ID`);
 
 --
+-- Indexes for table `Gaming.EventMembers`
+--
+ALTER TABLE `Gaming.EventAllowedMembers`
+  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_EventAllowedMembers_EventID` (`FK_Event_ID`), ADD KEY `IDX_EventAllowedMembers_UserID` (`FK_User_ID`);
+  
+--
 -- Indexes for table `Gaming.Events`
 --
 ALTER TABLE `Gaming.Events`
@@ -730,6 +746,11 @@ ALTER TABLE `Configuration.TimeZones`
 ALTER TABLE `Gaming.EventMembers`
   MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
 --
+-- AUTO_INCREMENT for table `Gaming.EventAllowedMembers`
+--
+ALTER TABLE `Gaming.EventAllowedMembers`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
+--
 -- AUTO_INCREMENT for table `Gaming.Events`
 --
 ALTER TABLE `Gaming.Events`
@@ -803,6 +824,13 @@ ADD CONSTRAINT `FK_GamePlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REF
 ALTER TABLE `Gaming.EventMembers`
 ADD CONSTRAINT `FK_EventMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `Gaming.Events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD CONSTRAINT `FK_EventMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `Gaming.EventAllowedMembers`
+--
+ALTER TABLE `Gaming.EventAllowedMembers`
+ADD CONSTRAINT `FK_EventAllowedMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `Gaming.Events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD CONSTRAINT `FK_EventAllowedMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Gaming.Events`
