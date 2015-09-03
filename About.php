@@ -67,7 +67,7 @@
                                                             <div class="image">
                                                                 <img src="images/author2.png"  />
                                                             </div>
-                                                            <p>The mold was broken when Paul entered this world. All joking aside, Paul enjoys all types of video games. From the FPS genre to an involving RPG. Lets not forget the indies! Have you played Axiom Verge?! As you can see in the picture above, he has his hands full with this little one. A second PS4 will be needed soon.</p>
+                                                            <p>The mold was broken when Paul entered this world. All joking aside, Paul enjoys all types of video games. From the FPS genre to an involving RPG. Lets not forget the indies! Have you played Axiom Verge?!</p>
                                                     </section>
                                                 </div>
                                         </article>
