@@ -39,25 +39,7 @@ function LoadEventEditor()
 }
 
 function LoadEventManager()
-{
-    /* ****************************** OLD WAY (event manager in straight HTML div) *******************************
-    // Make AJAX call to initialize Event Manager
-     $.ajax({
-        type: "POST",
-        url: "AJAXHandler.php",
-        data: "action=EventManagerLoad",
-        success: function(response){
-            $('#manageEventsContent').html(response);
-            EventManagerOnReady();
-        },
-        error: function() {
-            $('#manageEventsContent').html('Unable to load Event Manager...please try again later');
-        }
-    });
-    *********************************************************************************************************** */
-	
-    /* ******************************* NEW WAY (use jTable plugin for event management) *********************** */
-	
+{	
     // Initialize jTable on manageEventsContent div
     $('#manageEventsContent').jtable({
         title: "Events Hosted By You",
