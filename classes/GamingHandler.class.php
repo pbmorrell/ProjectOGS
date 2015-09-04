@@ -236,49 +236,6 @@ class GamingHandler
         return $gameSelector;
     }
 	
-    public function EventManagerLoad($dataAccess, $logger, $userID)
-    {
-        $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID);
-        $scheduledGamesHTML = '<div class="fixedHeightScrollableContainerLarge">';
-        
-        $gameMetadataFormat = '<p><strong>Game:</strong> %s<br/><strong>Platform:</strong> %s<br/><strong>Date:</strong> %s<br/><strong>Time:</strong> %s</p>'.
-                              '<strong>Notes:</strong><br />%s<br /><br />';
-        
-        $playersSignedUpFormat = '<h3>(%d) players currently signed up:</h3>'.
-                                 '<p><div class="fixedHeightScrollableContainer">';
-        $playerFormat = '%s<br>';
-	
-        $footerFormat = '</div></p>'.
-                        '<footer>'.
-                            '<a onclick="return EditEvent(%d);" href="#" class="button icon fa-wrench">Edit Event</a>'.
-                        '</footer><br/><br/>';
-        
-        foreach($scheduledGames as $game) {
-            $scheduledGamesHTML .= sprintf($gameMetadataFormat, $game->Name, $game->SelectedPlatformText, $game->ScheduledDate,
-                                           $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText, $game->Notes);
-            
-            $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $game->EventID);
-            $scheduledGamesHTML .= sprintf($playersSignedUpFormat, count($playersSignedUp));
-            
-            $playersHTML = '';
-            foreach($playersSignedUp as $player) {
-                $playersHTML .= sprintf($playerFormat, $player);
-            }
-            
-            $scheduledGamesHTML .= $playersHTML;
-            $scheduledGamesHTML .= sprintf($footerFormat, $game->EventID);
-        }
-		
-	// Return Event Manager HTML
-	return
-            '<section>'.
-                '<article class="box style2">'.
-                    '<span class="byline">(' . count($scheduledGames) . ') Scheduled</span><br /><br />'.
-                    $scheduledGamesHTML . '</div>'.
-                '</article>'.
-            '</section>';
-    }
-	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, 
                                            $pageSize, $showHiddenEvents)
     {
