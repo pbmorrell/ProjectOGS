@@ -35,7 +35,7 @@
                     <div class="12u">
 			<div id="main">
                             <div class="row">
-                                <div class="3u">						
+                                <div class="controlPanelSection">						
                                     <!-- Content -->
                                     <div id="content">							
                                         <section class="box ctaz">
@@ -65,7 +65,7 @@
                                         </section>				
                                     </div>
 				</div>
-				<div id="scheduleEventDiv" class="9u">
+				<div id="scheduleEventDiv" class="eventManagerSection">
                                     <section class="box style1">
                                         <h2>
                                             Schedule an Event
@@ -80,6 +80,7 @@
 				<div id="manageEventsDiv" class="9u">
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
+                                        <label style="float:right;"><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label><br />
                                         <div id="manageEventsContent">
                                         </div>
                                     </section>

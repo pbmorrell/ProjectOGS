@@ -34,7 +34,7 @@ class Logger
     {
         $success = false;
 		
-		try {
+	try {
             $logToDBQuery = "INSERT INTO `Administration.Logging`(`Category`, `Title`, `Message`) " .
                             "VALUES(:category, :title, :message);";
 		
@@ -51,20 +51,20 @@ class Logger
                     if($results != null) {
                         $success = true;
                     }
-				}
+		}
 				
-				$errors = $this->dataAccess->CheckErrors();
+		$errors = $this->dataAccess->CheckErrors();
             }
-		}
-		catch(Exception $e) {
-			var_dump($e->getMessage());
-		}
+	}
+	catch(Exception $e) {
+            var_dump($e->getMessage());
+	}
         
-        if(!success) {
+        if(!$success) {
             $message = "Error occurred when attempting to log message to DB: '" . $errors . "'. Original message: " . $message;
         }
         
-        return success;
+        return $success;
     }
     
     public function LogToFile($message, $category)

@@ -112,7 +112,7 @@ class GamingHandler
             
             // Load information about this event
             $eventArray = $this->GetUserScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", 
-                                                       false, "0", "10", $eventId);
+                                                       false, "0", "10", $eventId, true);
             if(count($eventArray) > 0) {
                 $eventInfo = $eventArray[0];
                 $gameDateValue = 'value="' . $eventInfo->ScheduledDate . '" ';
@@ -279,9 +279,11 @@ class GamingHandler
             '</section>';
     }
 	
-    public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize)
+    public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, 
+                                           $pageSize, $showHiddenEvents)
     {
-        $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+        $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
+                                                       $startIndex, $pageSize, -1, $showHiddenEvents);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -295,7 +297,8 @@ class GamingHandler
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-                "Edit" => ''
+                "Edit" => '',
+		"Hidden" => !$game->Visible ? "hidden" : ""
             );
 
             array_push($rows, $row);
@@ -398,7 +401,7 @@ class GamingHandler
             }
         }
 	
-        // Failed to add new game title, event, and/or initial event member -- roll back everything
+        // Failed to add new game title, create event, add initial event member, or add allowed event members -- roll back everything
         if($dataAccess->CheckIfInTransaction())
         {
             $dataAccess->RollbackTransaction();
@@ -435,6 +438,104 @@ class GamingHandler
 	}
         
         return $genreID;
+    }
+
+    public function EventEditorUpdateEvent($dataAccess, $logger, $userID, $eventGame)
+    {
+        $gameIDCol = "`FK_UserGames_ID`";
+        $genreID = NULL;
+        $genreParamType = PDO::PARAM_NULL;
+		
+	// If user entered a game title that doesn't currently exist in the system,
+	// add it to the UserGames table and retrieve the inserted ID
+        if(!$eventGame->IsExistingTitle) {
+            // Wrap UserGames, Events, and EventMembers inserts in transaction
+            if($dataAccess->BeginTransaction()) {
+		$eventGame->GameID = $this->AddNewGameToUserGameList($dataAccess, $logger, $userID, $eventGame->Name);
+            }
+            else {
+		$logger->LogError("Could not begin transaction to add user game title to UserGames. Exception: " . $dataAccess->CheckErrors());
+            }
+        }
+        else if($eventGame->IsGlobalGameTitle) {
+            $gameIDCol = "`FK_Game_ID`";
+            
+            // If user selected a system game title, get the genre associated with this title (if available)
+            $genreID = $this->GetGameTitleAssociatedGenre($dataAccess, $logger, $eventGame->GameID);
+        }
+        
+        if(($genreID != NULL) && ($genreID >= 0)) {
+            $genreParamType = PDO::PARAM_INT;
+        }
+		
+	// Format display time: convert to military time (24-hr clock) for DB storage
+	$eventGame->ScheduledTime = Utils::ConvertStandardTimeToMilitaryTime($eventGame->ScheduledTime);
+        
+        // Build query to update event
+        $updateEventQuery = "UPDATE `Gaming.Events` SET " .
+                            "`FK_User_ID_EventCreator`=:FKUserEventCreator," . $gameIDCol . "=:FKGameId," .
+                            "`FK_Genre_ID`=:FKGenreID,`FK_Platform_ID`=:FKPlatformID,`FK_Timezone_ID`=:FKTimezoneID," .
+                            "`EventModifiedDate`=SYSDATE(),`EventScheduledForDate`=:EventScheduledForDate," .
+                            "`RequiredMemberCount`=:RequiredMemberCount,`IsActive`=1,`IsPublic`=:IsPublic," .
+                            "`Notes`=:notes,`DisplayDate`=:displayDate,`DisplayTime`=:displayTime " .
+                            "WHERE `ID`=:eventId;";
+		
+	$parmEventCreatorUserId = new QueryParameter(':FKUserEventCreator', $userID, PDO::PARAM_INT);
+	$parmGameId = new QueryParameter(':FKGameId', $eventGame->GameID, PDO::PARAM_INT);
+        $parmGenreId = new QueryParameter(':FKGenreID', $genreID, $genreParamType);
+        $parmPlatformId = new QueryParameter(':FKPlatformID', $eventGame->SelectedPlatformID, PDO::PARAM_INT);
+        $parmTimezoneId = new QueryParameter(':FKTimezoneID', $eventGame->ScheduledTimeZoneID, PDO::PARAM_INT);
+        $parmEventScheduledForDate = new QueryParameter(':EventScheduledForDate', $eventGame->ScheduledDateUTC, PDO::PARAM_STR);
+        $parmRequiredMemberCount = new QueryParameter(':RequiredMemberCount', $eventGame->RequiredPlayersCount, PDO::PARAM_INT);
+        $parmIsPublicEvent = new QueryParameter(':IsPublic', $eventGame->IsPublicGame ? 1 : 0, PDO::PARAM_INT);
+        $parmNotes = new QueryParameter(':notes', $eventGame->Notes, PDO::PARAM_STR);
+	$parmDisplayDate = new QueryParameter(':displayDate', $eventGame->ScheduledDate, PDO::PARAM_STR);
+	$parmDisplayTime = new QueryParameter(':displayTime', $eventGame->ScheduledTime, PDO::PARAM_STR);
+        $parmEventId = new QueryParameter(':eventId', $eventGame->EventID, PDO::PARAM_INT);
+        
+	$queryParms = array($parmEventCreatorUserId, $parmGameId, $parmGenreId, $parmPlatformId, $parmTimezoneId, $parmEventScheduledForDate,
+                            $parmRequiredMemberCount, $parmIsPublicEvent, $parmNotes, $parmDisplayDate, $parmDisplayTime, $parmEventId);
+			
+	$errors = $dataAccess->CheckErrors();
+
+	if(strlen($errors) == 0) {
+            if(!$dataAccess->CheckIfInTransaction())
+            {
+		if(!$dataAccess->BeginTransaction()) {
+                    $errors .= "Could not begin transaction...unable to create event";
+		}
+            }
+				
+            $errors .= $dataAccess->CheckErrors();
+			
+            if(strlen($errors) == 0) {
+                if($dataAccess->BuildQuery($updateEventQuery, $queryParms)){
+                    $dataAccess->ExecuteNonQuery();
+
+                    // Update allowed users for this event, if a private event
+                    $updatedAllowedUsersForEvent = true;
+                    if(!$eventGame->IsPublicGame) {
+                        $replaceWithCurrentSet = true;
+                        $updatedAllowedUsersForEvent = $this->AddAllowedUsersToEvent($dataAccess, $logger, $eventGame->EventID, 
+                                                                                     $eventGame->FriendsAllowed, $replaceWithCurrentSet);
+                    }
+
+                    if($updatedAllowedUsersForEvent) {
+                        if($dataAccess->CommitTransaction())    return "true";
+                        else                                    $errors .= "Could not commit transaction...rolling back";
+                    }
+                }
+            }
+        }
+	
+        // Failed to add new game title, update event, and/or update allowed event members -- roll back everything
+        if($dataAccess->CheckIfInTransaction())
+        {
+            $dataAccess->RollbackTransaction();
+        }
+	
+        $logger->LogError("Could not update event for game '" . $eventGame->Name . "'. " . $errors);
+	return "System Error: Could not update event for game '" . $eventGame->Name . "'. Please try again later";
     }
     
     private function AddNewGameToUserGameList($dataAccess, $logger, $userID, $gameName)
@@ -506,8 +607,29 @@ class GamingHandler
 	return false;
     }
 	
-    public function AddAllowedUsersToEvent($dataAccess, $logger, $eventID, $allowedUsers)
+    public function AddAllowedUsersToEvent($dataAccess, $logger, $eventID, $allowedUsers, $replaceWithCurrentSet = false)
     {
+        $errors = "";
+        if($replaceWithCurrentSet) {
+            $deleteQuery = "DELETE FROM `Gaming.EventAllowedMembers` WHERE `FK_Event_ID`=:eventId;";
+            $parmEventId = new QueryParameter(':eventId', $eventID, PDO::PARAM_INT);
+            $deleteQueryParms = array($parmEventId);
+            
+            $errors = $dataAccess->CheckErrors();
+            if(strlen($errors) == 0) {
+                if($dataAccess->BuildQuery($deleteQuery, $deleteQueryParms)){
+                    $dataAccess->ExecuteNonQuery();
+                }
+
+                $errors = $dataAccess->CheckErrors();
+
+                if(strlen($errors) > 0) {
+                    $logger->LogError("Could not update allowed users for event [ID = " . $eventID . "]. " . $errors);
+                    return false;
+                }
+            }
+        }
+        
         $addAllowedUsersToEventQuery = "INSERT INTO `Gaming.EventAllowedMembers` (`FK_Event_ID`,`FK_User_ID`) VALUES ";
 		
         $valuesClauseFormat = "(%s, %s)";
@@ -546,6 +668,42 @@ class GamingHandler
 	
         $logger->LogError("Could not add allowed users to new event [ID = " . $eventID . "]. " . $errors);
 	return false;
+    }
+	
+    public function EventEditorToggleEventVisibility($dataAccess, $logger, $eventID, $isActive)
+    {
+	$updateSuccess = false;
+	$eventToggleName = "hidden";
+	if($isActive === "1") {
+            $eventToggleName = "visible";
+	}
+		
+	$updateEventQuery = "UPDATE `Gaming.Events` SET `IsActive` = :isActive WHERE `ID` = :eventId;";
+				
+	$parmIsActive = new QueryParameter(':isActive', $isActive, PDO::PARAM_INT);
+	$parmEventId = new QueryParameter(':eventId', $eventID, PDO::PARAM_INT);
+	$queryParms = array($parmIsActive, $parmEventId);
+			
+	$errors = $dataAccess->CheckErrors();
+			
+	if(strlen($errors) == 0) {
+            try {				
+		if($dataAccess->BuildQuery($updateEventQuery, $queryParms)){
+                    $updateSuccess = $dataAccess->ExecuteNonQuery();
+		}
+
+		$errors = $dataAccess->CheckErrors();
+            }
+            catch(Exception $e) {
+		$logger->LogError("Could not update visibility for event ID '" . $eventID . "'. Exception: " . $e->getMessage());
+            }
+	}
+			
+	if(!$updateSuccess) {
+            $logger->LogError("Could not update visibility for event ID '" . $eventID . "'. " . $errors);
+	}
+				
+	return $updateSuccess ? "SUCCESS: Updated event to be " . $eventToggleName : "SYSTEM ERROR: Could not make event " . eventToggleName . ". Please try again later.";
     }
 	
     public function GetTimezoneList($dataAccess, $selectedTimeZoneID, $eventId = '')
@@ -684,7 +842,7 @@ class GamingHandler
     }
 	
     public function GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
-                                          $paginationEnabled = false, $startIndex = "0", $pageSize = "10", $eventId = -1)
+                                          $paginationEnabled = false, $startIndex = "0", $pageSize = "10", $eventId = -1, $showHiddenEvents = false)
     {
 	$limitClause = "";
 	if($paginationEnabled) {
@@ -697,23 +855,29 @@ class GamingHandler
         $eventWhereClause = "";
         $parmEventId = null;
 	if($eventId > -1) {
-            $eventWhereClause = "AND (e.`ID` = :eventId) ";
+            $eventWhereClause .= "AND (e.`ID` = :eventId) ";
             $parmEventId = new QueryParameter(':eventId', $eventId, PDO::PARAM_INT);
             array_push($queryParms, $parmEventId);
+        }
+        
+        $parmIsActive = null;
+        if(!$showHiddenEvents) {
+            $eventWhereClause .= "AND (e.`IsActive` = :isActive) ";
+            $parmIsActive = new QueryParameter(':isActive', 1, PDO::PARAM_INT);
+            array_push($queryParms, $parmIsActive);
         }
         
 	$orderByClause = "ORDER BY " . $this->TranslateOrderByToQueryOrderByClause($orderBy);
 		
         $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
                              "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
-                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsPublic` " .
+                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsPublic`, e.`IsActive` " .
                              "FROM `Gaming.Events` AS e ".
                              "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
                              "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
                              "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
                              "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
-                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " .
-                             "AND (e.`IsActive` = 1) " . $eventWhereClause .
+                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " . $eventWhereClause .
                              "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) " . // Only show future events
                              $orderByClause . " " . $limitClause . ";";
         
@@ -738,7 +902,7 @@ class GamingHandler
 						
                         $userGame = Game::ConstructGameForEvent($row['GameID'], $row['DisplayDate'], $displayTime, $row['RequiredMemberCount'], $row['Notes'], $eventAllowedFriends, 
                                                                 false, $row['TimezoneID'], $row['PlatformID'], $row['GameTitle'], $row['EventScheduledForDate'], $row['Platform'], 
-                                                                $row['TimeZone'], $row['ID']);
+                                                                $row['TimeZone'], $row['ID'], $row['IsActive'] == '1' ? true : false);
 			array_push($userGames, $userGame);
                     }
 		}

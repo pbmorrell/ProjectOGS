@@ -313,6 +313,7 @@
     {
         background: #32353a;
         color: #fff;
+        padding: 1em 1em 1em 0.75em !important;
     }
 
     .memberHomeBtn {
@@ -508,6 +509,13 @@
         min-height: 2.3em;
     }*/
 
+    .controlPanelSection {
+	width: 23%;
+    }
+    .eventManagerSection {
+	width: 77%;
+    }
+	
     .offPage {
         position: absolute;
         bottom: 100%;

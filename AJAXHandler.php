@@ -329,7 +329,7 @@
             case "EventEditorLoad":
 		$eventId = '';
 		if(isset($_GET['EventID'])) {
-            $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
+                    $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
 		}             
 
 		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);
@@ -345,6 +345,29 @@
 
                 echo $gamingHandler->EventEditorCreateEvent($dataAccess, $logger, $objUser->UserID, $eventGame);
                 break;
+            case "EventEditorUpdateEvent":
+                $eventId = $_POST['eventId'];
+                $gameTitleId = trim($_POST['ddlGameTitles'.$eventId]);
+                $gameDate = $_POST['gameDate'.$eventId];
+                $gameTime = $_POST['gameTime'.$eventId];
+                $gamePlayersNeeded = $_POST['gamePlayersNeeded'.$eventId];
+                $message = trim($_POST['message'.$eventId]);
+                $pvtEventFriends = $_POST['pvtEventFriends'.$eventId];
+                $ddlTimeZonesId = $_POST['ddlTimeZones'.$eventId];
+                $ddlPlatformsId = $_POST['ddlPlatforms'.$eventId];
+                
+                $eventGame = Game::ConstructGameForEvent($gameTitleId, $gameDate, $gameTime, $gamePlayersNeeded, $message, $pvtEventFriends,
+                                                         $_POST['isGlobalGame'] == 'true' ? true : false, $ddlTimeZonesId, 
+                                                         $ddlPlatformsId, $_POST['gameTitle'], $_POST['gameDateUTC'], '', '', $eventId);
+
+                echo $gamingHandler->EventEditorUpdateEvent($dataAccess, $logger, $objUser->UserID, $eventGame);
+                break;
+            case "EventEditorToggleEventVisibility":
+                echo $gamingHandler->EventEditorToggleEventVisibility($dataAccess, $logger, $_POST['eventId'], $_POST['isActive']);
+                break;
+            case "EventEditorDeleteEvent":
+                echo $gamingHandler->EventEditorDeleteEvent($dataAccess, $logger, $objUser->UserID, $_POST['eventId']);
+                break;
             case "ReloadGameTitleSelector":
 		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID);
 		break;
@@ -353,10 +376,12 @@
 		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
 		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
+                
+                $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
+                $showHiddenEvents = ($showHidden === "1") ? true : false;
 			
-		//$logLine = sprintf("OrderBy: %s; StartIndex: %s; PageSize: %s; PaginationEnabled: %s", $orderBy, $startIndex, $pageSize, $paginationEnabled == true ? "true" : "false");
-		//$logger->LogInfo($logLine);
-		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
+                                                            $startIndex, $pageSize, $showHiddenEvents);
                 break;
         }
     }

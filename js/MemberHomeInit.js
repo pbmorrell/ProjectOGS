@@ -7,6 +7,8 @@ var panelEnum = {
 };
 
 var activePanel = panelEnum.CurrentEventFeed; 
+var eventManagerLoadAction = 'GetUserOwnedEventsForJTable';
+var eventManagerShowHiddenEvents = 0;
 
 // Functions
 function MemberHomeOnReady()
@@ -65,7 +67,7 @@ function LoadEventManager()
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
         actions: {
-            listAction: 'AJAXHandler.php?action=GetUserOwnedEventsForJTable'
+            listAction: "AJAXHandler.php"
         },
         fields: {
             ID: {
@@ -79,7 +81,7 @@ function LoadEventManager()
             },
             Platform: {
                 title: 'Console',
-                width: '10%',
+                width: '9%',
                 sorting: true
             },
             DisplayDate: {
@@ -99,12 +101,12 @@ function LoadEventManager()
             },
             PlayersSignedUp: {
                 title: 'Players Joined',
-                width: '13%',
+                width: '11%',
                 sorting: false
             },
             Edit: {
-                title: 'Edit Event',
-                width: '10%',
+                title: 'Edit',
+                width: '6%',
                 display: function (data) {
                     var $editImage = $('<img src="images/edit.png" rel="' + data.record.ID + '" />');
                     $editImage.click(function () {
@@ -116,57 +118,141 @@ function LoadEventManager()
                     return $editImage;
                 },
                 sorting: false
+            },
+            Hidden: {
+                title: 'Hidden',
+                width: '7%',
+                display: function (data) {
+                    var checkedVal = "";
+                    if(data.record.Hidden === 'hidden') {
+			checkedVal = " checked='checked'";
+                    }
+					
+                    var $hiddenCheckbox = $('<input type="checkbox" id="hiddenEvent' + data.record.ID + '"' + checkedVal + ' rel="' + data.record.ID + '" />');
+                    $hiddenCheckbox.change(function () {
+                        var eventId = $(this).attr('rel');
+			var isActive = $(this).is(':checked') ? '0' : '1';
+                        var result = ToggleEventVisibility(eventId, isActive);
+                        
+                        if(!result) {
+                            // Reject checked changed event (restore previous checked state)
+                            if(isActive) {
+                                $(this).prop('checked', true);
+                            }
+                            else {
+                                $(this).prop('checked', false);
+                            }
+                        }
+                    });
+
+                    // Return checkbox HTML for display in jTable
+                    return $hiddenCheckbox;
+                },
+                sorting: false
             }
         }
     });
 
     // Load event list
-    $('#manageEventsContent').jtable('load');
+    var postData = 
+        {
+            action: eventManagerLoadAction,
+            showHidden: eventManagerShowHiddenEvents
+        };
+    $('#manageEventsContent').jtable('load', postData);
 
+    // Execute any post-startup logic
+    EventManagerOnReady();
     /* ******************************************************************************************************** */
 }
 
 function EventManagerOnReady()
 {
-    
+    $('#toggleHiddenEvents').change(function() {
+            eventManagerShowHiddenEvents = ($(this).is(':checked')) ? 1 : 0;
+            var fullRefresh = true;
+            ReloadUserHostedEventsTable(fullRefresh);
+        }
+    );
 }
 
-function ReloadGameTitleSelector()
+function ReloadGameTitleSelector(eventId)
 {
+    var eventIdSuffix = "";
+    if(eventId > -1) {
+        eventIdSuffix = eventId.toString();
+    }
+    
     // Make AJAX call to refresh game title selector
     $.ajax({
         type: "POST",
         url: "AJAXHandler.php",
         data: "action=ReloadGameTitleSelector",
         success: function(response){
-            $('#gameSelectorDiv').html(response);
+            $('#gameSelectorDiv' + eventIdSuffix).html(response);
             
             // Convert reloaded game selector dropdown list to a jQuery-powered comboBox for game title selection or entry
-            PrepareAutocompleteComboBox("selGameTitle");
-            $('#ddlGameTitles').combobox();
+            PrepareAutocompleteComboBox("selGameTitle" + eventIdSuffix);
+            $('#ddlGameTitles' + eventIdSuffix).combobox();
         },
         error: function() {
-            var dfltSelectHtml =    '<select id="ddlGameTitles" name="ddlGameTitles">' +
+            var dfltSelectHtml =    '<select id="ddlGameTitles' + eventIdSuffix + '" name="ddlGameTitles' + eventIdSuffix + '">' +
                                         '<option value="-1" class="globalGameOption">' + 
                                             'Unable to reload game title selector...please try again later' + 
                                         '</option>' +
                                     '</select>';
 								 
-            $('#gameSelectorDiv').html(dfltSelectHtml);
+            $('#gameSelectorDiv' + eventIdSuffix).html(dfltSelectHtml);
         }
     });
 }
 
-function ReloadUserHostedEventsTable()
+function ToggleEventVisibility(eventId, isActive)
 {
-    // Reload event list
-    $('#manageEventsContent').jtable('load');
+    var actionText = "hide this event";
+    if(isActive === '1') {
+        actionText = "make this event visible";
+    }
+	
+    if(confirm('Are you sure you want to ' + actionText + '?')) {
+	// Make AJAX call to set event Active status to false
+	$.ajax({
+            type: "POST",
+            url: "AJAXHandler.php",
+            data: "action=EventEditorToggleEventVisibility&eventId=" + eventId + "&isActive=" + isActive,
+            success: function(response){
+                alert(response);
+            }
+        });
+        
+        return true;
+    }
+    else {
+        // Restore checkbox to previous state
+        return false;
+    }
+}
+
+function ReloadUserHostedEventsTable(fullRefresh)
+{
+    if(fullRefresh) {
+        var postData = 
+            {
+                action: eventManagerLoadAction,
+                showHidden: eventManagerShowHiddenEvents
+            };
+        $('#manageEventsContent').jtable('load', postData);   
+    }
+    else {
+        // Reload event list with same POST arguments
+        $('#manageEventsContent').jtable('reload');
+    }
 }
 
 function DisplayEditEventDialog(eventId)
 {
     var $dialog = $('<div></div>').load('AJAXHandler.php?action=EventEditorLoad&EventID=' + eventId, 
-                                        function() { EventSchedulerDialogOnReady(eventId); }).dialog({
+                                        function() { EventSchedulerDialogOnReady(eventId, $dialog); }).dialog({
             autoOpen: false,
             title: 'Edit Event',
             width: 600,
@@ -273,8 +359,13 @@ function EventSchedulerOnReady()
     }
 }
 
-function EventSchedulerDialogOnReady(eventId)
+function EventSchedulerDialogOnReady(eventId, $dialog)
 {
+    var eventIdSuffix = "";
+    if(eventId > -1) {
+        eventIdSuffix = eventId.toString();
+    }
+	
     // Create jQuery-powered comboBox for game title selection or entry
     PrepareAutocompleteComboBox("selGameTitle" + eventId);
     $('#ddlGameTitles' + eventId).combobox();
@@ -336,8 +427,16 @@ function EventSchedulerDialogOnReady(eventId)
 
     // Attach event handler to Edit Event button
     $('#editEventBtn' + eventId).click(function() {
-        return EditEvent(eventId);
+        return EditEvent(eventId, $dialog);
     });
+	
+    // Change dialog title to Editing Event: 'game' @ 'datetime'
+    var selGameTitle = $('#selGameTitle' + eventIdSuffix).val();
+    var gameDate = $('#gameDate' + eventIdSuffix).val();
+    var gameTime = $('#gameTime' + eventIdSuffix).val();
+	
+    var title = 'Editing Event: "' + selGameTitle + '" @ ' + gameDate + ' ' + gameTime;
+    $dialog.dialog('option', 'title', title);
 }
 
 function ToggleControlPanelDisplay(panelToToggle)
@@ -361,63 +460,130 @@ function ToggleControlPanelDisplay(panelToToggle)
     return false;
 }
 
-function EditEvent(eventId)
+function ValidateEventFormFields(eventId)
 {
-    alert('Editing event ' + eventId);
-    return false;
-}
-
-function CreateEvent()
-{
-    var gameDate = $('#gameDate').val();
-    var gameTime = $('#gameTime').val();
-    var gameTimezone = $('#ddlTimeZones option:selected').text();
+    var alertTextType = "create";
+    var eventIdSuffix = "";
+    if(eventId > -1) {
+        alertTextType = "update";
+        eventIdSuffix = eventId.toString();
+    }
+  
+    var numPlayersNeeded = $('#gamePlayersNeeded' + eventIdSuffix).val();
+    var numPlayersAllowed = $("input[name='pvtEventFriends" + eventIdSuffix + "[]']:checked").length;
+    var gameDate = $('#gameDate' + eventIdSuffix).val();
+    var gameTime = $('#gameTime' + eventIdSuffix).val();
+    var gameTimezone = $('#ddlTimeZones'  + eventIdSuffix + ' option:selected').text();
     var displayDatetime = gameDate + " " + gameTime + " " + gameTimezone;
     
-    var comments = $('#message').val();
-    var isGlobalGame = $('#ddlGameTitles option:selected').attr('class') == "globalGameOption" ? "true" : "false";
-	var isExistingGame = (($('#ddlGameTitles').val() != null) && ($('#ddlGameTitles').val().length > 0));
+    var comments = $('#message' + eventIdSuffix).val();
+    var isGlobalGame = $('#ddlGameTitles' + eventIdSuffix + ' option:selected').attr('class') == "globalGameOption" ? "true" : "false";
+    var isExistingGame = (($('#ddlGameTitles' + eventIdSuffix).val() != null) && ($('#ddlGameTitles' + eventIdSuffix).val().length > 0));
 	
+    var curMoment = moment().utc();
+    var eventInfo = new EventFormInfo(displayDatetime, comments, isGlobalGame, isExistingGame, curMoment, $('#selGameTitle' + eventIdSuffix).val());
+        
     // Regular expression for time format
     var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
 
     // Verify that required fields are filled out and have valid data
     if(gameDate.length === 0) {
-        alert("Unable to create event: Must select a date");
+        alert("Unable to " + alertTextType + " event: Must select a date");
     } else if (gameTime.length === 0) {
-        alert("Unable to create event: Must select a time");
+        alert("Unable to " + alertTextType + " event: Must select a time");
     } else if (!gameTime.match(regexTime)) {
-        alert("Unable to create event: Must enter a valid time");
+        alert("Unable to " + alertTextType + " event: Must enter a valid time");
     } else if (comments.trim().length === 0) {
-        alert("Unable to create event: Please enter notes about your event");
+        alert("Unable to " + alertTextType + " event: Please enter notes about your event");
+    } else if (numPlayersNeeded > numPlayersAllowed) {
+        alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
     } else {
         var curDateMoment = moment().utc();
         var gameDateWithTZ = moment.tz(gameDate + " " + gameTime, "YYYY-MM-DD h:mmA", gameTimezone);
         var gameTimeMoment = moment(gameDateWithTZ).utc();
+        eventInfo.gameTimeMoment = gameTimeMoment;
 
         if (gameTimeMoment.isBefore(curDateMoment)) {
-            alert("Unable to create event: Scheduled game time '" + displayDatetime + "' is in the past");
-            return false;
+            alert("Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past");
         }
+        else {
+            eventInfo.validated = true;
+        }
+    }
+    
+    return eventInfo;
+}
 
+function EventFormInfo(displayDatetime, comments, isGlobalGame, isExistingGame, gameTimeMoment, selGameTitle)
+{
+    this.displayDatetime = displayDatetime;
+    this.comments = comments;
+    this.isGlobalGame = isGlobalGame;
+    this.isExistingGame = isExistingGame;
+    this.gameTimeMoment = gameTimeMoment;
+    this.selGameTitle = selGameTitle;
+    this.validated = false;
+}
+
+function EditEvent(eventId, $dialog)
+{
+    var eventInfo = ValidateEventFormFields(eventId);
+    
+    if(eventInfo.validated) {
+        $.ajax({
+            type: "POST",
+            url: "AJAXHandler.php",
+            data: "action=EventEditorUpdateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
+                  "&eventId=" + eventId + "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventEditForm' + eventId).serialize(),
+            success: function(response){
+                if(response === 'true') {
+                    // Reload event manager
+                    var fullRefresh = false;
+                    ReloadUserHostedEventsTable(fullRefresh);
+
+                    // Reload game title dropdown, if user entered a new game
+                    if(!eventInfo.isExistingGame) {
+                        ReloadGameTitleSelector(eventId);
+                    }
+
+                    alert('Success - Updated event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    $dialog.dialog('close');
+                }
+                else {
+                    alert(response);
+                }
+            }
+        });
+    }
+
+    return false;
+}
+
+function CreateEvent()
+{
+    var eventId = -1;
+    var eventInfo = ValidateEventFormFields(eventId);
+
+    if(eventInfo.validated) {
         // Create event
         $.ajax({
             type: "POST",
             url: "AJAXHandler.php",
-            data: "action=EventEditorCreateEvent&isGlobalGame=" + isGlobalGame + "&gameTitle=" + $('#selGameTitle').val() + 
-                  "&gameDateUTC=" + gameTimeMoment.toISOString() + "&" + $('#eventCreateForm').serialize(),
+            data: "action=EventEditorCreateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
+                  "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventCreateForm').serialize(),
             success: function(response){
                 if(response === 'true') {
                     // Reload event manager
-                    //LoadEventManager();
-                    ReloadUserHostedEventsTable();
+                    var fullRefresh = false;
+                    ReloadUserHostedEventsTable(fullRefresh);
 
                     // Reload game title dropdown, if user entered a new game
-                    if(!isExistingGame) {
-			ReloadGameTitleSelector();
+                    /* *** This will not be needed when Create Event is moved to modal popup from main jTable screen *** */
+                    if(!eventInfo.isExistingGame) {
+			ReloadGameTitleSelector(eventId);
                     }
 					
-                    alert('Success - Created event for game "' + $('#selGameTitle').val() + '" at ' + displayDatetime + '!');
+                    alert('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
                 }
                 else {
                     alert(response);
