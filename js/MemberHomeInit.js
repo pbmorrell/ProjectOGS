@@ -78,6 +78,7 @@ function LoadEventManager()
 			var tableRow = $(this).closest('tr');
                         var curLblId = "#lblEvt" + data.record.ID;
                         
+                        // If we are just toggling the current child table display, close it, change icon back to + (expand), and return
                         if($('#manageEventsContent').jtable('isChildRowOpen', tableRow)) {
                             $('#manageEventsContent').jtable('closeChildTable', tableRow);
                             $(curLblId).attr('class', 'fa fa-plus-square');
