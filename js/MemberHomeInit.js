@@ -72,12 +72,20 @@ function LoadEventManager()
                 title: 'Players Joined',
                 width: '11%',
                 display: function (data) {
-                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label class="fa fa-plus-square" /></label>');
+                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblEvt' + data.record.ID + '" class="fa fa-plus-square" /></label>');
                     $expandImage.click(function () {
                         var eventId = data.record.ID;
 			var tableRow = $(this).closest('tr');
+                        var curLblId = "#lblEvt" + data.record.ID;
                         
-                        OpenChildTableForJoinedPlayers(tableRow, eventId);
+                        if($('#manageEventsContent').jtable('isChildRowOpen', tableRow)) {
+                            $('#manageEventsContent').jtable('closeChildTable', tableRow);
+                            $(curLblId).attr('class', 'fa fa-plus-square');
+                            return;
+                        }
+                        else {
+                            OpenChildTableForJoinedPlayers(tableRow, eventId);
+                        }
                     });
 
                     // Return image for display in jTable
@@ -157,15 +165,17 @@ function EventManagerOnReady()
 }
 
 function OpenChildTableForJoinedPlayers(tableRow, eventId)
-{
-    if($('#manageEventsContent').jtable('isChildRowOpen', tableRow)) {
-        $('#manageEventsContent').jtable('closeChildTable', tableRow);
-        return;
-    }
-    
+{    
+    // Close all other child tables (accordion-style)
     tableRow.siblings('.jtable-data-row').each(function () {
         $('#manageEventsContent').jtable('closeChildTable', $(this));
     });
+    
+    // Change all event row child table toggle icons to "+" (expand)
+    $('.fa.fa-minus-square').each(function() {
+            $(this).attr('class', 'fa fa-plus-square')
+        }
+    );
     
     $('#manageEventsContent').jtable('openChildTable', tableRow,
 	{
@@ -200,6 +210,9 @@ function OpenChildTableForJoinedPlayers(tableRow, eventId)
                             $(this).addClass('jTableChild');
                         }
                     );
+            
+                    // Change expand icon to collapse icon for this child table's parent row
+                    $("#lblEvt" + eventId).attr('class', 'fa fa-minus-square');
                 }
             );
 	}
