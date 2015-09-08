@@ -1,7 +1,6 @@
 // Globals
 var panelEnum = {
     None: 'None',
-    EventScheduler: '#scheduleEventDiv',
     MyEventViewer: '#manageEventsDiv',
     CurrentEventFeed: '#currentEventsDiv'
 };
@@ -13,41 +12,28 @@ var eventManagerShowHiddenEvents = 0;
 // Functions
 function MemberHomeOnReady()
 {
-    $(panelEnum.EventScheduler).addClass('hidden');
     $(panelEnum.MyEventViewer).addClass('hidden');
-	
-    LoadEventEditor();
     LoadEventManager();
-    
-}
-
-function LoadEventEditor()
-{
-    // Make AJAX call to initialize Event Scheduler
-    $.ajax({
-        type: "POST",
-        url: "AJAXHandler.php",
-        data: "action=EventEditorLoad&EventID=0",
-        success: function(response){
-            $('#scheduleEventContent').html(response);
-            EventSchedulerOnReady();
-        },
-        error: function() {
-            $('#scheduleEventContent').html('Unable to load Event Scheduler...please try again later');
-        }
-    });
 }
 
 function LoadEventManager()
-{	
+{
+    var isMobileView = false;
+    // If viewing device has screen width > 650px, treat as mobile device
+    if (window.matchMedia("(max-width: 650px)").matches) {
+        isMobileView = true;
+    }
+    
     // Initialize jTable on manageEventsContent div
     $('#manageEventsContent').jtable({
         title: "Events Hosted By You",
         paging: true,
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
+        pageSizeChangeArea: !isMobileView,
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
+        openChildAsAccordion: true,
         actions: {
             listAction: "AJAXHandler.php"
         },
@@ -63,32 +49,45 @@ function LoadEventManager()
             },
             Platform: {
                 title: 'Console',
-                width: '9%',
+                width: '11%',
                 sorting: true
             },
             DisplayDate: {
-                title: 'Scheduled Date',
-                width: '15%',
+                title: 'Date',
+                width: '14%',
                 sorting: true
             },
             DisplayTime: {
-                title: 'Scheduled Time',
+                title: 'Time',
                 width: '12%',
                 sorting: false
             },
             Notes: {
                 title: 'Game Notes',
                 width: '25%',
-                sorting: false
+                sorting: false,
+                list: !isMobileView
             },
             PlayersSignedUp: {
                 title: 'Players Joined',
                 width: '11%',
+                display: function (data) {
+                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label class="fa fa-plus-square" /></label>');
+                    $expandImage.click(function () {
+                        var eventId = data.record.ID;
+			var tableRow = $(this).closest('tr');
+                        
+                        OpenChildTableForJoinedPlayers(tableRow, eventId);
+                    });
+
+                    // Return image for display in jTable
+                    return $expandImage;
+                },
                 sorting: false
             },
             Edit: {
                 title: 'Edit',
-                width: '6%',
+                width: '5%',
                 display: function (data) {
                     var $editImage = $('<img src="images/edit.png" rel="' + data.record.ID + '" />');
                     $editImage.click(function () {
@@ -110,15 +109,14 @@ function LoadEventManager()
 			checkedVal = " checked='checked'";
                     }
 					
-                    var $hiddenCheckbox = $('<input type="checkbox" id="hiddenEvent' + data.record.ID + '"' + checkedVal + ' rel="' + data.record.ID + '" />');
+                    var $hiddenCheckbox = $('<input type="checkbox" id="hiddenEvent' + data.record.ID + '"' + checkedVal + ' />');
                     $hiddenCheckbox.change(function () {
-                        var eventId = $(this).attr('rel');
 			var isActive = $(this).is(':checked') ? '0' : '1';
-                        var result = ToggleEventVisibility(eventId, isActive);
+                        var result = ToggleEventVisibility(data.record.ID, isActive);
                         
                         if(!result) {
                             // Reject checked changed event (restore previous checked state)
-                            if(isActive) {
+                            if(isActive === '1') {
                                 $(this).prop('checked', true);
                             }
                             else {
@@ -155,6 +153,56 @@ function EventManagerOnReady()
             var fullRefresh = true;
             ReloadUserHostedEventsTable(fullRefresh);
         }
+    );
+}
+
+function OpenChildTableForJoinedPlayers(tableRow, eventId)
+{
+    if($('#manageEventsContent').jtable('isChildRowOpen', tableRow)) {
+        $('#manageEventsContent').jtable('closeChildTable', tableRow);
+        return;
+    }
+    
+    tableRow.siblings('.jtable-data-row').each(function () {
+        $('#manageEventsContent').jtable('closeChildTable', $(this));
+    });
+    
+    $('#manageEventsContent').jtable('openChildTable', tableRow,
+	{
+            title: "",
+            actions: {
+		listAction: 'AJAXHandler.php?action=GetJoinedPlayersForEvent&eventId=' + eventId
+            },
+            fields: {
+		ID: {
+                    key: true,
+                    list: false
+                },
+		PlayerName: {
+                    title: 'Player Name',
+                    width: '100%',
+                    sorting: true
+		}
+            }
+	},
+	function(data) {
+            data.childTable.jtable('load', {}, function () {
+                    // Customize child table appearance
+                    $(data.childTable).find('table.jtable > tbody > tr')
+                        .each(function() {
+                            $(this).addClass('customTheme');
+                        }
+                    );
+                    
+                    // Do not let child table expand to fill container
+                    $(data.childTable).find('table.jtable')
+                        .each(function() {
+                            $(this).addClass('jTableChild');
+                        }
+                    );
+                }
+            );
+	}
     );
 }
 
@@ -203,7 +251,11 @@ function ToggleEventVisibility(eventId, isActive)
             url: "AJAXHandler.php",
             data: "action=EventEditorToggleEventVisibility&eventId=" + eventId + "&isActive=" + isActive,
             success: function(response){
-                alert(response);
+                if((eventManagerShowHiddenEvents === 0) && (isActive === '0')){
+                    ReloadUserHostedEventsTable(true);
+		}
+				
+		alert(response);
             }
         });
         
@@ -231,6 +283,28 @@ function ReloadUserHostedEventsTable(fullRefresh)
     }
 }
 
+function DisplayCreateEventDialog()
+{
+    var eventId = -1;
+    var $dialog = $('<div></div>').load('AJAXHandler.php?action=EventEditorLoad', 
+                                        function() { EventSchedulerDialogOnReady(eventId, $dialog); }).dialog({
+            autoOpen: false,
+            title: 'Create Event',
+            width: 600,
+            height: 700,
+            modal: true
+        }
+    );
+    
+    $dialog.dialog('option', 'position', {
+        my: 'top',
+        at: 'top',
+        of: window
+    });
+
+    $dialog.dialog('open');
+}
+
 function DisplayEditEventDialog(eventId)
 {
     var $dialog = $('<div></div>').load('AJAXHandler.php?action=EventEditorLoad&EventID=' + eventId, 
@@ -252,108 +326,44 @@ function DisplayEditEventDialog(eventId)
     $dialog.dialog('open');
 }
 
-function EventSchedulerOnReady()
-{
-    // Create jQuery-powered comboBox for game title selection or entry
-    PrepareAutocompleteComboBox("selGameTitle");
-    $('#ddlGameTitles').combobox();
-	
-    // Initialize Game Scheduled Date datepicker
-    $('#gameDate').datepicker({
-         inline: true,
-         yearRange: '-0:+1',
-         changeYear: true,
-         constrainInput: true,
-         showButtonPanel: true,
-         showOtherMonths: true,
-         dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-         dateFormat: 'yy-mm-dd'
-    });
-    
-    // Initialize Game Scheduled Time datepicker
-    var defaultTimeDate = new Date();
-    var nextRoundIntervalValue = 15 - (defaultTimeDate.getMinutes() % 15);
-    defaultTimeDate.setMinutes(defaultTimeDate.getMinutes() + nextRoundIntervalValue);
-    $('#gameTime').timepicker(
-        {
-            defaultTime: defaultTimeDate,
-            timeFormat: 'h:mmp',
-            startTime: defaultTimeDate,
-            interval: 15 // 15 minutes
-        }
-    );
-    
-    // Define new mask characters
-    //$.mask.definitions['~']='[ap]';
-    
-    // Apply input mask to date field
-    $('#gameDate').mask('9999-99-99');
-    
-    // Apply input mask to time field
-    //$('#gameTime').mask('99:99 ~m');
-	
-    // If user selects Private Event checkbox, enable friend list selection
-    $('#privateEvent').click(function() {
-	var checkedVal = this.checked;
-			
-	if(checkedVal) {
-            $("input[name='pvtEventFriends[]']").removeProp('disabled');
-            $("#selectAllFriends").removeProp('disabled');
-	}
-	else {
-            $("input[name='pvtEventFriends[]']").prop('disabled', true);
-            $("input[name='pvtEventFriends[]']").prop('checked', false);
-            
-            $("#selectAllFriends").prop('disabled', true);
-            $("#selectAllFriends").prop('checked', false);
-	}
-    });
-    
-    $("#selectAllFriends").click(function() {
-        var checkedVal = this.checked;
-        
-        if(checkedVal) {
-            $("input[name='pvtEventFriends[]']").prop('checked', true);
-        }
-        else {
-            $("input[name='pvtEventFriends[]']").prop('checked', false);
-        }
-    });
-
-    // If viewing device has screen width > 650px, treat as mobile device
-    if (window.matchMedia("(max-width: 650px)").matches) {
-        $('#createEventBtn').hide();
-        $('#createEventBtnMobile').show();
-
-        // Attach event handler to Create Event mobile button
-        $('#createEventBtnMobile').click(function() {
-            CreateEvent();
-        });
-    }
-    else {
-        $('#createEventBtn').show();
-        $('#createEventBtnMobile').hide();
-        
-        // Attach event handler to Create Event desktop button
-        $('#createEventBtn').click(function() {
-            CreateEvent();
-        });
-    }
-}
-
 function EventSchedulerDialogOnReady(eventId, $dialog)
 {
     var eventIdSuffix = "";
+    var gameTime = "";
+    
     if(eventId > -1) {
         eventIdSuffix = eventId.toString();
+        
+        // Attach event handler to Edit Event button
+        $('#editEventBtn' + eventIdSuffix).click(function() {
+            return EditEvent(eventIdSuffix, $dialog);
+        });
+        
+        // Create jQuery-powered comboBox for game title selection or entry
+        PrepareAutocompleteComboBox("selGameTitle" + eventIdSuffix);
+        $('#ddlGameTitles' + eventIdSuffix).combobox();
+        
+        // Change dialog title to Editing Event: 'game' @ 'datetime'
+        var selGameTitle = $('#selGameTitle' + eventIdSuffix).val();
+        var gameDate = $('#gameDate' + eventIdSuffix).val();
+        gameTime = $('#gameTime' + eventIdSuffix).val();
+
+        var title = 'Editing Event: "' + selGameTitle + '" @ ' + gameDate + ' ' + gameTime;
+        $dialog.dialog('option', 'title', title);
+    }
+    else {
+        // Create jQuery-powered comboBox for game title selection or entry
+        PrepareAutocompleteComboBox("selGameTitle");
+        $('#ddlGameTitles').combobox();
+        
+        // Attach event handler to Create Event button
+        $('#createEventBtn').click(function() {
+            return CreateEvent($dialog);
+        });
     }
 	
-    // Create jQuery-powered comboBox for game title selection or entry
-    PrepareAutocompleteComboBox("selGameTitle" + eventId);
-    $('#ddlGameTitles' + eventId).combobox();
-	
     // Initialize Game Scheduled Date datepicker
-    $('#gameDate' + eventId).datepicker({
+    $('#gameDate' + eventIdSuffix).datepicker({
          inline: true,
          yearRange: '-0:+1',
          changeYear: true,
@@ -365,60 +375,57 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
     });
     
     // Initialize Game Scheduled Time datepicker
-    var defaultTimeDate = new Date();
-    var nextRoundIntervalValue = 15 - (defaultTimeDate.getMinutes() % 15);
-    defaultTimeDate.setMinutes(defaultTimeDate.getMinutes() + nextRoundIntervalValue);
-    $('#gameTime' + eventId).timepicker(
-        {
-            timeFormat: 'h:mmp',
-            startTime: defaultTimeDate,
-            interval: 15 // 15 minutes
-        }
-    );
+    var minTime = null;
+    if(gameTime.length === 0) {
+        var defaultTimeDate = new Date();
+        var nextRoundIntervalValue = 15 - (defaultTimeDate.getMinutes() % 15);
+        defaultTimeDate.setMinutes(defaultTimeDate.getMinutes() + nextRoundIntervalValue);
+        minTime = defaultTimeDate;
+    }
+    else {
+        minTime = gameTime;
+    }
+
+    var options = {
+        disableTextInput: true,
+        disableTouchKeyboard: true,
+        minTime: minTime,
+        selectOnBlur: true,
+        step: 15
+    };
+    
+    $('#gameTime' + eventIdSuffix).timepicker(options);
     
     // Apply input mask to date field
-    $('#gameDate' + eventId).mask('9999-99-99');
+    $('#gameDate' + eventIdSuffix).mask('9999-99-99');
 	
     // If user selects Private Event checkbox, enable friend list selection
-    $('#privateEvent' + eventId).click(function() {
+    $('#privateEvent' + eventIdSuffix).click(function() {
 	var checkedVal = this.checked;
 			
 	if(checkedVal) {
-            $("input[name='pvtEventFriends" + eventId + "[]']").removeProp('disabled');
-            $("#selectAllFriends" + eventId).removeProp('disabled');
+            $("input[name='pvtEventFriends" + eventIdSuffix + "[]']").removeProp('disabled');
+            $("#selectAllFriends" + eventIdSuffix).removeProp('disabled');
 	}
 	else {
-            $("input[name='pvtEventFriends" + eventId + "[]']").prop('disabled', true);
-            $("input[name='pvtEventFriends" + eventId + "[]']").prop('checked', false);
+            $("input[name='pvtEventFriends" + eventIdSuffix + "[]']").prop('disabled', true);
+            $("input[name='pvtEventFriends" + eventIdSuffix + "[]']").prop('checked', false);
             
-            $("#selectAllFriends" + eventId).prop('disabled', true);
-            $("#selectAllFriends" + eventId).prop('checked', false);
+            $("#selectAllFriends" + eventIdSuffix).prop('disabled', true);
+            $("#selectAllFriends" + eventIdSuffix).prop('checked', false);
 	}
     });
     
-    $("#selectAllFriends" + eventId).click(function() {
+    $("#selectAllFriends" + eventIdSuffix).click(function() {
         var checkedVal = this.checked;
         
         if(checkedVal) {
-            $("input[name='pvtEventFriends" + eventId + "[]']").prop('checked', true);
+            $("input[name='pvtEventFriends" + eventIdSuffix + "[]']").prop('checked', true);
         }
         else {
-            $("input[name='pvtEventFriends" + eventId + "[]']").prop('checked', false);
+            $("input[name='pvtEventFriends" + eventIdSuffix + "[]']").prop('checked', false);
         }
     });
-
-    // Attach event handler to Edit Event button
-    $('#editEventBtn' + eventId).click(function() {
-        return EditEvent(eventId, $dialog);
-    });
-	
-    // Change dialog title to Editing Event: 'game' @ 'datetime'
-    var selGameTitle = $('#selGameTitle' + eventIdSuffix).val();
-    var gameDate = $('#gameDate' + eventIdSuffix).val();
-    var gameTime = $('#gameTime' + eventIdSuffix).val();
-	
-    var title = 'Editing Event: "' + selGameTitle + '" @ ' + gameDate + ' ' + gameTime;
-    $dialog.dialog('option', 'title', title);
 }
 
 function ToggleControlPanelDisplay(panelToToggle)
@@ -453,6 +460,7 @@ function ValidateEventFormFields(eventId)
   
     var numPlayersNeeded = $('#gamePlayersNeeded' + eventIdSuffix).val();
     var numPlayersAllowed = $("input[name='pvtEventFriends" + eventIdSuffix + "[]']:checked").length;
+    var isPrivateEvent = $('#privateEvent' + eventIdSuffix).is(':checked');
     var gameDate = $('#gameDate' + eventIdSuffix).val();
     var gameTime = $('#gameTime' + eventIdSuffix).val();
     var gameTimezone = $('#ddlTimeZones'  + eventIdSuffix + ' option:selected').text();
@@ -477,7 +485,7 @@ function ValidateEventFormFields(eventId)
         alert("Unable to " + alertTextType + " event: Must enter a valid time");
     } else if (comments.trim().length === 0) {
         alert("Unable to " + alertTextType + " event: Please enter notes about your event");
-    } else if (numPlayersNeeded > numPlayersAllowed) {
+    } else if (isPrivateEvent && (numPlayersNeeded > numPlayersAllowed)) {
         alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
     } else {
         var curDateMoment = moment().utc();
@@ -512,11 +520,13 @@ function EditEvent(eventId, $dialog)
     var eventInfo = ValidateEventFormFields(eventId);
     
     if(eventInfo.validated) {
+        var postData = "action=EventEditorUpdateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
+                       "&eventId=" + eventId + "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventEditForm' + eventId).serialize();
+
         $.ajax({
             type: "POST",
             url: "AJAXHandler.php",
-            data: "action=EventEditorUpdateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
-                  "&eventId=" + eventId + "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventEditForm' + eventId).serialize(),
+            data: postData,
             success: function(response){
                 if(response === 'true') {
                     // Reload event manager
@@ -541,31 +551,33 @@ function EditEvent(eventId, $dialog)
     return false;
 }
 
-function CreateEvent()
+function CreateEvent($dialog)
 {
     var eventId = -1;
     var eventInfo = ValidateEventFormFields(eventId);
 
     if(eventInfo.validated) {
         // Create event
+        var postData = "action=EventEditorCreateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
+                       "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventCreateForm').serialize();
+
         $.ajax({
             type: "POST",
             url: "AJAXHandler.php",
-            data: "action=EventEditorCreateEvent&isGlobalGame=" + eventInfo.isGlobalGame + "&gameTitle=" + eventInfo.selGameTitle + 
-                  "&gameDateUTC=" + eventInfo.gameTimeMoment.toISOString() + "&" + $('#eventCreateForm').serialize(),
+            data: postData,
             success: function(response){
                 if(response === 'true') {
                     // Reload event manager
                     var fullRefresh = false;
                     ReloadUserHostedEventsTable(fullRefresh);
-
+		
                     // Reload game title dropdown, if user entered a new game
-                    /* *** This will not be needed when Create Event is moved to modal popup from main jTable screen *** */
                     if(!eventInfo.isExistingGame) {
-			ReloadGameTitleSelector(eventId);
+                        ReloadGameTitleSelector(eventId);
                     }
-					
+                
                     alert('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    $dialog.dialog('close');
                 }
                 else {
                     alert(response);

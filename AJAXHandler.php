@@ -338,8 +338,9 @@
 		echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
                 break;
             case "EventEditorCreateEvent":
+                $pvtEventFriends = (isset($_POST['pvtEventFriends'])) ? ($_POST['pvtEventFriends']) : [];
                 $eventGame = Game::ConstructGameForEvent(trim($_POST['ddlGameTitles']), $_POST['gameDate'], $_POST['gameTime'], 
-                                                         $_POST['gamePlayersNeeded'], trim($_POST['message']), $_POST['pvtEventFriends'],
+                                                         $_POST['gamePlayersNeeded'], trim($_POST['message']), $pvtEventFriends,
                                                          $_POST['isGlobalGame'] == 'true' ? true : false, $_POST['ddlTimeZones'], 
                                                          $_POST['ddlPlatforms'], $_POST['gameTitle'], $_POST['gameDateUTC'], '', '', -1);
 
@@ -352,7 +353,7 @@
                 $gameTime = $_POST['gameTime'.$eventId];
                 $gamePlayersNeeded = $_POST['gamePlayersNeeded'.$eventId];
                 $message = trim($_POST['message'.$eventId]);
-                $pvtEventFriends = $_POST['pvtEventFriends'.$eventId];
+                $pvtEventFriends = (isset($_POST['pvtEventFriends'.$eventId])) ? ($_POST['pvtEventFriends'.$eventId]) : [];
                 $ddlTimeZonesId = $_POST['ddlTimeZones'.$eventId];
                 $ddlPlatformsId = $_POST['ddlPlatforms'.$eventId];
                 
@@ -383,6 +384,9 @@
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $showHiddenEvents);
                 break;
+            case "GetJoinedPlayersForEvent":
+		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
+		break;
         }
     }
     else {

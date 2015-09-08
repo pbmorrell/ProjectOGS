@@ -124,7 +124,7 @@
 				<div class="12u">							
                                     <!-- Content -->
                                     <div id="content">
-                                        <article class="box main">
+                                        <article class="box style3">
                                             <header>
                                                 <h2>
                                                     <?php 
@@ -174,7 +174,7 @@
                                                         <span id="passwordMatch" class="passwordWeak"></span>
                                                         <button type="submit" id="hiddenBtn" style="display:none">Update Profile</button>
                                                     </section>
-                                                    <section class="3u">
+                                                    <section class="4u">
                                                         <p><i class="fa fa-user"></i>&nbsp;&nbsp;What is your name?</p>
                                                         <?php                                                           
                                                             echo $firstNameInputHTML . $lastNameInputHTML;
@@ -193,8 +193,8 @@
                                                         <p><i class="fa fa-clock-o"></i>&nbsp;&nbsp;What is your time zone?</p>
                                                         <?php echo $timeZoneHTML; ?>
                                                     </section>
-                                                    <section class="6u">
-                                                        <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on? (check all that apply)</p>
+                                                    <section class="4u">
+                                                        <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on?<br /><label>(check all that apply)</label></p>
                                                         <?php echo $gamingHandler->GetPlatformCheckboxList($dataAccess, $objUser->GamePlatforms); ?><br/><br/>
                                                         <p><i class="fa fa-comment"></i>&nbsp;&nbsp;Tell us about yourself.</p>
                                                         <?php

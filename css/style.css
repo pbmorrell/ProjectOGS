@@ -87,7 +87,11 @@
     .box.style1 input[type=text],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
-    
+	
+    .box.style1 input[type=password],select{
+        height: 2.15em !important; /* Fix for IE display of textboxes */
+    }
+
     #ddlTimeZones{
         width: auto !important;
     }
@@ -442,6 +446,9 @@
         background: #32353a;
         color: #fff;
         line-height: 1em;
+        font-size: .3em;
+        border-radius: .5em;
+        padding: .6em;
     }
 	
     .captchaInput {
@@ -504,16 +511,8 @@
         width: 0px;
     }
 
-    /*.timeInput
-    {
-        min-height: 2.3em;
-    }*/
-
     .controlPanelSection {
 	width: 23%;
-    }
-    .eventManagerSection {
-	width: 77%;
     }
 	
     .offPage {
@@ -653,6 +652,7 @@
         color: rgba(255,255,255,0.75);
         /*background: #32AECF;*/
         background: #1E90FF;
+	padding-top: 1em;
     }
 
     .box.style2
@@ -661,6 +661,21 @@
         color: #fff;
         color: rgba(255,255,255,0.75);
         background: #7B915B;
+    }
+    
+    .box.style3
+    {
+        box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
+        color: #fff;
+        color: rgba(255,255,255,0.75);
+        /*background: #32AECF;*/
+        background: #2c2f34;
+	padding-top: 1em;
+    }
+    
+    .box.style3 .controlBtn
+    {
+        font-size: 1.5em;
     }
 
     .box.main
@@ -673,6 +688,12 @@
         font-size: 1.4em;
     }
 
+    .box.main p label
+    {
+        color: #fff;
+        font-size: 0.7em;
+    }
+	
     .box.main h2
     {
         line-height: 1.2em;
@@ -855,12 +876,6 @@
         margin: 0px 15px 0px 0px;
     }
 
-    #loginBtn{
-        font-size: .3em;
-        border-radius: .5em;
-        padding: .6em;
-    }
-
     input[type=checkbox] {
         padding-left:5px;
         padding-right:5px;
@@ -1021,4 +1036,24 @@
 
     #search{
         width: 14em;
+    }
+    
+    table.jtable.jTableChild thead {
+	background: #000 url("../../lightcolor/bg-thead.png") repeat-x scroll left top !important;
+        color: #fff;
+    }
+
+    table.jtable.jTableChild {
+        width: 33% !important;
+    }
+    
+    /* Alternating row colors for child table */
+    table.jtable tbody > tr.customTheme {
+        background-color: #fdfbec !important;
+        color: #919691 !important;
+    }
+    
+    table.jtable tbody > tr .jtable-row-even.customTheme {
+        background-color: #faf6d5 !important;
+        color: #919691 !important;
     }

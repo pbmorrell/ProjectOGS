@@ -172,6 +172,11 @@
     }
     
     // Construct HTML Header string, which will be echoed by all including pages
+    $jQueryUiCssPath = '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />';
+    if(isset($customJqueryUiCssPath)) {
+        $jQueryUiCssPath = $customJqueryUiCssPath;
+    }
+    
     $pageHeaderHTML = 
         '<meta charset="UTF-8">'.
         '<title>Project OGS | ' . $welcomeUserName . '</title>'.
@@ -184,9 +189,8 @@
             '<link rel="stylesheet" href="css/skel.css" />'.
             '<link rel="stylesheet" href="css/style.css" />'.
             '<link rel="stylesheet" href="css/style-desktop.css" />'.
-        '</noscript>'.
-        '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />'.
-        '<link rel="stylesheet" href="css/jquery.timepicker.min.css" />'.
+        '</noscript>' . $jQueryUiCssPath.
+        '<link rel="stylesheet" href="css/jquery.timepicker.css" />'.
 
         '<script src="js/jquery.min.js"></script>'.
         '<script src="js/jquery.dropotron.min.js"></script>'.

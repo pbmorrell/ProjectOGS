@@ -3,6 +3,7 @@
     $mobileLoginPage = false;
     $sessionRequired = false;
     $sessionAllowed = true;
+    $authFailureRedirectPage = "Index.php";
     include "Header.php";
 ?>
 <!DOCTYPE HTML>
@@ -40,7 +41,7 @@
                                                 <div class="row double">
                                                     <section class="8u">
                                                         <h2>Our Goal</h2>
-                                                        <p>Help gamers from all over, meet and engage with other like minded gamers to enrich their online game experience.</p><br/>
+                                                        <p>To help gamers everywhere, meet and engage with other like-minded gamers to enrich their online game experience.</p><br/>
                                                         <h2>What our site offers</h2>
                                                         <p>
                                                             - The ability to schedule games that your friends can join<br/>
@@ -52,7 +53,7 @@
                                                         <p /><br/>
                                                         <h2>Why?</h2>
                                                         <p>Have you ever started a new game only to wind up in a lobby with unfamiliar gamer tags?<br/>Are your current friends still playing a game you no longer have
-                                                           interest in?<br/>Do you need help with a particular game but are unsure where to turn?<br/><br/>...We have and our aim to correct that.</p>
+                                                           interest in?<br/>Do you need help with a particular game, but are unsure where to turn?<br/><br/>...Then this site is for you.</p>
                                                     </section>
                                                     <!-- Second Main Div -->
                                                     <section class="4u box style3">
@@ -61,7 +62,7 @@
                                                             <div class="image">
                                                                 <img src="images/author1.jpg"  />
                                                             </div>
-                                                            <p>The master of all things programming, Stephen has graciously given much of his time to make this site a reality. When not hammering away on a keyboard, Stephen enjoys crafting ninja blades made of the rare Ultima material.</p>
+                                                            <p>The master of all things programming, Stephen has graciously given much of his time to make this site a reality. When not hammering away on a keyboard, Stephen enjoys ping-pong, football, studying the Bible, and (occasionally) playing Halo and various racing games.</p>
                                                         <br />
                                                         <h2>Paul Morrell</h2>
                                                             <div class="image">

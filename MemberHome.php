@@ -43,13 +43,13 @@
                                                         <h2>Control Panel</h2>
                                                         <ul class="style3 contact">
                                                             <li class="icon fa-calendar">
-                                                                <a href="#scheduleEventDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.EventScheduler, 0);" style="text-decoration:none;">Schedule Event</a>
+                                                                <a href="#" onclick="return DisplayCreateEventDialog();" style="text-decoration:none;">Schedule Event</a>
                                                             </li>
                                                             <li class="icon fa-gamepad">
-                                                                <a href="#manageEventsDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage My Events</a>
+                                                                <a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage My Events</a>
                                                             </li>
                                                             <li class="icon fa-flask">
-                                                                <a href="#currentEventsDiv" target="" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">Event Feed</a>
+                                                                <a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">Event Feed</a>
                                                             </li><br/><br/>
                                                             <input type="text" id="search" placeholder=" Search Events"/><br/><br/>
                                                             <a href="" style="text-decoration:none;">Filters</a><br/>
@@ -65,22 +65,17 @@
                                         </section>				
                                     </div>
 				</div>
-				<div id="scheduleEventDiv" class="eventManagerSection">
+<!--				<div id="scheduleEventDiv" class="eventManagerSection">
                                     <section class="box style1">
-                                        <h2>
-                                            Schedule an Event
-                                            <div id="scheduleEventSubmitDiv" class="memberHomeSubmitDiv">
-                                                <button type="submit" class="memberHomeBtn icon fa-cogs" id="createEventBtn">Create Event!</button>
-                                            </div>
-                                        </h2>
+                                        <h2>Schedule an Event</h2>
                                         <div id="scheduleEventContent">
                                         </div>
                                     </section>
-				</div>
+				</div>-->
 				<div id="manageEventsDiv" class="9u">
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
-                                        <label style="float:right;"><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label><br />
+                                        <label style="float:right;"><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label><br /><br />
                                         <div id="manageEventsContent">
                                         </div>
                                     </section>

@@ -10,19 +10,20 @@ class GamingHandler
     public function LoadUserFriends($dataAccess, $logger, $userID, $eventId = -1)
     {
 	$eventWhereClause = "";
+        $eventLeftJoinClause = "";
         $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
 	$parmEventId = null;
 	$queryParms = array($parmUserId);
 		
 	if($eventId > -1) {
+            $eventLeftJoinClause = "LEFT JOIN `Gaming.EventAllowedMembers` as em ON u.`ID` = em.`FK_User_ID` ";
             $eventWhereClause = "AND ((COALESCE(em.`FK_Event_ID`, -1)) = :eventId) ";
             $parmEventId = new QueryParameter(':eventId', $eventId, PDO::PARAM_INT);
             array_push($queryParms, $parmEventId);
 	}
 		
         $getUserFriendsQuery = "SELECT uf.`FK_User_ID_Friend` as FriendID, u.`FirstName`, u.`LastName`, u.`UserName` FROM `Gaming.UserFriends` as uf " .
-                               "INNER JOIN `Security.Users` as u ON uf.`FK_User_ID_Friend` = u.`ID` " .
-                               "LEFT JOIN `Gaming.EventAllowedMembers` as em ON u.`ID` = em.`FK_User_ID` " .
+                               "INNER JOIN `Security.Users` as u ON uf.`FK_User_ID_Friend` = u.`ID` " . $eventLeftJoinClause .
                                "WHERE (uf.`FK_User_ID_ThisUser` = :userID) " . $eventWhereClause .
                                "ORDER BY CASE WHEN ((u.`FirstName` IS NOT NULL) AND (LENGTH(u.`FirstName`) > 0)) THEN u.`FirstName` ELSE u.`UserName` END, " .
                                "CASE WHEN ((u.`FirstName` IS NOT NULL) AND (LENGTH(u.`FirstName`) > 0)) THEN u.`LastName` ELSE u.`UserName` END;";
@@ -93,22 +94,18 @@ class GamingHandler
 	
     public function EventEditorLoad($dataAccess, $logger, $userID, $eventId)
     {
-        // If this is called for existing event, apply styles and call JS for modal dialog instance of this editor
-        $additionalCSS = "";
+        // If this is called for existing event, append eventID to each control ID for uniqueness
         $formName = "eventCreateForm";
-        $formButtonName = "createEventBtnMobile";
+        $formButtonName = "createEventBtn";
         $formButtonText = "Create Event!";
         $gameDateValue = "";
         $gameTimeValue = "";
         $eventInfo = null;
-	$eventEditorLineBreak = "";
         
         if(strlen($eventId) > 0) {
-            $additionalCSS = "class='box style1'";
             $formName = "eventEditForm"  . $eventId;
             $formButtonName = "editEventBtn" . $eventId;
             $formButtonText = "Update Event";
-            $eventEditorLineBreak = "<br />";
             
             // Load information about this event
             $eventArray = $this->GetUserScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", 
@@ -175,7 +172,7 @@ class GamingHandler
 		
 	// Return Event Scheduler HTML
 	return
-            '<section ' . $additionalCSS . '>'.
+            '<section class="box style1">'.
 		'<form id="' . $formName . '" name="' . $formName . '" method="POST" action="">'.
                     '<div class="inputLine">'.
 			'<p><i class="fa fa-gamepad"></i> &nbsp; What game do you wish to schedule?<br/>'.
@@ -187,7 +184,7 @@ class GamingHandler
                             'type="text" maxlength="50" placeholder=" Date"></p>'.
 			'<p><i class="fa fa-clock-o"></i> &nbsp; Time you want to play<br/>'.
                             '<input id="gameTime' . $eventId . '" name="gameTime' . $eventId . '" ' . $gameTimeValue .
-                            'type="text" maxlength="9" placeholder=" Time">&nbsp;&nbsp;'. $eventEditorLineBreak .
+                            'type="text" maxlength="9" placeholder=" Time"><br />' .
                             $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : -1), $eventId) .
                         '</p>'.
 			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>'. 
@@ -255,7 +252,7 @@ class GamingHandler
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
                 "Edit" => '',
-		"Hidden" => !$game->Visible ? "hidden" : ""
+		"Hidden" => !$game->Visible ? 'hidden' : ''
             );
 
             array_push($rows, $row);
@@ -264,6 +261,28 @@ class GamingHandler
         $jTableResult = [];
         $jTableResult['Result'] = 'OK';
         $jTableResult['TotalRecordCount'] = $this->GetTotalCountUserScheduledGames($dataAccess, $logger, $userID);
+        $jTableResult['Records'] = $rows;
+        return json_encode($jTableResult);
+    }
+	
+    public function LoadJoinedPlayersForEvent($dataAccess, $logger, $eventId)
+    {
+        $rows = [];
+        $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $eventId);
+        //$playersSignedUp = ['TestPlayer1','TestPlayer2'];
+
+        foreach($playersSignedUp as $player) {
+            $row = array (
+                "ID" => $eventId,
+                "PlayerName" => $player
+            );
+
+            array_push($rows, $row);
+        }
+
+        $jTableResult = [];
+        $jTableResult['Result'] = 'OK';
+        $jTableResult['TotalRecordCount'] = count($rows);
         $jTableResult['Records'] = $rows;
         return json_encode($jTableResult);
     }
