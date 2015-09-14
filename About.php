@@ -50,7 +50,7 @@
                                                             - Subscribe to events created for particular game titles, platforms, etc.<br/>
                                                             - Defeat your archnemesis in any game<br/>
                                                             - OK, that last one is still in the works...<br/>
-                                                        <p /><br/>
+                                                        </p><br/>
                                                         <h2>Why?</h2>
                                                         <p>Have you ever started a new game only to wind up in a lobby with unfamiliar gamer tags?<br/>Are your current friends still playing a game you no longer have
                                                            interest in?<br/>Do you need help with a particular game, but are unsure where to turn?<br/><br/>...Then this site is for you.</p>
