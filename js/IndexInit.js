@@ -2,7 +2,7 @@ function IndexOnReady(getAction)
 {
     // If viewing device has screen width > 650px, treat as mobile device
     // and redirect user to mobile login page
-    if ((getAction != "Signup") && window.matchMedia("(max-width: 650px)").matches) {
+    if ((getAction != "Signup") && isMobileView()) {
         window.location.replace("MobileLogin.php");
     }
     

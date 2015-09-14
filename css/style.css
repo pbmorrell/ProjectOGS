@@ -91,8 +91,16 @@
     .box.style1 input[type=password],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
+    
+    .box.style3 input[type=text],select{
+        height: 2.15em !important; /* Fix for IE display of textboxes */
+    }
+	
+    .box.style3 input[type=password],select{
+        height: 2.15em !important; /* Fix for IE display of textboxes */
+    }
 
-    #ddlTimeZones{
+    #ddlTimeZones, #toggleShowPastEvents{
         width: auto !important;
     }
     
@@ -379,7 +387,7 @@
     }
 
     .hidden {
-        display:none;
+        display:none !important;
     }
 
     .hiddenDesktopAds {
@@ -486,7 +494,7 @@
         border:2px solid #ccc;
         box-sizing: border-box;
         padding: 0.5em;
-        width: 250px;
+        width: 300px;
         height: 100px;
         overflow-y: scroll;
     }
@@ -570,19 +578,19 @@
 
     .bigbutton:hover
     {
-            background: #2d3238;
+        background: #2d3238;
     }
 
     .bigbutton:before
     {
-            position: relative;
-            top: 0.1em;
-            margin-right: 0.65em;
+        position: relative;
+        top: 0.1em;
+        margin-right: 0.65em;
     }
 
     .bigbutton.style1
     {
-            background: #32AECF;
+        background: #32AECF;
     }
 
     .bigbutton.style1:hover
@@ -592,7 +600,7 @@
 
     .bigbutton.style2
     {
-            background: #7B915B;
+        background: #7B915B;
     }
 
     .bigbutton.style2:hover
@@ -650,7 +658,6 @@
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
         color: #fff;
         color: rgba(255,255,255,0.75);
-        /*background: #32AECF;*/
         background: #1E90FF;
 	padding-top: 1em;
     }
@@ -668,7 +675,6 @@
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
         color: #fff;
         color: rgba(255,255,255,0.75);
-        /*background: #32AECF;*/
         background: #2c2f34;
 	padding-top: 1em;
     }
@@ -929,7 +935,10 @@
         color: #000;
         border-radius: .5em;
         line-height: 1.75em;
-        width: 28em;		
+        width: 28em;
+    }
+    .textareaMobile{
+        width: 18em !important;
     }
 
     select{
@@ -1038,6 +1047,58 @@
         width: 14em;
     }
     
+    .dlgToolbarContainer {
+        width: 550px;
+        height: 200px;
+        border-color: gray;
+        border-style:solid;
+        border-width: 1px;
+        overflow-y: auto;
+    }
+    
+    .dlgToolbarContainer > button {
+        width: 40%;
+        height: 65px;
+        float: left;
+        margin: 1% 2% 1% 2%;
+        padding: 1em 1em 1em 0.75em !important;
+    }
+    
+    .mobileDlgToolbarContainer {
+        width: 18em;
+        height: 200px;
+        border-color: gray;
+        border-style:solid;
+        border-width: 1px;
+        overflow-y: auto;
+    }
+    
+    .mobileDlgToolbarContainer > button {
+        width: 40%;
+        height: 65px;
+        float: left;
+        margin: 1% 2% 1% 2%;
+        padding: 1em 1em 1em 0.75em !important;
+    }
+    
+    .mobileToolbarContainer {
+        width: 400px;
+        height: 200px;
+        overflow-y: auto;
+    }
+    
+    .mobileToolbarContainer > button {
+        width: 40%;
+        height: 25%;
+        float: left;
+        margin: 1% 2% 1% 2%; // top right bottom left
+    }
+    
+    .mobileToolbarContainer > .button:hover
+    {
+        background: #32353a !important;
+    }
+    
     table.jtable.jTableChild thead {
 	background: #000 url("../../lightcolor/bg-thead.png") repeat-x scroll left top !important;
         color: #fff;
@@ -1045,6 +1106,8 @@
 
     table.jtable.jTableChild {
         width: 33% !important;
+	float: right !important;
+        margin-bottom: 0.5em;
     }
     
     /* Alternating row colors for child table */
@@ -1056,4 +1119,8 @@
     table.jtable tbody > tr .jtable-row-even.customTheme {
         background-color: #faf6d5 !important;
         color: #919691 !important;
+    }
+	
+    .jTableChildRowHidden {
+	height:0px !important;
     }

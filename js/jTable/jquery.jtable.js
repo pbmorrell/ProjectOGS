@@ -4887,42 +4887,79 @@ THE SOFTWARE.
             //Close child table when close button is clicked (default behavior)
             if (tableOptions.showCloseButton && !tableOptions.closeRequested) {
                 tableOptions.closeRequested = function () {
-                    self.closeChildTable($row);
+                    self.closeChildTable($row, void 0, tableOptions.childTableNoReloadOnOpen);
                 };
             }
 
             //If accordion style, close open child table (if it does exists)
             if (self.options.openChildAsAccordion) {
                 $row.siblings('.jtable-data-row').each(function () {
-                    self.closeChildTable($(this));
+                    self.closeChildTable($(this), void 0, tableOptions.childTableNoReloadOnOpen);
                 });
             }
 
             //Close child table for this row and open new one for child table
             self.closeChildTable($row, function () {
-                var $childRowColumn = self.getChildRow($row).children('td').empty();
-                var $childTableContainer = $('<div />')
+                var $childRow = self.getChildRow($row, tableOptions.childTableNoReloadOnOpen);
+                var $childRowColumn = $childRow.children('td').empty();
+		var $childTableContainer = null;
+					
+		$childTableContainer = $('<div />')
                     .addClass('jtable-child-table-container')
                     .appendTo($childRowColumn);
-                $childRowColumn.data('childTable', $childTableContainer);
-                $childTableContainer.jtable(tableOptions);
-                self.openChildRow($row);
-                $childTableContainer.hide().slideDown('fast', function () {
+					
+		$childRowColumn.data('childTable', $childTableContainer);
+		$childTableContainer.jtable(tableOptions);
+					
+		if(!tableOptions.childTableNoReloadOnOpen) {
+                    self.openChildRow($row, tableOptions.childTableNoReloadOnOpen);
+                    $childTableContainer.hide().slideDown('fast', function () {
+			if (opened) {
+                            opened({
+				 childTable: $childTableContainer
+                            });
+			 }
+                    });
+		}
+		else {
+                    $childRow.slideUp(0);
+                    $childRow.addClass("jTableChildRowHidden");
+					
                     if (opened) {
-                        opened({
-                             childTable: $childTableContainer
-                        });
+			opened({
+                            childTable: $childTableContainer
+			});
                     }
-                });
-            });
+		}
+            }, tableOptions.childTableNoReloadOnOpen);
         },
 
+	showChildTable: function ($row, opened) {
+            var self = this;
+            var childTableNoReloadOnOpen = true;
+
+            //If accordion style, close open child table (if it does exists)
+            if (self.options.openChildAsAccordion) {
+                $row.siblings('.jtable-data-row').each(function () {
+                    self.closeChildTable($(this), void 0, childTableNoReloadOnOpen);
+                });
+            }
+
+            //Reveal pre-loaded child table for this row
+            self.openChildRow($row, childTableNoReloadOnOpen);
+            if (opened) {
+                opened({
+                     childTable: $childTableContainer
+                });
+            }
+	},
+		
         /* Closes child table for given row.
         *************************************************************************/
-        closeChildTable: function ($row, closed) {
+        closeChildTable: function ($row, closed, childTableNoReloadOnOpen) {
             var self = this;
             
-            var $childRowColumn = this.getChildRow($row).children('td');
+            var $childRowColumn = this.getChildRow($row, childTableNoReloadOnOpen).children('td');
             var $childTable = $childRowColumn.data('childTable');
             if (!$childTable) {
                 if (closed) {
@@ -4932,35 +4969,59 @@ THE SOFTWARE.
                 return;
             }
 
-            $childRowColumn.data('childTable', null);
-            $childTable.slideUp('fast', function () {
-                $childTable.jtable('destroy');
-                $childTable.remove();
-                self.closeChildRow($row);
+            if(childTableNoReloadOnOpen) {
+                self.closeChildRow($row, childTableNoReloadOnOpen);
+                    
                 if (closed) {
                     closed();
                 }
-            });
+            }
+            else {
+		$childRowColumn.data('childTable', null);
+		$childTable.slideUp('fast', function () {
+                    $childTable.jtable('destroy');
+                    $childTable.remove();
+                    self.closeChildRow($row, childTableNoReloadOnOpen);
+                    
+                    if (closed) {
+			closed();
+                    }
+		});
+            }
         },
 
         /* Returns a boolean value indicates that if a child row is open for given row.
         *************************************************************************/
-        isChildRowOpen: function ($row) {
-            return (this.getChildRow($row).is(':visible'));
+        isChildRowOpen: function ($row, childTableNoReloadOnOpen) {
+            return ((!this.getChildRow($row, childTableNoReloadOnOpen).hasClass("jTableChildRowHidden")) && 
+                    (this.getChildRow($row, childTableNoReloadOnOpen).is(':visible')));
         },
 
         /* Gets child row for given row, opens it if it's closed (Creates if needed).
         *************************************************************************/
-        getChildRow: function ($row) {
-            return $row.data('childRow') || this._createChildRow($row);
+        getChildRow: function ($row, childTableNoReloadOnOpen) {
+            return ($row.data('childRow')) || (this._createChildRow($row, childTableNoReloadOnOpen));
         },
 
         /* Creates and opens child row for given row.
         *************************************************************************/
-        openChildRow: function ($row) {
-            var $childRow = this.getChildRow($row);
-            if (!$childRow.is(':visible')) {
-                $childRow.show();
+        openChildRow: function ($row, childTableNoReloadOnOpen) {
+            var $childRow = this.getChildRow($row, childTableNoReloadOnOpen);
+            var $childRowColumn = $childRow.children('td');
+            var $childTable = $childRowColumn.data('childTable');
+			
+            if(!childTableNoReloadOnOpen) {
+		if (!$childRow.is(':visible')) {
+                    $childRow.show();
+		}
+            }
+            else if($childRow.hasClass("jTableChildRowHidden")) {
+                $childRow.hide();
+                $childTable.hide();
+		$childRow.removeClass("jTableChildRowHidden");
+                $childRow.slideDown(10, function() {
+                    $childTable.slideDown('fast');
+                });
             }
 
             return $childRow;
@@ -4968,10 +5029,23 @@ THE SOFTWARE.
 
         /* Closes child row if it's open.
         *************************************************************************/
-        closeChildRow: function ($row) {
-            var $childRow = this.getChildRow($row);
-            if ($childRow.is(':visible')) {
-                $childRow.hide();
+        closeChildRow: function ($row, childTableNoReloadOnOpen) {
+            var $childRow = this.getChildRow($row, childTableNoReloadOnOpen);
+            var $childRowColumn = $childRow.children('td');
+            var $childTable = $childRowColumn.data('childTable');
+			
+            if(!childTableNoReloadOnOpen) {
+		if ($childRow.is(':visible')) {
+                    $childRow.hide();
+		}
+            }
+            else if(!$childRow.hasClass("jTableChildRowHidden")) {
+                $childTable.slideUp('fast', function() {
+                    $childRow.slideUp(10, function () {                    
+                        $childRow.addClass("jTableChildRowHidden");
+                        $childTable.show();
+                    });
+                });
             }
         },
 
@@ -5004,14 +5078,18 @@ THE SOFTWARE.
 
         /* Creates a child row for a row, hides and returns it.
         *************************************************************************/
-        _createChildRow: function ($row) {
+        _createChildRow: function ($row, childTableNoReloadOnOpen) {
             var totalColumnCount = this._$table.find('thead th').length;
             var $childRow = $('<tr></tr>')
                 .addClass('jtable-child-row')
                 .append('<td colspan="' + totalColumnCount + '"></td>');
             $row.after($childRow);
             $row.data('childRow', $childRow);
-            $childRow.hide();
+			
+            if(!childTableNoReloadOnOpen) {
+		$childRow.hide();
+            }
+
             return $childRow;
         }
 

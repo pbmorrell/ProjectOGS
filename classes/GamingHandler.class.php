@@ -3,6 +3,7 @@ include_once 'classes/DataAccess.class.php';
 include_once 'classes/Logger.class.php';
 include_once 'classes/User.class.php';
 include_once 'classes/Game.class.php';
+include_once 'classes/EventMember.class.php';
 include_once 'classes/Utils.class.php';
 
 class GamingHandler
@@ -98,6 +99,7 @@ class GamingHandler
         $formName = "eventCreateForm";
         $formButtonName = "createEventBtn";
         $formButtonText = "Create Event!";
+        $editEventButtons = "";
         $gameDateValue = "";
         $gameTimeValue = "";
         $eventInfo = null;
@@ -109,11 +111,22 @@ class GamingHandler
             
             // Load information about this event
             $eventArray = $this->GetUserScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", 
-                                                       false, "0", "10", $eventId, true);
+                                                       false, "0", "10", $eventId, true, 30);
             if(count($eventArray) > 0) {
                 $eventInfo = $eventArray[0];
                 $gameDateValue = 'value="' . $eventInfo->ScheduledDate . '" ';
                 $gameTimeValue = 'value="' . $eventInfo->ScheduledTime . '" ';
+                
+                $btnVisibilityActionAttr = "1";
+                $btnVisibilityText = "Enable Event";
+                if($eventInfo->Visible) {
+                    $btnVisibilityActionAttr = "0";
+                    $btnVisibilityText = "Hide Event";
+                }
+                
+                $editEventButtons = '<button class="memberHomeBtn icon fa-close" myAction="' . $btnVisibilityActionAttr . 
+                                        '" id="toggleEventVisibilityBtn' . $eventId . '">' . $btnVisibilityText . '</button>'.
+                                    '<button class="memberHomeBtn icon fa-trash" id="deleteEventBtn' . $eventId . '">Delete</button>';
             }
             else {
                 $logger->LogError("Event " . $eventId . " could not be loaded for editing");
@@ -204,8 +217,12 @@ class GamingHandler
                             ((($eventId === 0) || (!$privateEventOptionChecked)) ? 'disabled ' : '') . '>Select all</input>'.
                         '<div class="fixedHeightScrollableContainer">'. 
                             $friendListSelect .
+                        '</div><br /><br />'.
+                        '<div id="eventDialogToolbar' . $eventId . '">'.
+                            '<button type="submit" class="memberHomeBtn icon fa-cogs" id="' . $formButtonName . '">' . $formButtonText . '</button>'.
+                            '<button class="memberHomeBtn icon fa-thumbs-o-down" id="cancelEventBtn' . $eventId . '">Cancel</button>'.
+                            $editEventButtons.
                         '</div>'.
-                        '<br /><br /><button type="submit" class="memberHomeBtn icon fa-cogs" id="' . $formButtonName . '">' . $formButtonText . '</button><br/>'.
                     '</div>'.
 		'</form>'.
             '</section>';
@@ -234,14 +251,20 @@ class GamingHandler
     }
 	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, 
-                                           $pageSize, $showHiddenEvents)
+                                           $pageSize, $showHiddenEvents, $showPastEventsDays)
     {
         $scheduledGames = $this->GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
-                                                       $startIndex, $pageSize, -1, $showHiddenEvents);
+                                                       $startIndex, $pageSize, -1, $showHiddenEvents, $showPastEventsDays);
 
         $rows = [];
         foreach($scheduledGames as $game) {
-            $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $game->EventID);
+            $playersSignedUp = $this->GetEventMembers($dataAccess, $logger, $game->EventID);
+			
+            $playersSignedUpData = "";
+            foreach($playersSignedUp as $player) {
+		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+            }
+            $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
             $row = array (
                 "ID" => $game->EventID,
@@ -251,8 +274,9 @@ class GamingHandler
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
+		"PlayersSignedUpData" => $playersSignedUpData,
                 "Edit" => '',
-		"Hidden" => !$game->Visible ? 'hidden' : ''
+		"Hidden" => !$game->Visible ? 'Yes' : 'No'
             );
 
             array_push($rows, $row);
@@ -260,7 +284,7 @@ class GamingHandler
 
         $jTableResult = [];
         $jTableResult['Result'] = 'OK';
-        $jTableResult['TotalRecordCount'] = $this->GetTotalCountUserScheduledGames($dataAccess, $logger, $userID);
+        $jTableResult['TotalRecordCount'] = $this->GetTotalCountUserScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays);
         $jTableResult['Records'] = $rows;
         return json_encode($jTableResult);
     }
@@ -268,13 +292,12 @@ class GamingHandler
     public function LoadJoinedPlayersForEvent($dataAccess, $logger, $eventId)
     {
         $rows = [];
-        $playersSignedUp = $this->GetEventAttendeeNames($dataAccess, $logger, $eventId);
-        //$playersSignedUp = ['TestPlayer1','TestPlayer2'];
+        $playersSignedUp = $this->GetEventMembers($dataAccess, $logger, $eventId);
 
         foreach($playersSignedUp as $player) {
             $row = array (
-                "ID" => $eventId,
-                "PlayerName" => $player
+                "ID" => $player->EventMemberId,
+                "PlayerName" => $player->UserDisplayName
             );
 
             array_push($rows, $row);
@@ -646,40 +669,93 @@ class GamingHandler
 	return false;
     }
 	
-    public function EventEditorToggleEventVisibility($dataAccess, $logger, $eventID, $isActive)
+    public function EventEditorToggleEventVisibility($dataAccess, $logger, $eventIDs, $isActive)
     {
-	$updateSuccess = false;
 	$eventToggleName = "hidden";
 	if($isActive === "1") {
             $eventToggleName = "visible";
 	}
 		
-	$updateEventQuery = "UPDATE `Gaming.Events` SET `IsActive` = :isActive WHERE `ID` = :eventId;";
-				
-	$parmIsActive = new QueryParameter(':isActive', $isActive, PDO::PARAM_INT);
-	$parmEventId = new QueryParameter(':eventId', $eventID, PDO::PARAM_INT);
-	$queryParms = array($parmIsActive, $parmEventId);
-			
-	$errors = $dataAccess->CheckErrors();
+	$updateSuccess = false;
+	$eventIdList = "";
+	$updateEventQuery = "";
+	$errors = "";
+		
+	try {
+            if(is_array($eventIDs)) {
+		$eventIdList = implode(",", $eventIDs);
+		$eventIdListForQuery = (str_repeat("?,", count($eventIDs) - 1)) . "?";
+		$updateEventQuery = "UPDATE `Gaming.Events` SET `IsActive` = ? WHERE `ID` IN (" . $eventIdListForQuery . ");";
+            }
+            else {
+		$errors = "Error when preparing toggle event visibility query: event list is not an array";
+            }
+	}
+	catch(Exception $e) {
+            $errors = "Exception when preparing toggle event visibility query: " . $e->getMessage();
+	}
 			
 	if(strlen($errors) == 0) {
             try {				
-		if($dataAccess->BuildQuery($updateEventQuery, $queryParms)){
-                    $updateSuccess = $dataAccess->ExecuteNonQuery();
+		if($dataAccess->BuildQuery($updateEventQuery)){
+                    $positionalParms = [$isActive];
+                    $positionalParms = array_unique(array_merge($positionalParms, $eventIDs));
+                    $updateSuccess = $dataAccess->ExecuteNonQueryWithPositionalParms($positionalParms);
 		}
 
 		$errors = $dataAccess->CheckErrors();
             }
             catch(Exception $e) {
-		$logger->LogError("Could not update visibility for event ID '" . $eventID . "'. Exception: " . $e->getMessage());
+		$logger->LogError("Could not update visibility for event IDs (" . $eventIdList . "). Exception: " . $e->getMessage());
             }
 	}
 			
 	if(!$updateSuccess) {
-            $logger->LogError("Could not update visibility for event ID '" . $eventID . "'. " . $errors);
+            $logger->LogError("Could not update visibility for event IDs (" . $eventIdList . "). " . $errors);
 	}
 				
-	return $updateSuccess ? "SUCCESS: Updated event to be " . $eventToggleName : "SYSTEM ERROR: Could not make event " . eventToggleName . ". Please try again later.";
+	return ($updateSuccess === true) ? ("SUCCESS: Updated requested events to be " . $eventToggleName) : ("SYSTEM ERROR: Could not make requested events " . $eventToggleName . ". Please try again later.");
+    }
+	
+    public function EventEditorDeleteEvents($dataAccess, $logger, $eventIDs)
+    {		
+	$deleteSuccess = false;
+	$eventIdList = "";
+	$deleteEventQuery = "";
+	$errors = "";
+		
+	try {
+            if(is_array($eventIDs)) {
+		$eventIdList = implode(",", $eventIDs);
+		$eventIdListForQuery = (str_repeat("?,", count($eventIDs) - 1)) . "?";
+		$deleteEventQuery = "DELETE FROM `Gaming.Events` WHERE `ID` IN (" . $eventIdListForQuery . ");";
+            }
+            else {
+		$errors = "Error when preparing delete events query: event list is not an array";
+            }
+	}
+	catch(Exception $e) {
+            $errors = "Exception when preparing delete events query: " . $e->getMessage();
+	}
+			
+	if(strlen($errors) == 0) {
+            try {				
+		if($dataAccess->BuildQuery($deleteEventQuery)){
+                    $deleteSuccess = $dataAccess->ExecuteNonQueryWithPositionalParms($eventIDs);
+		}
+
+		$errors = $dataAccess->CheckErrors();
+            }
+            catch(Exception $e) {
+		$logger->LogError("Could not delete events (" . $eventIdList . "). Exception: " . $e->getMessage());
+            }
+	}
+			
+	if(!$deleteSuccess) {
+            $logger->LogError("Could not delete events (" . $eventIdList . "). " . $errors);
+	}
+				
+	return ($deleteSuccess === true) ? ("SUCCESS: Deleted requested events") : ("SYSTEM ERROR: Could not delete requested events. Please try again later.");
     }
 	
     public function GetTimezoneList($dataAccess, $selectedTimeZoneID, $eventId = '')
@@ -809,6 +885,10 @@ class GamingHandler
             case "Platform":
                 $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
+            case "Hidden":
+		// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
+                $queryOrderByClause = "(CASE WHEN e.`IsActive` = 0 THEN 1 ELSE 0 END) " . $orderByDirection . ", e.`EventScheduledForDate`";
+                break;
             case "DisplayDate":
                 $queryOrderByClause = "e.`EventScheduledForDate` " . $orderByDirection;
                 break;
@@ -818,7 +898,8 @@ class GamingHandler
     }
 	
     public function GetUserScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
-                                          $paginationEnabled = false, $startIndex = "0", $pageSize = "10", $eventId = -1, $showHiddenEvents = false)
+                                          $paginationEnabled = false, $startIndex = "0", $pageSize = "10", 
+					  $eventId = -1, $showHiddenEvents = false, $showPastEventsDays = "-1")
     {
 	$limitClause = "";
 	if($paginationEnabled) {
@@ -842,6 +923,16 @@ class GamingHandler
             $parmIsActive = new QueryParameter(':isActive', 1, PDO::PARAM_INT);
             array_push($queryParms, $parmIsActive);
         }
+		
+	$parmShowPastEventsDays = null;
+        if($showPastEventsDays !== "-1") {
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
+            $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
+            array_push($queryParms, $parmShowPastEventsDays);
+        }
+	else {
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // Only show future events
+	}
         
 	$orderByClause = "ORDER BY " . $this->TranslateOrderByToQueryOrderByClause($orderBy);
 		
@@ -854,7 +945,6 @@ class GamingHandler
                              "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
                              "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
                              "WHERE (e.`FK_User_ID_EventCreator` = :userID) " . $eventWhereClause .
-                             "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) " . // Only show future events
                              $orderByClause . " " . $limitClause . ";";
         
 	$userGames = array();
@@ -893,20 +983,36 @@ class GamingHandler
         return $userGames;
     }
 	
-    private function GetTotalCountUserScheduledGames($dataAccess, $logger, $userID)
+    private function GetTotalCountUserScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays = "-1")
     {
 	$userTotalScheduledGamesCnt = 0;
+		
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+	$eventWhereClause = "";
+		
+        $parmIsActive = null;
+        if(!$showHiddenEvents) {
+            $eventWhereClause .= "AND (e.`IsActive` = :isActive) ";
+            $parmIsActive = new QueryParameter(':isActive', 1, PDO::PARAM_INT);
+            array_push($queryParms, $parmIsActive);
+        }
+		
+	$parmShowPastEventsDays = null;
+        if($showPastEventsDays !== "-1") {
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
+            $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
+            array_push($queryParms, $parmShowPastEventsDays);
+        }
+	else {
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // Only show future events
+	}
+		
         $getUserGamesQuery = "SELECT COUNT(e.`ID`) AS Cnt " .
                              "FROM `Gaming.Events` AS e ".
                              "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
                              "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
-                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " .
-                             "AND (e.`IsActive` = 1) " .
-                             "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP());";
-        
-        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-        $queryParms = array($parmUserId);
-	$userGames = array();
+                             "WHERE (e.`FK_User_ID_EventCreator` = :userID) " . $eventWhereClause . ";";
         
         $errors = $dataAccess->CheckErrors();
         
@@ -928,9 +1034,10 @@ class GamingHandler
         return $userTotalScheduledGamesCnt;
     }
     
-    public function GetEventAttendeeNames($dataAccess, $logger, $eventID)
+    public function GetEventMembers($dataAccess, $logger, $eventID)
     {
-        $getEventMembersQuery = "SELECT u.`UserName`, CASE WHEN e.`FK_User_ID_EventCreator` = em.`FK_User_ID` THEN ' (Creator)' ELSE '' END AS EventCreator " .
+        $getEventMembersQuery = "SELECT u.`UserName`, CASE WHEN e.`FK_User_ID_EventCreator` = em.`FK_User_ID` THEN ' (Creator)' ELSE '' END AS EventCreator, " .
+				"em.`ID`, em.`FK_Event_ID` AS EventID, em.`FK_User_ID` AS UserID " .
 				"FROM `Gaming.EventMembers` AS em " .
                                 "INNER JOIN `Security.Users` AS u ON em.`FK_User_ID` = u.`ID` " .
 				"INNER JOIN `Gaming.Events` AS e ON e.`ID` = em.`FK_Event_ID` " .
@@ -939,7 +1046,7 @@ class GamingHandler
         
         $parmEventId = new QueryParameter(':eventID', $eventID, PDO::PARAM_INT);
         $queryParms = array($parmEventId);
-	$userNames = array();
+	$eventMembers = array();
         
         $errors = $dataAccess->CheckErrors();
         
@@ -949,7 +1056,8 @@ class GamingHandler
 					
 		if($results != null){
                     foreach($results as $row) {
-			array_push($userNames, $row['UserName'] . $row['EventCreator']);
+			$eventMember = new EventMember($row['ID'], $row['EventID'], $row['UserID'], $row['UserName'], $row['UserName'] . $row['EventCreator']);
+			array_push($eventMembers, $eventMember);
                     }
 		}
             }
@@ -957,9 +1065,9 @@ class GamingHandler
         
 	$errors = $dataAccess->CheckErrors();
 	if(strlen($errors) > 0) {
-            $logger->LogError("Could not retrieve attendees for event " . $eventID . ". " . $errors);
+            $logger->LogError("Could not retrieve members for event " . $eventID . ". " . $errors);
 	}
         
-        return $userNames;
+        return $eventMembers;
     }
 }

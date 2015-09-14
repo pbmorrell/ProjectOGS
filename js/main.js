@@ -164,11 +164,41 @@ function evaluateUserNameAvailability(userNameField, availIndicatorField, action
 function displayHiddenAdsByBrowsingDevice()
 {   
     // If viewing device has screen width > 650px, treat as desktop device
-    if (!window.matchMedia("(max-width: 650px)").matches)
+    if (!isMobileView())
     {
         $('.mobileAdStyle').attr('class', 'hiddenMobileAds');
         $('.hiddenDesktopAds').attr('class', 'desktopAdStyle');
     }
+}
+
+function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPosition, displayContainer, 
+                             autoOpen, isModal, dialogLoadURL, dialogLoadOnLoaded)
+{
+    var width = 600;
+    var height = 700;
+    
+    if(isMobileView()) {
+        width = 400;
+        height = 500;
+        displayContainerPosition = displayContainerPosition + "+10%";
+    }
+    
+    var $dialog = $('<div id="' + dialogId + '"></div>').load(dialogLoadURL, dialogLoadOnLoaded).dialog({
+            autoOpen: autoOpen,
+            title: title,
+            width: width,
+            height: height,
+            modal: isModal
+        }
+    );
+    
+    $dialog.dialog('option', 'position', {
+        my: dialogPosition,
+        at: displayContainerPosition,
+        of: displayContainer
+    });
+
+    $dialog.dialog('open');
 }
 
 function PrepareAutocompleteComboBox(textboxId)
@@ -297,4 +327,9 @@ function PrepareAutocompleteComboBox(textboxId)
             }
         }
     );
+}
+
+function isMobileView()
+{
+    return window.matchMedia("(max-width: 650px)").matches;
 }

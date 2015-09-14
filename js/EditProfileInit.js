@@ -28,7 +28,7 @@ function EditProfileOnReady()
     });
 
     // If viewing device has screen width > 650px, treat as mobile device
-    if (window.matchMedia("(max-width: 650px)").matches) {
+    if (isMobileView()) {
         $('#signupBtn').hide();
         $('#signupBtnMobile').show();
         

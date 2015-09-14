@@ -13,7 +13,7 @@
     
     $onloadPopupJSCode = "";
     if(isset($_GET['redirectMsg'])){
-        $onloadPopupJSCode = "window.history.pushState('Index', '', '/ogs/Index.php'); alert('" . filter_var($_GET['redirectMsg'], FILTER_SANITIZE_STRING) . "');";
+        $onloadPopupJSCode = "window.history.pushState('Index', '', 'Index.php'); alert('" . filter_var($_GET['redirectMsg'], FILTER_SANITIZE_STRING) . "');";
         unset($_GET['redirectMsg']);
     }
     

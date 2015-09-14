@@ -65,17 +65,36 @@
                                         </section>				
                                     </div>
 				</div>
-<!--				<div id="scheduleEventDiv" class="eventManagerSection">
-                                    <section class="box style1">
-                                        <h2>Schedule an Event</h2>
-                                        <div id="scheduleEventContent">
-                                        </div>
-                                    </section>
-				</div>-->
 				<div id="manageEventsDiv" class="9u">
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
-                                        <label style="float:right;"><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label><br /><br />
+                                        <label id="mobileEventsTableToolbar" class="mobileToolbarContainer hidden">
+                                            <button class="controlBtn button" id="refreshEventsBtn" >
+                                                <img style="margin-right:5px" src="images/refresh.png">Refresh
+                                            </button>
+                                            <button class="controlBtn button" id="activateEventsBtn" >
+                                                <img style="margin-right:5px" src="images/activate.png">Activate
+                                            </button>
+                                            <button class="controlBtn button" id="hideEventsBtn" >
+                                                <img style="margin-right:5px" src="images/deactivate.png">Hide
+                                            </button>
+                                            <button class="controlBtn button" id="deleteEventsBtn" >
+                                                <img style="margin-right:5px" src="images/delete.png">Delete
+                                            </button>
+                                        </label>
+                                        <span id="toolbarSpacer" class="hidden">
+                                            <br /><br /><br /><br /><br /><br /><br /><br />
+                                        </span>
+                                        <label style="float:right;">
+                                            <label><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <select id="toggleShowPastEvents">
+                                                    <option value="-1">No</option>
+                                                    <option value="15">15 days</option>
+                                                    <option value="30">30 days</option>
+                                                </select>&nbsp;Show Past Events</label>
+                                        </label>
+					<br /><br />
                                         <div id="manageEventsContent">
                                         </div>
                                     </section>

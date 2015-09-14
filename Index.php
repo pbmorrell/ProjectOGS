@@ -20,7 +20,7 @@
             $(document).ready(function($) {
                 displayHiddenAdsByBrowsingDevice();
                 
-                var getAction = "<?php echo isset($_GET['action']) ? filter_var($_GET['action'], FILTER_SANITIZE_STRING) : "Signup"; ?>";
+                var getAction = "<?php echo isset($_GET['action']) ? filter_var($_GET['action'], FILTER_SANITIZE_STRING) : "Login"; ?>";
 		IndexOnReady(getAction);
                 
 		// Display auth failure redirection message, if present and valid

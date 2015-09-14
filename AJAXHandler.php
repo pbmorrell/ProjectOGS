@@ -363,11 +363,11 @@
 
                 echo $gamingHandler->EventEditorUpdateEvent($dataAccess, $logger, $objUser->UserID, $eventGame);
                 break;
-            case "EventEditorToggleEventVisibility":
-                echo $gamingHandler->EventEditorToggleEventVisibility($dataAccess, $logger, $_POST['eventId'], $_POST['isActive']);
+            case "EventEditorToggleEventVisibility":				
+                echo $gamingHandler->EventEditorToggleEventVisibility($dataAccess, $logger, $_POST['eventIds'], $_POST['isActive']);
                 break;
-            case "EventEditorDeleteEvent":
-                echo $gamingHandler->EventEditorDeleteEvent($dataAccess, $logger, $objUser->UserID, $_POST['eventId']);
+            case "EventEditorDeleteEvents":
+                echo $gamingHandler->EventEditorDeleteEvents($dataAccess, $logger, $_POST['eventIds']);
                 break;
             case "ReloadGameTitleSelector":
 		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID);
@@ -381,8 +381,9 @@
                 $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
                 $showHiddenEvents = ($showHidden === "1") ? true : false;
 			
+		$showPastEventsDays = isset($_POST['showPastEventsInDays']) ? filter_var($_POST['showPastEventsInDays'], FILTER_SANITIZE_STRING) : "-1";
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
-                                                            $startIndex, $pageSize, $showHiddenEvents);
+                                                            $startIndex, $pageSize, $showHiddenEvents, $showPastEventsDays);
                 break;
             case "GetJoinedPlayersForEvent":
 		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);

@@ -111,6 +111,17 @@ class DataAccess
         }
     }
 	
+    public function ExecuteNonQueryWithPositionalParms($valArray)
+    {
+        try {
+            return $this->curStatement->execute($valArray);
+        }
+        catch(PDOException $e){
+            $this->errorResult = 'Could not execute non-query SQL: "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+            return false;
+        }
+    }
+	
     public function RowCount()
     {
         try {
