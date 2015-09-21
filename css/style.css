@@ -24,6 +24,10 @@
         color: #fff;
         text-decoration: underline;
     }
+    
+    a.actionLink {
+        color: blue;
+    }
 
     strong
     {
@@ -1048,37 +1052,41 @@
     }
     
     .dlgToolbarContainer {
-        width: 550px;
-        height: 200px;
-        border-color: gray;
-        border-style:solid;
-        border-width: 1px;
+        width: 28em;
+        height: auto;
+        border:2px solid red;
+        box-sizing: border-box;
         overflow-y: auto;
     }
     
     .dlgToolbarContainer > button {
-        width: 40%;
+        width: 45%;
         height: 65px;
         float: left;
-        margin: 1% 2% 1% 2%;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: 2%;
+        margin-right: 2%;
         padding: 1em 1em 1em 0.75em !important;
     }
     
     .mobileDlgToolbarContainer {
-        width: 18em;
-        height: 200px;
-        border-color: gray;
-        border-style:solid;
-        border-width: 1px;
+        width: 300px;
+        height: auto;
+        border:2px solid red;
+        box-sizing: border-box;
         overflow-y: auto;
     }
     
     .mobileDlgToolbarContainer > button {
-        width: 40%;
-        height: 65px;
+        width: 45%;
+        height: 90px;
         float: left;
-        margin: 1% 2% 1% 2%;
-        padding: 1em 1em 1em 0.75em !important;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: 2%;
+        margin-right: 2%;
+        padding: 1.5em 1em 1em 0.75em !important;
     }
     
     .mobileToolbarContainer {
@@ -1098,7 +1106,37 @@
     {
         background: #32353a !important;
     }
+
+	/* Custom theme for current events jTable: override lightcolor/green CSS to make table orange */
+    #currentEventsContent div.jtable-main-container div.jtable-title {
+	background: #E69316 url("../../lightcolor/bg-thead.png") repeat-x scroll left top !important;
+        color: #000;
+	background: -moz-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #E69316), color-stop(100%, #D4902B));
+	background: -webkit-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -o-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -ms-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: linear-gradient(to bottom, #E69316 0%, #D4902B 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#E69316', endColorstr='#D4902B', GradientType=0);
+	border-color: #CF8414;
+    }
+	
+    #currentEventsContent div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
+        background-color: #CF8414;
+    }
+	
+    #currentEventsContent div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
+			  div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
+	background-color: #E69316;
+	border-color: #CF8414;
+    }
+	
+    #currentEventsContent div.jtable-main-container table.jtable tbody > tr.jtable-row-selected,
+			  div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
+	background-color: #D4902B;
+    }
     
+    /* Custom theme for child tables: override lightcolor/green CSS to make child table headers black, and to not allow them to expand to fill the entire parent row space */
     table.jtable.jTableChild thead {
 	background: #000 url("../../lightcolor/bg-thead.png") repeat-x scroll left top !important;
         color: #fff;
@@ -1122,5 +1160,5 @@
     }
 	
     .jTableChildRowHidden {
-	height:0px !important;
+        height:0px !important;
     }

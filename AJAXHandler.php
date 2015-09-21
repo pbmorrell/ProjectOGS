@@ -385,6 +385,20 @@
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $showHiddenEvents, $showPastEventsDays);
                 break;
+            case "GetCurrentEventsForJTable":
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
+			
+		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+                break;
+            case "EventViewerJoinEvents":
+		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+                break;
+            case "EventViewerLeaveEvents":
+		echo $gamingHandler->RemoveUserFromEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+                break;
             case "GetJoinedPlayersForEvent":
 		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
 		break;

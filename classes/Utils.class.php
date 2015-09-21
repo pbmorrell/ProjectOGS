@@ -67,5 +67,38 @@ class Utils
 		
 		return $foundUser;
 	}
+	
+	public static function SearchEventMemberArrayByUserID($eventMemberArray, $id)
+	{
+		$foundMember = null;
+		foreach($eventMemberArray as $member)
+		{
+			if($member->UserID === $id) {
+				$foundMember = $member;
+				break;
+			}
+		}
+		
+		return $foundMember;
+	}
+	
+	public static function UserIsInEventMemberArray($eventMemberArray, $id)
+	{
+		return (Utils::SearchEventMemberArrayByUserID($eventMemberArray, $id)) != null;
+	}
+	
+	public static function SearchEventMemberArrayByUserNameText($eventMemberArray, $text)
+	{
+		$foundMember = null;
+		foreach($eventMemberArray as $member)
+		{
+			if(stripos($member->UserDisplayName, $text) !== false) {
+				$foundMember = $member;
+				break;
+			}
+		}
+		
+		return $foundMember;
+	}
 }
 

@@ -188,7 +188,10 @@ function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPo
             title: title,
             width: width,
             height: height,
-            modal: isModal
+            modal: isModal,
+            close: function(event, ui) {
+                $dialog.dialog('destroy').remove();
+            }
         }
     );
     
