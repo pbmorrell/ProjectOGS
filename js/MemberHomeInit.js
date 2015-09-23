@@ -324,25 +324,30 @@ function LoadCurrentEventViewer()
                 list: !isMobile,
                 display: function (data) {
                     // Create JOIN or LEAVE link
-                    var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
-                    
-                    if(data.record.Joined === 'JOIN') {
-                        $expandLink.click(function () {
-                            var eventIds = [data.record.ID];
-                            JoinEvents(eventIds);
-                            return false;
-                        });
-                    }
-                    else {
-                        $expandLink.click(function () {
-                            var eventIds = [data.record.ID];
-                            LeaveEvents(eventIds);
-                            return false;
-                        });
-                    }
-                    
-                    // Return image for display in jTable
-                    return $expandLink;
+					if(data.record.Joined !== 'FULL') {
+						var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
+						
+						if(data.record.Joined === 'JOIN') {
+							$expandLink.click(function () {
+								var eventIds = [data.record.ID];
+								JoinEvents(eventIds);
+								return false;
+							});
+						}
+						else {
+							$expandLink.click(function () {
+								var eventIds = [data.record.ID];
+								LeaveEvents(eventIds);
+								return false;
+							});
+						}
+						
+						// Return image for display in jTable
+						return $expandLink;
+					}
+					else {
+						return $('<label>FULL</label>');
+					}
                 }
             },
             PlayersSignedUp: {
@@ -353,7 +358,7 @@ function LoadCurrentEventViewer()
                     var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblCurEvt' + data.record.ID + '" class="fa fa-plus-square" /></label>');
                     $expandImage.click(function () {
                         var eventId = data.record.ID;
-			var tableRow = $(this).closest('tr');
+						var tableRow = $(this).closest('tr');
                         var curLblId = "#lblCurEvt" + data.record.ID;
                         
                         // If we are just toggling the current child table display, close it, change icon back to + (expand), and return
@@ -373,27 +378,38 @@ function LoadCurrentEventViewer()
                 sorting: false
             }
         },
-	recordsLoaded: function(event, data) {
+		recordsLoaded: function(event, data) {
+			// Set total count of games that need joining
+			if((data.records !== null) && (data.records.length > 0)) {
+				var totalGameCount = data.records[0].TotalGamesToJoinCount;
+				var needText = "need";
+				if(totalGameCount == 1) {
+					needText = "needs";
+				}
+				
+				$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
+			}
+			
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
-		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
-		var id = $(this).attr('data-record-key');
-		var dataRecordArray = $.grep(data.records, function (e) {
-                    return e.ID === id;
-		});
-							
-		var playerData = dataRecordArray[0].PlayersSignedUpData;
-		$(this).attr('data-playersSignedUp', playerData);
-							
-		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
+				// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
+				var id = $(this).attr('data-record-key');
+				var dataRecordArray = $.grep(data.records, function (e) {
+					return e.ID === id;
+				});
+									
+				var playerData = dataRecordArray[0].PlayersSignedUpData;
+				$(this).attr('data-playersSignedUp', playerData);
+									
+				// Pre-load each child table, but do not show yet
+				OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
                 
-                // If in mobile view, and an event is joined by current user, set forecolor to green rather than show "Joined" column
+                // If an event is joined by current user, set forecolor to green
                 var isJoined = dataRecordArray[0].Joined;
-                if((isMobile) && (isJoined === 'LEAVE')) {
+                if(isJoined === 'LEAVE') {
                     $(this).css('color', 'green');
                 }
             });
-	}
+		}
     });
 
     // Load event list
@@ -1055,7 +1071,7 @@ function ValidateEventFormFields(eventId)
         alert("Unable to " + alertTextType + " event: Must enter a valid time");
     } else if (comments.trim().length === 0) {
         alert("Unable to " + alertTextType + " event: Please enter notes about your event");
-    } else if (isPrivateEvent && (numPlayersNeeded > numPlayersAllowed)) {
+    } else if (isPrivateEvent && (numPlayersNeeded > (numPlayersAllowed + 1))) { // Event creator is implicitly allowed to join event
         alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
     } else {
         var curDateMoment = moment().utc();

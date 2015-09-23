@@ -17,8 +17,6 @@
     $action = isset($_GET['action']) ? filter_var($_GET['action'], FILTER_SANITIZE_STRING) : filter_var($_POST['action'], FILTER_SANITIZE_STRING);
     
     if(isset($action)) {
-        //$logger->LogInfo("action = " . $action);
-
         // Only proceed if this page is accessed due to signup/login, or from a logged-in user
         if(($action != "Login") && ($action != "Signup")) {
             $sessionDataAccess = new DataAccess();

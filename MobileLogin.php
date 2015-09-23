@@ -1,5 +1,4 @@
 <?php
-    $curPageName = "MobileLogin";
     $mobileLoginPage = true;
     $welcomeUserName = "Log In";
     $sessionRequired = false;
