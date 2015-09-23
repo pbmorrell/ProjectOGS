@@ -1,5 +1,5 @@
 <?php
-    $curPageName = "MemberHome";
+    $curPageName = "Memberhome";
     $mobileLoginPage = false;
     $authFailureRedirectPage = "Index.php";
     $sessionRequired = true;
