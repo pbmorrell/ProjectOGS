@@ -1,13 +1,7 @@
 <?php
+include_once 'Constants.class.php';
 class DataAccess
-{	
-    // Database configuration
-    private $dbType = "mysql";
-    private $dbHost = "localhost";
-    private $dbUser = "raiden01_webuser";
-    private $dbPassword = "t3\$t*useR";
-    private $dbName = "raiden01_ProjectOGS";
-	
+{		
     // Globals
     private $dbHandler;
     private $errorResult = "";
@@ -196,22 +190,22 @@ class DataAccess
     
     public function Open()
     {
-	// Set DSN
-	$dsn = $this->dbType . ':host=' . $this->dbHost . ';dbname=' . $this->dbName;
-			
-	// Set connection options
-	$options = array(
-            PDO::ATTR_PERSISTENT => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-	);
-			
-	// Attempt to create new PDO instance
-	try{
-            $this->dbHandler = new PDO($dsn, $this->dbUser, $this->dbPassword, $options);
-	}
-	catch(PDOException $e){
-            $this->errorResult = $e->getMessage();
-	}
+		// Set DSN
+		$dsn = Constants::$dbType . ':host=' . Constants::$dbHost . ';dbname=' . Constants::$dbName;
+				
+		// Set connection options
+		$options = array(
+			PDO::ATTR_PERSISTENT => true,
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		);
+				
+		// Attempt to create new PDO instance
+		try{
+			$this->dbHandler = new PDO($dsn, Constants::$dbUser, Constants::$dbPassword, $options);
+		}
+		catch(PDOException $e){
+			$this->errorResult = $e->getMessage();
+		}
     }
     
     public function Close()

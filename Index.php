@@ -1,5 +1,4 @@
 <?php
-    $curPageName = "Index";
     $mobileLoginPage = false;
     $welcomeUserName = "Sign Up";
     $sessionRequired = false;

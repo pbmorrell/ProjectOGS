@@ -1,4 +1,5 @@
 <?php
+	include_once 'classes/Constants.class.php';
     include_once 'classes/DataAccess.class.php';
     include_once 'classes/SecurityHandler.class.php';
     include_once 'classes/GamingHandler.class.php';
@@ -7,7 +8,8 @@
     include_once 'classes/User.class.php';
     
     $welcomeUserName = "Welcome";
-    
+    $curPageName = basename($_SERVER['PHP_SELF'], ".php");
+	
     // Construct page JS init file name for script include
     $pageInitJSScriptName = $curPageName . "Init.js";
     
@@ -74,7 +76,7 @@
         $objUser = User::constructDefaultUser();
         $justCreatedSession = false;
         // If user not logged in or unauthorized to view this page, redirect to login page
-        if($securityHandler->UserCanAccessThisPage($dataAccess, $logger, $curPageName, $authFailureRedirectPage)) {
+        if($securityHandler->UserCanAccessThisPage($dataAccess, $logger, $curPageName, Constants::$authFailureRedirectPage)) {
             $objUser = $_SESSION['WebUser'];
             $_SESSION['lastActivity'] = time();
 

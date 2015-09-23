@@ -1,7 +1,5 @@
 <?php
-    $curPageName = "MemberHome";
     $mobileLoginPage = false;
-    $authFailureRedirectPage = "Index.php";
     $sessionRequired = true;
     $sessionAllowed = true;
     include "Header.php";

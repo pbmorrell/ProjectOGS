@@ -1,9 +1,7 @@
 <?php
-    $curPageName = "About";
     $mobileLoginPage = false;
     $sessionRequired = false;
     $sessionAllowed = true;
-    $authFailureRedirectPage = "Index.php";
     include "Header.php";
 ?>
 <!DOCTYPE HTML>

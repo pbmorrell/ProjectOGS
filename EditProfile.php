@@ -1,7 +1,5 @@
 <?php
-    $curPageName = "EditProfile";
     $mobileLoginPage = false;
-    $authFailureRedirectPage = "Index.php";
     $sessionRequired = true;
     $sessionAllowed = true;
     
