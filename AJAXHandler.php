@@ -368,7 +368,7 @@
                 echo $gamingHandler->EventEditorDeleteEvents($dataAccess, $logger, $_POST['eventIds']);
                 break;
             case "ReloadGameTitleSelector":
-		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID);
+		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID, '');
 		break;
             case "GetUserOwnedEventsForJTable":
 		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";

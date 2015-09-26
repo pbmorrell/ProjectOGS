@@ -17,7 +17,10 @@ class Game
     public $SelectedPlatformID = -1;
     public $Notes = "";
     public $Visible = true;
+    public $EventCreatorUserName = "";
+    public $JoinStatus = "";
     public $FriendsAllowed = [];
+    public $EventMembers = [];
 	
     public function __construct($gid, $gn, $igg)
     {
@@ -26,7 +29,7 @@ class Game
 	$this->IsGlobalGameTitle = $igg;
     }
     
-    public static function ConstructGameForEvent($gid, $sd, $st, $rpc, $n, $fa, $igg, $tzi, $pid, $gn, $sdu, $spt, $tzt, $eid, $v = true)
+    public static function ConstructGameForEvent($gid, $sd, $st, $rpc, $n, $fa, $igg, $tzi, $pid, $gn, $sdu, $spt, $tzt, $eid, $v = true, $ecu = "")
     {
         $isPublicGame = count($fa) > 0 ? false : true;
         
@@ -45,6 +48,7 @@ class Game
         $instance->SelectedPlatformText = $spt;
         $instance->ScheduledTimeZoneText = $tzt;
 	$instance->Visible = $v;
+	$instance->EventCreatorUserName = $ecu;
         
         return $instance;
     }
