@@ -44,11 +44,11 @@
                                             <div class="row double">
 						<section class="6u">
                                                     <header>
-                                                        <h2>Schedule online video gaming events with friends around the world.</h2>
-                                                    </header>									
-                                                    <p><i class="fa fa-calendar"></i> &nbsp Create gaming events and invite friends.</p>
-                                                    <p><i class="fa fa-user"></i> &nbsp Find new friends to connect with and game.</p>
-                                                    <p><i class="fa fa-trophy"></i> &nbsp Level up your online gaming experience.</p>
+                                                        <h2>The simplest "looking for group" site on the web. and its free.</h2>
+                                                    </header><br/><br/>								
+                                                    <p><i id="colorCalendar" class="fa fa-calendar"></i> &nbsp Easily create gaming events and invite friends.</p><br/>
+                                                    <p><i id="colorUser" class="fa fa-user"></i> &nbsp Find new players to connect with and game together.</p><br/>
+                                                    <p><i id="colorTrophy" class="fa fa-trophy"></i> &nbsp Never be stuck looking for online players again.</p><br/>
 						</section>								
 						<section class="6u">
                                                     <header>
