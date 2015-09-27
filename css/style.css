@@ -85,7 +85,7 @@
         color: #000;
         border-radius: .5em;
         line-height: 1.75em;
-        width: 18em;
+        width: 22em;
     }
 
     .box.style1 input[type=text],select{
@@ -330,6 +330,7 @@
         background: #32353a;
         color: #fff;
         padding: 1em 1em 1em 0.75em !important;
+		width: 21em;
     }
 
     .memberHomeBtn {
@@ -457,7 +458,7 @@
     {
         background: #32353a;
         color: #fff;
-        line-height: 1em;
+        line-height: 2.1em;
         font-size: .3em;
         border-radius: .5em;
         padding: .6em;
@@ -841,7 +842,8 @@
 
     #loginForm input
     {
-        min-height: 2.5em;
+        min-height: 3em;
+		width: 17.5em;
     }
 
     .newsletter input
@@ -1162,3 +1164,19 @@
     .jTableChildRowHidden {
         height:0px !important;
     }
+	
+/*********************************************************************************/
+/* Favicon Icon Colors                                                           */
+/*********************************************************************************/	
+
+	#colorCalendar{
+		color: #CC3300;
+	}
+	
+	#colorUser{
+		color: #66CCFF;
+	}
+	
+	#colorTrophy{
+		color: #999900;
+	}

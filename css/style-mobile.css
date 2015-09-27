@@ -24,6 +24,10 @@
 	{
 		font-size: 1em;
 	}
+	
+	input{
+		width: 100%;
+	}
 
 	section,
 	article
@@ -179,8 +183,9 @@
 		padding: 10px;
 	}
 	
-	#footer-wrapper
+	#footer-wrapper input
 	{
+		width: 100%;
 	}
 
 /*********************************************************************************/
