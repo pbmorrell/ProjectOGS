@@ -54,7 +54,7 @@
                                                     <header>
                                                         <h2>Sign Up</h2>
                                                     </header>
-                                                    <div id="signupFormDiv">
+                                                    <div id="signupFormDiv" class="signupInp">
                                                         <form name="signupForm" method="POST" action="">
                                                             <input id="signupEmail" type="text" maxlength="100" placeholder=" Email Address"><span></span><br/>
                                                             <input id="signupPW" type="password" maxlength="50" placeholder=" Password"><span></span>
@@ -81,7 +81,7 @@
 									<img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
 								</div>
 								<br/><br/>
-                                                            <button type="submit" class="controlBtn button icon fa-cogs" id="signupBtn">Create Free Account</button>
+                                                            <button type="submit" class="controlBtn controlBtnIndex button icon fa-cogs" id="signupBtn">Create Free Account</button>
                                                         </form>
                                                     </div>
                                                     <div id="signupErr" class="signupErr" />

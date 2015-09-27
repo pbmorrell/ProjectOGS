@@ -85,7 +85,7 @@
         color: #000;
         border-radius: .5em;
         line-height: 1.75em;
-        width: 22em;
+        width: 18em;
     }
 
     .box.style1 input[type=text],select{
@@ -330,8 +330,15 @@
         background: #32353a;
         color: #fff;
         padding: 1em 1em 1em 0.75em !important;
-		width: 21em;
     }
+	
+	.controlBtnIndex{
+		width: 21em;
+	}
+        
+        .signupInp input{
+            width: 22em;
+        }
 
     .memberHomeBtn {
         background: rgba(255,255,255,0.05);
