@@ -331,6 +331,14 @@
         color: #fff;
         padding: 1em 1em 1em 0.75em !important;
     }
+	
+	.controlBtnIndex{
+		width: 21em;
+	}
+        
+        .signupInp input{
+            width: 22em;
+        }
 
     .memberHomeBtn {
         background: rgba(255,255,255,0.05);
@@ -461,7 +469,7 @@
     {
         background: #32353a;
         color: #fff;
-        line-height: 1em;
+        line-height: 2.1em;
         font-size: .3em;
         border-radius: .5em;
         padding: .6em;
@@ -858,7 +866,8 @@
 
     #loginForm input
     {
-        min-height: 2.5em;
+        min-height: 3em;
+		width: 17.5em;
     }
 
     .newsletter input
@@ -1179,3 +1188,19 @@
     .jTableChildRowHidden {
         height:0px !important;
     }
+	
+/*********************************************************************************/
+/* Favicon Icon Colors                                                           */
+/*********************************************************************************/	
+
+	#colorCalendar{
+		color: #CC3300;
+	}
+	
+	#colorUser{
+		color: #66CCFF;
+	}
+	
+	#colorTrophy{
+		color: #999900;
+	}

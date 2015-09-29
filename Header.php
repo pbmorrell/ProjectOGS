@@ -44,7 +44,7 @@
                             '<header id="header">'.
                             '<!-- Logo -->'.
                             '<h1>'.
-                                '<a href="#" id="logo">Project OGS</a>'.
+                                '<a href="#" id="logo">Player Unite</a>'.
                                 $pageHeaderLoginForm .
                             '</h1>'.
                             '<!-- Nav -->'.
@@ -144,7 +144,7 @@
                             '<div class="12u">'.
                                 '<header id="header">'.						
                                     '<!-- Logo -->'.
-                                    '<h1><a href="#" id="logo">Project OGS</a></h1>' .
+                                    '<h1><a href="#" id="logo">Player Unite</a></h1>' .
                                     '<!-- Nav -->'.
                                     '<nav id="nav">'.
                                         '<ul>' . $premiumMemberBenefitAdDesktop .

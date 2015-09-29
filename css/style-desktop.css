@@ -65,6 +65,14 @@
 		{
 			margin-left: 12.5em;
 		}
+               
+        .controlBtnIndex{
+		width: 21em;
+	}
+        
+        .signupInp input{
+            width: 22em;
+        }
 		
 /*********************************************************************************/
 /* Wrappers                                                                      */

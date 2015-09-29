@@ -31,17 +31,17 @@
                                             <div class="row double">
 						<section class="6u">
                                                     <header>
-                                                        <h2>Schedule online video gaming events with friends around the world.</h2>
-                                                    </header>									
-                                                    <p><i class="fa fa-calendar"></i> &nbsp Create gaming events and invite friends.</p>
-                                                    <p><i class="fa fa-user"></i> &nbsp Find new friends to connect with and game.</p>
-                                                    <p><i class="fa fa-trophy"></i> &nbsp Level up your online gaming experience.</p>
+                                                        <h2>The simplest "looking for group" site on the web. and its free.</h2>
+                                                    </header><br/><br/>								
+                                                    <p><i id="colorCalendar" class="fa fa-calendar"></i> &nbsp Easily create gaming events and invite friends.</p><br/>
+                                                    <p><i id="colorUser" class="fa fa-user"></i> &nbsp Find new players to connect with and game together.</p><br/>
+                                                    <p><i id="colorTrophy" class="fa fa-trophy"></i> &nbsp Never be stuck looking for online players again.</p><br/>
 						</section>								
 						<section class="6u">
                                                     <header>
                                                         <h2>Sign Up</h2>
                                                     </header>
-                                                    <div id="signupFormDiv">
+                                                    <div id="signupFormDiv" class="signupInp">
                                                         <form name="signupForm" method="POST" action="">
                                                             <input id="signupEmail" type="text" maxlength="100" placeholder=" Email Address"><span></span><br/>
                                                             <input id="signupPW" type="password" maxlength="50" placeholder=" Password"><span></span>
@@ -68,7 +68,7 @@
 									<img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
 								</div>
 								<br/><br/>
-                                                            <button type="submit" class="controlBtn button icon fa-cogs" id="signupBtn">Create Free Account</button>
+                                                            <button type="submit" class="controlBtn controlBtnIndex button icon fa-cogs" id="signupBtn">Create Free Account</button>
                                                         </form>
                                                     </div>
                                                     <div id="signupErr" class="signupErr" />

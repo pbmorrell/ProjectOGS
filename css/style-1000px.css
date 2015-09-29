@@ -26,6 +26,14 @@
 		{
 			font-size: 1.5em;
 		}
+                
+        .controlBtnIndex{
+		width: 21em;
+	}
+        
+        .signupInp input{
+            width: 22em;
+        }
 
 /*********************************************************************************/
 /* Wrappers                                                                      */

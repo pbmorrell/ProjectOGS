@@ -45,7 +45,7 @@
                 <!-- Footer -->
                 <!-- Copyright -->
                 <div id="copyright">
-                    &copy; <script>document.write(new Date().getFullYear());</script> Project OGS<br/> All Rights Reserved<br/>
+                    &copy; <script>document.write(new Date().getFullYear());</script> Player Unite<br/> All Rights Reserved<br/>
                 </div>
                 <!-- Copyright -->
             </div>
