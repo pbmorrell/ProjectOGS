@@ -27,7 +27,7 @@ function EditProfileOnReady()
         evaluateUserNameAvailability('#userName', '#userNameTakenIndicator', 'AJAXHandler.php');
     });
 
-    // If viewing device has screen width > 650px, treat as mobile device
+    // If viewing device has screen width < 650px, treat as mobile device
     if (isMobileView()) {
         $('#signupBtn').hide();
         $('#signupBtnMobile').show();

@@ -1,4 +1,81 @@
 // Shared functions
+function GlobalStartupActions()
+{
+    // If current page defines a viewport width handler, register for
+    // viewport width transitions now
+    if(typeof OnViewportWidthChanged == 'function') {
+        // Attach handler for events fired by viewport size transition
+        enquire.register("(max-width: 400px)", function() {
+                // Fire viewportWidthChanged handler, if defined in current page
+                OnViewportWidthChanged("xtraSmall");
+            });
+
+        enquire.register("(min-width: 401px) and (max-width: 650px)", function() {
+                // Fire viewportWidthChanged handler
+                OnViewportWidthChanged("mobile");
+            });
+
+        enquire.register("(min-width: 651px) and (max-width: 1680px)", function() {
+                // Fire viewportWidthChanged handler
+                OnViewportWidthChanged("desktop");
+            });
+    }
+    
+    // Display in desktop mode any ads whose position/size is dependent on
+    // viewport size, if site not being used on mobile device
+    displayHiddenAdsByBrowsingDevice();
+    
+    // If a login panel is included on this page, attach event handler to login button
+    if($("#login").length) {
+        $('#loginBtn').click(function() {
+            $('#loginErr').attr('class', 'preLogin');
+            $('#loginErr').html("Logging In...");
+            $('#loginErr').fadeIn(200);
+
+            $.ajax({
+                type: "POST",
+                url: "AJAXHandler.php",
+                data: "action=Login&" + $('#loginForm').serialize(),
+                success: function(response){
+                    if(response === 'true') {
+                        window.location.href = "MemberHome.php";
+                    }
+                    else {
+                        $('#loginErr').attr('class', 'loginError');
+                        $('#loginErr').html(response);
+
+                        $('#loginPassword').val('');
+
+                        setTimeout(function() {
+                            $('#loginErr').hide();
+                            }, 3000
+                        );
+                    }
+                }
+            });
+
+            return false;
+        });
+    }
+}
+
+function GetURLParamVal(paramName)
+{
+    var params = {};
+    
+    if(location.search) {
+        var keyValuePairs = location.search.substring(1).split('&');
+        
+        for(var i = 0; i < keyValuePairs.length; i++) {
+            var keyValPair = keyValuePairs[i].split('=');
+            if(!keyValPair)  continue;
+            params[keyValPair[0]] = keyValPair[1] || true;
+        }
+    }
+    
+    return (params[paramName] == undefined) ? '' : params[paramName];
+}
+
 function _(x) {
     return document.getElementById(x);	
 }
@@ -335,4 +412,99 @@ function PrepareAutocompleteComboBox(textboxId)
 function isMobileView()
 {
     return window.matchMedia("(max-width: 650px)").matches;
+}
+
+// Param "colsToCombine" expected to be in following format:
+//      Array of strings, each string representing a column name from a table on this page
+//      First column is the one that should contain the stacked text from the other columns
+//      The columns are in the order that the text is desired to be stacked (i.e. the second
+//          specified column's text should appear right below the first, the third column's text
+//          should appear right below the second column's, etc.)
+//      All columns after the first one will be hidden from view after their text is consolidated
+// Param "colsToCombineBlankSeparatorLine" expected to be in following format:
+//      Key-val pair array with key being name of column (from colsToCombine), and val being
+//          a boolean indicating whether or not to prepend two newlines to that column
+function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tableContainerDiv, hiddenClassName)
+{
+    // If column array contains less than one column, nothing to do
+    if((!colsToCombine) || (colsToCombine.length < 2)) {
+        return;
+    }
+    
+    var destColIdx = $(tableContainerDiv + ' th:contains("' + colsToCombine[0] + '")').index();
+    
+    // For each displayed row
+    $(tableContainerDiv).find('table tbody tr').each(function() {
+        var stackedTextCol = $(this).find('td').eq(destColIdx);
+        var stackedText = $(stackedTextCol).text();
+        
+        // Apply "white-space:pre" style to stack column, to allow separator line between
+        // the text values of each column
+        $(stackedTextCol).addClass('multiLineTableColumn');
+        
+        for(var i = 1; i < colsToCombine.length; i++) {
+            // Get current index of this column
+            var colIdx = $(tableContainerDiv + ' th:contains("' + colsToCombine[i] + '")').index();
+
+            // Get text of this column
+            var newLinesToAdd = "\n";
+            if(colsToCombineBlankSeparatorLine[colsToCombine[i]]) {
+                newLinesToAdd += "\n";
+            }
+            
+            var col = $(this).find('td').eq(colIdx);
+            var colText = newLinesToAdd + $(col).text();
+
+            // Add to stack
+            stackedText += colText;
+
+            // Hide this column
+            $(col).addClass(hiddenClassName);
+            
+            // Hide this column header
+            if(i === 1) {
+                var colHdr = $(tableContainerDiv + ' thead tr th:contains("' + colsToCombine[i] + '")');
+                $(colHdr).addClass(hiddenClassName);
+            }
+        }
+        
+        // Set text of stack column to combined text of other columns
+        stackedTextCol.text(stackedText);
+    });
+}
+
+// Param "stackCol" expected to be name of column which is storing all combined columns' text
+// Param "colsToExpand" expected to be in following format:
+//      Array of strings, each string representing a column name from a table on this page
+//      Columns here are expected to be in the order that text was added to the stack column
+//          (thus the same order as in the array passed to "CombineTableColumns" function)
+function ExpandTableColumn(stackCol, colsToExpand, tableContainerDiv, hiddenClassName)
+{
+    // If column array contains no column, nothing to do
+    if((!colsToExpand) || (colsToExpand.length < 1)) {
+        return;
+    }
+    
+    var stackColIdx = $(tableContainerDiv + ' th:contains("' + stackCol + '")').index();
+    
+    // For each displayed row
+    $(tableContainerDiv).find('table tbody tr').each(function() {
+        var stackedTextCol = $(this).find('td').eq(stackColIdx);
+        var stackedText = $(stackedTextCol).text();
+        
+        // Remove stacked text, leaving only original text
+        stackedText = stackedText.split('\n')[0];
+        $(stackedTextCol).text(stackedText);
+        
+        // Remove "white-space:pre" style from stack column, which allowed separator line between
+        // the text values of each column
+        $(stackedTextCol).removeClass('multiLineTableColumn');
+        
+        // Make previously hidden columns visible again
+        for(var i = 0; i < colsToExpand.length; i++) {
+            var colIdx = $(tableContainerDiv + ' th:contains("' + colsToExpand[i] + '")').index();
+            var col = $(this).find('td').eq(colIdx);
+            $(col).removeClass(hiddenClassName);
+        }
+    });
 }

@@ -16,13 +16,6 @@
         <script src="js/moment-timezone-with-data.min.js"></script>
 	<script src="js/jTable/jquery.jtable.min.js"></script>
 	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
-        <script>
-            // JQuery functionality
-            $(document).ready(function($) {
-                displayHiddenAdsByBrowsingDevice();
-                MemberHomeOnReady();
-            });
-        </script>
     </head>
     <body class="">
         <?php echo $headerHTML; ?>

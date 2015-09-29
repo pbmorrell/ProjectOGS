@@ -23,6 +23,31 @@ function MemberHomeOnReady()
     LoadEventManager();
 }
 
+function OnViewportWidthChanged(newViewType)
+{
+    switch(newViewType) {
+        case "xtraSmall":
+            // Enclose jTable containers in fixed-width scrollable divs
+            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer').addClass('fixedWidthScrollableContainer');
+            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer').addClass('fixedWidthScrollableContainer');
+            
+            FormatCurrentEventsTableForCurrentView(true);
+            break;
+        case "mobile":
+            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer');
+            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer');
+            
+            FormatCurrentEventsTableForCurrentView(true);
+            break;
+        case "desktop":
+            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer');
+            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer');
+            
+            FormatCurrentEventsTableForCurrentView(false);
+            break;
+    }
+}
+
 function LoadEventManager()
 {
     var isMobile = isMobileView();
@@ -231,16 +256,14 @@ function LoadEventManager()
 }
 
 function LoadCurrentEventViewer()
-{
-    var isMobile = isMobileView();
-    
+{   
     // Initialize jTable on currentEventsContent div
     $(currentEventViewerJTableDiv).jtable({
-        title: (isMobile) ? ('Browse User Events') : ('Browse Events Hosted By Other Users'),
+        title: 'Browse Events Hosted By Other Users',
         paging: true,
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
-        pageSizeChangeArea: !isMobile,
+        pageSizeChangeArea: true,
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
         openChildAsAccordion: false,
@@ -252,7 +275,7 @@ function LoadCurrentEventViewer()
             items:
             [
                 {
-                    text: (isMobile) ? ('Refresh') : ('Refresh Events'),
+                    text: 'Refresh Events',
                     icon: 'images/refresh.png',
                     tooltip: 'Refreshes current event list',
                     click: function(){
@@ -261,7 +284,7 @@ function LoadCurrentEventViewer()
                     }
                 },
                 {
-                    text: (isMobile) ? ('Join') : ('Join Selected'),
+                    text: 'Join Selected',
                     icon: 'images/signup.png',
                     tooltip: 'Signs you up for all selected events',
                     click: function(){
@@ -269,7 +292,7 @@ function LoadCurrentEventViewer()
                     }
                 },
                 {
-                    text: (isMobile) ? ('Leave') : ('Leave Selected'),
+                    text: 'Leave Selected',
                     icon: 'images/cancelsignup.png',
                     tooltip: 'Cancels enrollment for selected events',
                     click: function(){
@@ -315,39 +338,37 @@ function LoadCurrentEventViewer()
                 title: 'Game Notes',
                 width: '22%',
                 sorting: false,
-                list: !isMobile
             },
             Joined: {
                 title: 'Joined',
                 width: '7%',
                 sorting: true,
-                list: !isMobile,
                 display: function (data) {
                     // Create JOIN or LEAVE link
-					if(data.record.Joined !== 'FULL') {
-						var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
+                    if(data.record.Joined !== 'FULL') {
+			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
+					
+			if(data.record.Joined === 'JOIN') {
+                            $expandLink.click(function () {
+				var eventIds = [data.record.ID];
+				JoinEvents(eventIds);
+				return false;
+                            });
+			}
+			else {
+                            $expandLink.click(function () {
+				var eventIds = [data.record.ID];
+				LeaveEvents(eventIds);
+				return false;
+                            });
+			}
 						
-						if(data.record.Joined === 'JOIN') {
-							$expandLink.click(function () {
-								var eventIds = [data.record.ID];
-								JoinEvents(eventIds);
-								return false;
-							});
-						}
-						else {
-							$expandLink.click(function () {
-								var eventIds = [data.record.ID];
-								LeaveEvents(eventIds);
-								return false;
-							});
-						}
-						
-						// Return image for display in jTable
-						return $expandLink;
-					}
-					else {
-						return $('<label>FULL</label>');
-					}
+			// Return image for display in jTable
+			return $expandLink;
+                    }
+                    else {
+			return $('<label>FULL</label>');
+                    }
                 }
             },
             PlayersSignedUp: {
@@ -358,7 +379,7 @@ function LoadCurrentEventViewer()
                     var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblCurEvt' + data.record.ID + '" class="fa fa-plus-square" /></label>');
                     $expandImage.click(function () {
                         var eventId = data.record.ID;
-						var tableRow = $(this).closest('tr');
+			var tableRow = $(this).closest('tr');
                         var curLblId = "#lblCurEvt" + data.record.ID;
                         
                         // If we are just toggling the current child table display, close it, change icon back to + (expand), and return
@@ -378,38 +399,47 @@ function LoadCurrentEventViewer()
                 sorting: false
             }
         },
-		recordsLoaded: function(event, data) {
-			// Set total count of games that need joining
-			if((data.records !== null) && (data.records.length > 0)) {
-				var totalGameCount = data.records[0].TotalGamesToJoinCount;
-				var needText = "need";
-				if(totalGameCount == 1) {
-					needText = "needs";
-				}
+	recordsLoaded: function(event, data) {
+            // Set total count of games that need joining
+            if((data.records !== null) && (data.records.length > 0)) {
+		var totalGameCount = data.records[0].TotalGamesToJoinCount;
+		var needText = "need";
+		if(totalGameCount == 1) {
+                    needText = "needs";
+		}
 				
-				$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
-			}
+		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
+            }
 			
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
-				// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
-				var id = $(this).attr('data-record-key');
-				var dataRecordArray = $.grep(data.records, function (e) {
-					return e.ID === id;
-				});
+		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
+		var id = $(this).attr('data-record-key');
+		var dataRecordArray = $.grep(data.records, function (e) {
+                    return e.ID === id;
+		});
 									
-				var playerData = dataRecordArray[0].PlayersSignedUpData;
-				$(this).attr('data-playersSignedUp', playerData);
+		var playerData = dataRecordArray[0].PlayersSignedUpData;
+		$(this).attr('data-playersSignedUp', playerData);
 									
-				// Pre-load each child table, but do not show yet
-				OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
+		// Pre-load each child table, but do not show yet
+		OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
                 
                 // If an event is joined by current user, set forecolor to green
                 var isJoined = dataRecordArray[0].Joined;
                 if(isJoined === 'LEAVE') {
                     $(this).css('color', 'green');
                 }
+                // If all required players are signed up for a given event,
+                // such that it is "full", set forecolor to red
+                else if(isJoined === 'FULL') {
+                    $(this).css('color', 'red');
+                }
             });
-		}
+            
+            if(isMobileView()) {
+                FormatCurrentEventsTableForCurrentView(true);
+            }
+	}
     });
 
     // Load event list
@@ -423,6 +453,71 @@ function LoadCurrentEventViewer()
     // Execute any post-startup logic
     CurrentEventViewerOnReady();
     /* ******************************************************************************************************** */
+}
+
+function FormatCurrentEventsTableForCurrentView(isMobile)
+{
+    if(isMobile) {
+        // CurrentEvents: Collapse Game & Console columns into one vertical column,
+        // and Scheduled Date & Scheduled Time columns into another vertical column
+        var colsToCombine = ["Game", "Console"];
+        var colsToCombineBlankSeparatorLine = {"Game": false, "Console": true};
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, "hiddenInMobileView");
+
+        colsToCombine = ["Date", "Time"];
+        colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, "hiddenInMobileView");
+        
+        // Change table header and toolbar text to shorter, mobile-friendly words
+        $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse User Events');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join Selected")').text('Join');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave Selected")').text('Leave');
+        
+        // Hide "Game Notes" and "Joined" columns
+        var gameNotesColHdr = $(currentEventViewerJTableDiv + ' th:contains("Game Notes")');
+        
+        var joinedColHdr = $(currentEventViewerJTableDiv + ' th').filter(function() {
+            return $(this).text() === "Joined";
+        }).eq(0);
+        
+        var gameNotesColIdx = $(gameNotesColHdr).index();
+        var joinedColIdx = $(joinedColHdr).index();
+        
+        $(gameNotesColHdr).addClass("hiddenInMobileView");
+        $(joinedColHdr).addClass("hiddenInMobileView");
+                
+        $(currentEventViewerJTableDiv + ' table tbody tr').each(function() {
+            var gameNotesCol = $(this).find('td').eq(gameNotesColIdx);
+            var joinedCol = $(this).find('td').eq(joinedColIdx);
+            $(gameNotesCol).addClass('hiddenInMobileView');
+            $(joinedCol).addClass('hiddenInMobileView');
+        });
+        
+        // Hide page size change area
+        $(currentEventViewerJTableDiv + ' .jtable-page-size-change').hide();
+    }
+    else {
+        // CurrentEvents: Expand Game & Console columns into two distinct columns again;
+        // do same for Scheduled Date & Scheduled Time columns
+        var colsToExpand = ["Console"];
+        ExpandTableColumn("Game", colsToExpand, currentEventViewerJTableDiv, "hiddenInMobileView");
+            
+        colsToExpand = ["Time"];
+        ExpandTableColumn("Date", colsToExpand, currentEventViewerJTableDiv, "hiddenInMobileView");
+
+        // Change table header and toolbar text to full-length versions
+        $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse Events Hosted By Other Users');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join")').text('Join Selected');
+        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave")').text('Leave Selected');
+        
+        // Show hidden columns
+        $('.hiddenInMobileView').removeClass('hiddenInMobileView');
+        
+        // Display page size change area
+        $(currentEventViewerJTableDiv + ' .jtable-page-size-change').show();
+    }
 }
 
 function CurrentEventViewerOnReady()

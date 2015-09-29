@@ -1,5 +1,5 @@
 <?php
-	include_once 'classes/Constants.class.php';
+    include_once 'classes/Constants.class.php';
     include_once 'classes/DataAccess.class.php';
     include_once 'classes/SecurityHandler.class.php';
     include_once 'classes/GamingHandler.class.php';
@@ -198,6 +198,7 @@
         '<script src="js/jquery.dropotron.min.js"></script>'.
         '<script src="js/skel.min.js"></script>'.
         '<script src="js/skel-layers.min.js"></script>'.
+        '<script src="js/enquire.min.js"></script>'.    
         '<script src="js/init.js"></script>'.
         '<script src="js/main.js"></script>'.
         '<script src="js/' . $pageInitJSScriptName . '"></script>'.
@@ -206,5 +207,13 @@
         '<script src="js/jquery-ui-1.10.4.custom.js"></script>'.
         '<script src="js/jquery.maskedinput.min.js"></script>'.
         '<script src="js/jquery.timepicker.min.js"></script>'.
-        '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->';
+        '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->'.
+        '<script>'.
+            '$(document).ready(function($) { '.
+                'GlobalStartupActions(); '.
+                $curPageName . 'OnReady(); '.
+                // Display auth failure redirection message, if present
+                $onloadPopupJSCode.
+            '});'.
+        '</script>';
 ?>

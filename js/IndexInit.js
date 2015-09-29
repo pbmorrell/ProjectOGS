@@ -1,5 +1,8 @@
-function IndexOnReady(getAction)
+function IndexOnReady()
 {
+    var getAction = GetURLParamVal('action');
+    getAction = (getAction.length > 0) ? getAction : 'Login';
+    
     // If viewing device has screen width > 650px, treat as mobile device
     // and redirect user to mobile login page
     if ((getAction != "Signup") && isMobileView()) {

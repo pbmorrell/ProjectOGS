@@ -393,6 +393,10 @@
     .hidden {
         display:none !important;
     }
+    
+    .hiddenInMobileView {
+        display:none !important;
+    }    
 
     .hiddenDesktopAds {
         display:none;
@@ -510,6 +514,19 @@
         width: 100%;
         height: 400px;
         overflow-y: scroll;
+    }
+    
+    .fixedWidthScrollableContainer {
+        border:2px solid #ccc;
+        box-sizing: border-box;
+        padding: 0em 1em 0em;
+        width: 375px;
+        height: 100%;
+        overflow-x: scroll;
+    }
+    
+    .multiLineTableColumn {
+        white-space: pre;
     }
     
     .sectionHeader
@@ -1107,7 +1124,7 @@
         background: #32353a !important;
     }
 
-	/* Custom theme for current events jTable: override lightcolor/green CSS to make table orange */
+    /* Custom theme for current events jTable: override lightcolor/green CSS to make table orange */
     #currentEventsContent div.jtable-main-container div.jtable-title {
 	background: #E69316 url("../../lightcolor/bg-thead.png") repeat-x scroll left top !important;
         color: #000;

@@ -14,19 +14,6 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
-        <script>		
-            // JQuery functionality
-            $(document).ready(function($) {
-                displayHiddenAdsByBrowsingDevice();
-                
-                var getAction = "<?php echo isset($_GET['action']) ? filter_var($_GET['action'], FILTER_SANITIZE_STRING) : "Login"; ?>";
-		IndexOnReady(getAction);
-                
-		// Display auth failure redirection message, if present and valid
-		<?php echo $onloadPopupJSCode; ?>
-            }
-        );
-        </script>
     </head>
     <body class="">
         <?php echo $headerHTML; ?>

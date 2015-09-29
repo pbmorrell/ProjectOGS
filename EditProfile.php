@@ -102,13 +102,6 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
-        <script>
-            // JQuery functionality
-            $(document).ready(function($) {
-                displayHiddenAdsByBrowsingDevice();
-                EditProfileOnReady();
-            });
-        </script>
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
