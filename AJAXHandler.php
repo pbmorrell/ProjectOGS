@@ -337,7 +337,12 @@
                 break;
             case "EventEditorCreateEvent":
                 $pvtEventFriends = (isset($_POST['pvtEventFriends'])) ? ($_POST['pvtEventFriends']) : [];
-                $eventGame = Game::ConstructGameForEvent(trim($_POST['ddlGameTitles']), $_POST['gameDate'], $_POST['gameTime'], 
+                $gameTitleID = -1;
+                if(isset($_POST['ddlGameTitles'])) {
+                    $gameTitleID = trim($_POST['ddlGameTitles']);
+                }
+                
+                $eventGame = Game::ConstructGameForEvent($gameTitleID, $_POST['gameDate'], $_POST['gameTime'], 
                                                          $_POST['gamePlayersNeeded'], trim($_POST['message']), $pvtEventFriends,
                                                          $_POST['isGlobalGame'] == 'true' ? true : false, $_POST['ddlTimeZones'], 
                                                          $_POST['ddlPlatforms'], $_POST['gameTitle'], $_POST['gameDateUTC'], '', '', -1);

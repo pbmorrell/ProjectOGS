@@ -25,65 +25,33 @@ function MemberHomeOnReady()
 
 function OnViewportWidthChanged(newViewType)
 {
+    var curVisibleTable = $(currentEventViewerJTableDiv).is(':visible') ? currentEventViewerJTableDiv : eventManagerJTableDiv;
+	
     switch(newViewType) {
         case "xtraSmall":
-            // Enclose jTable containers in fixed-width scrollable divs
-            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer').addClass('fixedWidthScrollableContainer');
-            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer').addClass('fixedWidthScrollableContainer');
-            
-            FormatCurrentEventsTableForCurrentView(true);
-            break;
         case "mobile":
-            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer');
-            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer');
-            
-            FormatCurrentEventsTableForCurrentView(true);
+            // If not already formatted for small viewports
+            if(!($(curVisibleTable + ' table').hasClass('mobileViewFontSize'))) {				
+		if(curVisibleTable == currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
+		else                                                FormatEventManagerTableForCurrentView(true);
+            }
             break;
-        case "desktop":
-            $('#manageEventsContent').removeClass('fixedWidthScrollableContainer');
-            $('#currentEventsContent').removeClass('fixedWidthScrollableContainer');
-            
-            FormatCurrentEventsTableForCurrentView(false);
+        case "desktop":            
+            if(curVisibleTable == currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
+            else 						FormatEventManagerTableForCurrentView(false);
             break;
     }
 }
 
 function LoadEventManager()
-{
-    var isMobile = isMobileView();
-    
-    if(isMobile) {
-        $('#mobileEventsTableToolbar').removeClass('hidden');
-        $('#toolbarSpacer').removeClass('hidden');
-        $('#refreshEventsBtn').click(function() {
-            var fullRefresh = false;
-            ReloadUserHostedEventsTable(fullRefresh);
-            return false;
-        });
-        
-        $('#activateEventsBtn').click(function() {
-            ToggleTableEventActivation("1");
-            return false;
-        });
-        
-        $('#hideEventsBtn').click(function() {
-            ToggleTableEventActivation("0");
-            return false;
-        });
-        
-        $('#deleteEventsBtn').click(function() {
-            DeleteTableEvents();
-            return false;
-        });        
-    }
-    
+{    
     // Initialize jTable on manageEventsContent div
     $(eventManagerJTableDiv).jtable({
         title: "Events Hosted By You",
         paging: true,
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
-        pageSizeChangeArea: !isMobile,
+        pageSizeChangeArea: true,
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
         openChildAsAccordion: false,
@@ -98,7 +66,6 @@ function LoadEventManager()
                     text: 'Refresh Events',
                     icon: 'images/refresh.png',
                     tooltip: 'Refreshes your event list',
-                    cssClass: (isMobile) ? ('hidden') : (''),
                     click: function(){
 			var fullRefresh = false;
                         ReloadUserHostedEventsTable(fullRefresh);
@@ -108,7 +75,6 @@ function LoadEventManager()
                     text: 'Activate Selected',
                     icon: 'images/activate.png',
                     tooltip: 'Makes selected events active & visible',
-                    cssClass: (isMobile) ? ('hidden') : (''),
                     click: function(){
                         ToggleTableEventActivation("1");
                     }
@@ -117,7 +83,6 @@ function LoadEventManager()
                     text: 'Hide Selected',
                     icon: 'images/deactivate.png',
                     tooltip: 'Makes selected events inactive & invisible',
-                    cssClass: (isMobile) ? ('hidden') : (''),
                     click: function(){
                         ToggleTableEventActivation("0");
                     }
@@ -126,7 +91,6 @@ function LoadEventManager()
                     text: 'Delete Selected',
                     icon: 'images/delete.png',
                     tooltip: 'Permanently deletes selected events',
-                    cssClass: (isMobile) ? ('hidden') : (''),
                     click: function(){
                         DeleteTableEvents();
                     }
@@ -164,8 +128,7 @@ function LoadEventManager()
             Notes: {
                 title: 'Game Notes',
                 width: '25%',
-                sorting: false,
-                list: !isMobile
+                sorting: false
             },
             PlayersSignedUp: {
                 title: 'Players Joined',
@@ -197,8 +160,7 @@ function LoadEventManager()
             Hidden: {
                 title: 'Hidden',
                 width: '7%',
-                sorting: true,
-                list: !isMobile
+                sorting: true
             },
             Edit: {
                 title: 'Edit',
@@ -221,22 +183,25 @@ function LoadEventManager()
 		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
 		var id = $(this).attr('data-record-key');
 		var dataRecordArray = $.grep(data.records, function (e) {
-                        return e.ID === id;
-                    }
-		);
+                    return e.ID === id;
+                });
 					
 		var playerData = dataRecordArray[0].PlayersSignedUpData;
 		$(this).attr('data-playersSignedUp', playerData);
-					
+							
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), id, eventManagerJTableDiv);
                 
-                // If in mobile view, and an event is hidden, set forecolor to red rather than show "Hidden" column
+                // If an event is hidden, set forecolor to red
                 var isHidden = dataRecordArray[0].Hidden;
-                if((isMobile) && (isHidden === 'Yes')) {
+                if(isHidden === 'Yes') {
                     $(this).css('color', 'red');
                 }
             });
+			
+            if(isMobileView()) {
+                FormatEventManagerTableForCurrentView(true);
+            }
 	}
     });
 
@@ -362,7 +327,7 @@ function LoadCurrentEventViewer()
 				return false;
                             });
 			}
-						
+							
 			// Return image for display in jTable
 			return $expandLink;
                     }
@@ -420,7 +385,7 @@ function LoadCurrentEventViewer()
 									
 		var playerData = dataRecordArray[0].PlayersSignedUpData;
 		$(this).attr('data-playersSignedUp', playerData);
-									
+											
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
                 
@@ -455,18 +420,97 @@ function LoadCurrentEventViewer()
     /* ******************************************************************************************************** */
 }
 
-function FormatCurrentEventsTableForCurrentView(isMobile)
+function FormatEventManagerTableForCurrentView(isMobile)
 {
+    var hiddenClass = "evtMgrHiddenInMobileView";
     if(isMobile) {
-        // CurrentEvents: Collapse Game & Console columns into one vertical column,
+        // Collapse Game & Console columns into one vertical column,
         // and Scheduled Date & Scheduled Time columns into another vertical column
         var colsToCombine = ["Game", "Console"];
         var colsToCombineBlankSeparatorLine = {"Game": false, "Console": true};
-        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, "hiddenInMobileView");
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, eventManagerJTableDiv, hiddenClass);
 
         colsToCombine = ["Date", "Time"];
         colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
-        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, "hiddenInMobileView");
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, eventManagerJTableDiv, hiddenClass);
+        
+        // Change table header and toolbar text to shorter, mobile-friendly words
+        $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate Selected")').text('Activate');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide Selected")').text('Hide');
+	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete Selected")').text('Delete');
+        
+        // Hide "Game Notes" and "Hidden" columns
+        var gameNotesColHdr = $(eventManagerJTableDiv + ' th:contains("Game Notes")');
+        var hiddenColHdr = $(eventManagerJTableDiv + ' th:contains("Hidden")');
+        
+        var gameNotesColIdx = $(gameNotesColHdr).index();
+        var hiddenColIdx = $(hiddenColHdr).index();
+        
+        $(gameNotesColHdr).addClass(hiddenClass);
+        $(hiddenColHdr).addClass(hiddenClass);
+                
+        $(eventManagerJTableDiv + ' table tbody tr').each(function() {
+            var gameNotesCol = $(this).find('td').eq(gameNotesColIdx);
+            var hiddenCol = $(this).find('td').eq(hiddenColIdx);
+            $(gameNotesCol).addClass(hiddenClass);
+            $(hiddenCol).addClass(hiddenClass);
+        });
+        
+        // Hide page size change area
+        $(eventManagerJTableDiv + ' .jtable-page-size-change').hide();
+        
+	// Reduce font size of table text to limit need for table overflow
+	$(eventManagerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
+		
+	// Enclose jTable containers in fixed-width scrollable divs
+	$(eventManagerJTableDiv + ' .jtable-main-container .jtable').addClass('fixedWidthScrollableContainer');
+    }
+    else {        
+        // Expand Game & Console columns into two distinct columns again;
+        // do same for Scheduled Date & Scheduled Time columns
+        var colsToExpand = ["Console"];
+        ExpandTableColumn("Game", colsToExpand, eventManagerJTableDiv, hiddenClass);
+            
+        colsToExpand = ["Time"];
+        ExpandTableColumn("Date", colsToExpand, eventManagerJTableDiv, hiddenClass);
+
+        // Change table header and toolbar text to full-length versions
+        $(eventManagerJTableDiv + ' .jtable-title-text').text('Events Hosted By You');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate")').text('Activate Selected');
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide")').text('Hide Selected');
+	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete")').text('Delete Selected');
+        
+        // Show hidden columns
+        $('.' + hiddenClass).removeClass(hiddenClass);
+        
+        // Display page size change area
+        $(eventManagerJTableDiv + ' .jtable-page-size-change').show();
+		
+	// Make font size normal again
+	$(eventManagerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
+		
+	// Remove fixed-width scrollable container
+	$(eventManagerJTableDiv + ' .jtable-main-container .jtable').removeClass('fixedWidthScrollableContainer');
+    }
+}
+
+function FormatCurrentEventsTableForCurrentView(isMobile)
+{
+    var hiddenClass = "curEvtsHiddenInMobileView";
+	
+    if(isMobile) {
+        // Collapse Game & Console columns into one vertical column,
+        // and Scheduled Date & Scheduled Time columns into another vertical column
+        var colsToCombine = ["Game", "Console"];
+        var colsToCombineBlankSeparatorLine = {"Game": false, "Console": true};
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, hiddenClass);
+
+        colsToCombine = ["Date", "Time"];
+        colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
+        CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, hiddenClass);
         
         // Change table header and toolbar text to shorter, mobile-friendly words
         $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse User Events');
@@ -484,27 +528,33 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         var gameNotesColIdx = $(gameNotesColHdr).index();
         var joinedColIdx = $(joinedColHdr).index();
         
-        $(gameNotesColHdr).addClass("hiddenInMobileView");
-        $(joinedColHdr).addClass("hiddenInMobileView");
+        $(gameNotesColHdr).addClass(hiddenClass);
+        $(joinedColHdr).addClass(hiddenClass);
                 
         $(currentEventViewerJTableDiv + ' table tbody tr').each(function() {
             var gameNotesCol = $(this).find('td').eq(gameNotesColIdx);
             var joinedCol = $(this).find('td').eq(joinedColIdx);
-            $(gameNotesCol).addClass('hiddenInMobileView');
-            $(joinedCol).addClass('hiddenInMobileView');
+            $(gameNotesCol).addClass(hiddenClass);
+            $(joinedCol).addClass(hiddenClass);
         });
         
         // Hide page size change area
         $(currentEventViewerJTableDiv + ' .jtable-page-size-change').hide();
+        
+	// Reduce font size of table text to limit need for table overflow
+	$(currentEventViewerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
+		
+	// Enclose jTable containers in fixed-width scrollable divs
+	$(currentEventViewerJTableDiv + ' .jtable-main-container .jtable').addClass('fixedWidthScrollableContainer');
     }
     else {
-        // CurrentEvents: Expand Game & Console columns into two distinct columns again;
+        // Expand Game & Console columns into two distinct columns again;
         // do same for Scheduled Date & Scheduled Time columns
         var colsToExpand = ["Console"];
-        ExpandTableColumn("Game", colsToExpand, currentEventViewerJTableDiv, "hiddenInMobileView");
+        ExpandTableColumn("Game", colsToExpand, currentEventViewerJTableDiv, hiddenClass);
             
         colsToExpand = ["Time"];
-        ExpandTableColumn("Date", colsToExpand, currentEventViewerJTableDiv, "hiddenInMobileView");
+        ExpandTableColumn("Date", colsToExpand, currentEventViewerJTableDiv, hiddenClass);
 
         // Change table header and toolbar text to full-length versions
         $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse Events Hosted By Other Users');
@@ -513,16 +563,30 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave")').text('Leave Selected');
         
         // Show hidden columns
-        $('.hiddenInMobileView').removeClass('hiddenInMobileView');
+        $('.' + hiddenClass).removeClass(hiddenClass);
         
         // Display page size change area
         $(currentEventViewerJTableDiv + ' .jtable-page-size-change').show();
+		
+	// Make font size normal again
+	$(currentEventViewerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
+		
+	// Remove fixed-width scrollable container
+	$(currentEventViewerJTableDiv + ' .jtable-main-container .jtable').removeClass('fixedWidthScrollableContainer');
     }
 }
 
 function CurrentEventViewerOnReady()
 {
+    $('#searchPanel').slideReveal({
+        trigger: $('#searchFilterLink'),
+        position: "right",
+        push: false
+    });
 	
+    $('#closePanelBtn').click(function() {
+        $('#searchPanel').slideReveal("hide");
+    });
 }
 
 function EventManagerOnReady()

@@ -126,6 +126,7 @@
                                                     </div>
                                                 </h2>
                                                 <h3>
+                                                    <br />
                                                     <div id="editProfileStatus" class="hidden">&nbsp;</div>
                                                 </h3>
                                                 <?php
@@ -196,6 +197,8 @@
                                                     </section>
                                                 </div>
                                             </form>
+                                            <br />
+                                            <div id="editProfileStatusMobile" class="hidden">&nbsp;</div>
 					</article>
 					<!-- Lower Article Wrapper -->							
 					<!-- Lower Article Wrapper -->

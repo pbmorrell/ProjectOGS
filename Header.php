@@ -30,8 +30,11 @@
             </form>
         </div>';
     
+    $loginErrorDiv = '<div id="loginErr" class="preLogin">&nbsp;</div>';
+    
     if($mobileLoginPage) {
         $pageHeaderLoginForm = "";
+        $loginErrorDiv = "";
     }
     
     $headerHTML =
@@ -41,7 +44,7 @@
                 '<div class="row">'.
                     '<div class="12u">'.
                         '<!-- Header -->'.
-                            '<header id="header">'.
+                        '<header id="header">'.
                             '<!-- Logo -->'.
                             '<h1>'.
                                 '<a href="#" id="logo">Player Unite</a>'.
@@ -54,8 +57,7 @@
                                     '<li><a href="Index.php?action=Signup">Sign Up</a></li>'.
                                 '</ul>'.
                             '</nav>'.
-                        '</header>'.
-                        '<div id="loginErr" class="preLogin">&nbsp;</div>'.
+                        '</header>' . $loginErrorDiv.
                     '</div>'.
                 '</div>'.
             '</div>'.

@@ -1,7 +1,7 @@
 function MobileLoginOnReady()
 {
     $('#mobileLoginBtn').click(function() {
-        $('#loginErr').attr('class', 'preLogin');
+        $('#loginErr').attr('class', 'mobilePreLogin');
         $('#loginErr').html("Logging In...");
         $('#loginErr').fadeIn(200);
 
@@ -14,9 +14,9 @@ function MobileLoginOnReady()
                     window.location.href = "MemberHome.php";
                 }
                 else {
-                    $('#loginErr').attr('class', 'loginError');
+                    $('#loginErr').attr('class', 'mobileLoginError');
                     $('#loginErr').html(response);
-
+                    
                     $('#loginPassword').val('');
 
                     setTimeout(function() {

@@ -9,16 +9,6 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
-        <script>
-            // JQuery functionality
-            $(document).ready(function($) {
-                displayHiddenAdsByBrowsingDevice();
-                MobileLoginOnReady();
-                
-		// Display auth failure redirection message, if present and valid
-		<?php echo $onloadPopupJSCode; ?>
-            });
-        </script>
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
@@ -45,9 +35,9 @@
                                                                 <button type="submit" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</button>&nbsp;
                                                             </form>
                                                         </div>
-                                                        <div id="loginErr" class="preLogin"></div>
+                                                        <div id="loginErr" class="mobilePreLogin">&nbsp;</div>
                                                     </header>
-						</section>								
+						</section>
                                             </div>
                                         </article>							
                                         <!-- Lower Article Wrapper -->								

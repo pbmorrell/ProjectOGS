@@ -15,7 +15,7 @@ function GlobalStartupActions()
                 OnViewportWidthChanged("mobile");
             });
 
-        enquire.register("(min-width: 651px) and (max-width: 1680px)", function() {
+        enquire.register("(min-width: 651px) and (max-width: 2000px)", function() {
                 // Fire viewportWidthChanged handler
                 OnViewportWidthChanged("desktop");
             });

@@ -34,7 +34,7 @@ function EditProfileOnReady()
         
         // Attach event handler to Edit Profile mobile button
         $('#signupBtnMobile').click(function() {
-            OnEditProfile();
+            return OnEditProfile('#editProfileStatusMobile');
         });
     }
     else {
@@ -43,12 +43,12 @@ function EditProfileOnReady()
         
         // Attach event handler to Edit Profile desktop button
         $('#signupBtn').click(function() {
-            OnEditProfile();
+            return OnEditProfile('#editProfileStatus');
         });
     }
 }
 
-function OnEditProfile()
+function OnEditProfile(editProfileStatusId)
 {
     var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
@@ -73,9 +73,9 @@ function OnEditProfile()
         alert("Unable to update account: The Email, Birthdate and Autobiography fields must be filled");
     } 
     else if ((checkedPlatforms > 0) || ((checkedPlatforms === 0) && (confirm("No game platforms selected...proceed with update?")))) {
-        $('#editProfileStatus').attr('class', 'preEditProfile');
-        $('#editProfileStatus').html("Updating Account...");
-        $('#editProfileStatus').fadeIn(200);
+        $(editProfileStatusId).attr('class', 'preEditProfile');
+        $(editProfileStatusId).html("Updating Account...");
+        $(editProfileStatusId).fadeIn(200);
 
         // Make AJAX call to update user account
         $.ajax({
@@ -87,11 +87,11 @@ function OnEditProfile()
                     window.location.href = "MemberHome.php";
                 }
                 else {
-                    $('#editProfileStatus').attr('class', 'editProfileErr');
-                    $('#editProfileStatus').html(response);
+                    $(editProfileStatusId).attr('class', 'editProfileErr');
+                    $(editProfileStatusId).html(response);
 
                     setTimeout(function() {
-                        $('#editProfileStatus').hide();
+                        $(editProfileStatusId).hide();
                         }, 3000
                     );
                 }

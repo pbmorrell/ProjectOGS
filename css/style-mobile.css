@@ -24,15 +24,30 @@
 	{
 		font-size: 1em;
 	}
+        
+    .signupInp input{
+		width: 100%;
+    }
 	
-	input{
+	#mobileLoginForm input {
 		width: 100%;
 	}
-        
-        .signupInp input{
-                width: 100%;
-        }
 
+        .controlPanelSection h2 {
+            font-size: 1.8em;
+            text-align: center;
+        }
+        
+        .controlPanelSection a {
+            font-size: 1.6em;
+        }
+        
+        .jTableContainer h2 {
+            margin-top: 5%;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        
 	section,
 	article
 	{
