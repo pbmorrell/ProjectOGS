@@ -382,19 +382,25 @@
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
                 
                 $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
-                $showHiddenEvents = ($showHidden === "1") ? true : false;
-			
+                $showHiddenEvents = ($showHidden === "1") ? true : false;	
 		$showPastEventsDays = isset($_POST['showPastEventsInDays']) ? filter_var($_POST['showPastEventsInDays'], FILTER_SANITIZE_STRING) : "-1";
+                $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
+                $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+                
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
-                                                            $startIndex, $pageSize, $showHiddenEvents, $showPastEventsDays);
+                                                            $startIndex, $pageSize, $showHiddenEvents, $showPastEventsDays, $startDateTime, $endDateTime);
                 break;
             case "GetCurrentEventsForJTable":
 		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
 		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
 		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
-			
-		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+
+                $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
+                $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+                
+		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
+                                                                  $pageSize, $startDateTime, $endDateTime);
                 break;
             case "EventViewerJoinEvents":
 		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);

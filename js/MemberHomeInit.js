@@ -21,24 +21,140 @@ function MemberHomeOnReady()
     $(panelEnum.MyEventViewer).hide();
     LoadCurrentEventViewer();
     LoadEventManager();
+    
+    var isMobile = isMobileView();
+    
+    // Set up search filter panel
+    $('#searchPanel').slideReveal({
+        trigger: $('#searchFilterLink'),
+        position: "right",
+        push: false,
+        width: isMobile ? (Math.round($(window).width() * 0.75)) : (Math.round($(window).width() * 0.4))
+    });
+	
+    $('#closePanelBtn').click(function() {
+        $('#searchPanel').slideReveal("hide");
+        return false;
+    });
+    
+    // Initialize Game Filter Date datepickers
+    $('#gameFilterStartDate').datepicker({
+         inline: true,
+         changeYear: true,
+         yearRange: '-0:+1',
+         changeMonth: true,
+         constrainInput: true,
+         showButtonPanel: true,
+         showOtherMonths: true,
+         dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+         dateFormat: 'yy-mm-dd',
+         onClose: function(selectedDate) {
+             $('#gameFilterEndDate').datepicker('option', 'minDate', selectedDate);
+         }
+    });
+    
+    $('#gameFilterEndDate').datepicker({
+         defaultDate: "+3",
+         inline: true,
+         changeYear: true,
+         yearRange: '-0:+1',
+         changeMonth: true,
+         constrainInput: true,
+         showButtonPanel: true,
+         showOtherMonths: true,
+         dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+         dateFormat: 'yy-mm-dd',
+         onClose: function(selectedDate) {
+             $('#gameFilterStartDate').datepicker('option', 'maxDate', selectedDate);
+         }
+    });
+    
+    // Set date fields to defaults
+    $('#gameFilterStartDate').datepicker('setDate', new Date());
+    $('#gameFilterEndDate').datepicker('setDate', addDaysToDate(new Date(), 3));
+    
+    // If in mobile view, disable text input
+    if(isMobile) {
+        $('#gameFilterStartDate').prop('readonly', true);
+        $('#gameFilterEndDate').prop('readonly', true);
+    }
+    
+    // Initialize Game Filter Time datepickers
+    var defaultTimeDate = new Date();
+    var nextRoundIntervalValue = 15 - (defaultTimeDate.getMinutes() % 15);
+    defaultTimeDate.setMinutes(defaultTimeDate.getMinutes() + nextRoundIntervalValue);
+
+    var optionsTimePicker = {
+        disableTextInput: false,
+        disableTouchKeyboard: false,
+        minTime: defaultTimeDate,
+        selectOnBlur: !isMobile,
+        useSelect: isMobile,
+        className: 'overlayPanelElement',
+        step: 15
+    };
+    
+    $('#gameFilterStartTime').timepicker(optionsTimePicker);
+    $('#gameFilterEndTime').timepicker(optionsTimePicker);   
+    
+    // Set default start and end times
+    $('#gameFilterStartTime').timepicker('setTime', defaultTimeDate);
+    $('#gameFilterEndTime').timepicker('setTime', defaultTimeDate);
+    
+    // Add overlayPanel class to time zone pickers in search panel
+    $('#ddlTimeZonesStart').addClass('overlayPanelElement');
+    $('#ddlTimeZonesEnd').addClass('overlayPanelElement');
+    
+    // Attach event handler to search button
+    $('#searchBtn').click(function() {
+        var isCurEvtFeed = (activePanel === panelEnum.CurrentEventFeed);
+        var searchFieldClass = '.searchPanelCurEvtsFilterFld';
+        if(isCurEvtFeed) {
+            searchFieldClass = '.searchPanelEvtMgrFilterFld';
+        }
+        
+        var searchEventInfo = ValidateSearchFormFields(searchFieldClass);
+        if(searchEventInfo.validated) {
+            if (isCurEvtFeed) {
+                ReloadCurrentEventsTable(true, searchEventInfo.postData);
+            }
+            else {
+                ReloadUserHostedEventsTable(true, searchEventInfo.postData);
+            }
+        }
+        
+        return false;
+    });
 }
 
 function OnViewportWidthChanged(newViewType)
 {
-    var curVisibleTable = $(currentEventViewerJTableDiv).is(':visible') ? currentEventViewerJTableDiv : eventManagerJTableDiv;
+    var curVisibleTable = (activePanel === panelEnum.CurrentEventFeed) ? currentEventViewerJTableDiv : eventManagerJTableDiv;
 	
     switch(newViewType) {
         case "xtraSmall":
         case "mobile":
             // If not already formatted for small viewports
             if(!($(curVisibleTable + ' table').hasClass('mobileViewFontSize'))) {				
-		if(curVisibleTable == currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
-		else                                                FormatEventManagerTableForCurrentView(true);
+                $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
+                $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
+                
+                $('#gameFilterStartDate').prop('readonly', true);
+                $('#gameFilterEndDate').prop('readonly', true);
+                
+                if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
+		else                                                 FormatEventManagerTableForCurrentView(true);
             }
             break;
-        case "desktop":            
-            if(curVisibleTable == currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
-            else 						FormatEventManagerTableForCurrentView(false);
+        case "desktop":
+            $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
+            $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
+            
+            $('#gameFilterStartDate').prop('readonly', false);
+            $('#gameFilterEndDate').prop('readonly', false);
+            
+            if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
+            else 						 FormatEventManagerTableForCurrentView(false);
             break;
     }
 }
@@ -576,17 +692,25 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
     }
 }
 
+function ToggleSearchDivDisplay(curDiv, curToggleLink)
+{
+    var isExpand = $(curToggleLink).hasClass('fa-plus-square');
+    
+    if(isExpand) {
+        $(curDiv).slideDown('slow');
+        $(curToggleLink).removeClass('fa-plus-square').addClass('fa-minus-square');
+    }
+    else {
+        $(curDiv).slideUp('slow');
+        $(curToggleLink).removeClass('fa-minus-square').addClass('fa-plus-square');
+    }
+    
+    return false;
+}
+
 function CurrentEventViewerOnReady()
 {
-    $('#searchPanel').slideReveal({
-        trigger: $('#searchFilterLink'),
-        position: "right",
-        push: false
-    });
-	
-    $('#closePanelBtn').click(function() {
-        $('#searchPanel').slideReveal("hide");
-    });
+
 }
 
 function EventManagerOnReady()
@@ -989,15 +1113,22 @@ function LeaveEvents(selectedEventIds)
     }
 }
 
-function ReloadUserHostedEventsTable(fullRefresh)
+function ReloadUserHostedEventsTable(fullRefresh, postData)
 {
+    var defaultPostData = {
+                            action: eventManagerLoadAction,
+                            showHidden: eventManagerShowHiddenEvents,
+                            showPastEventsInDays: eventManagerShowPastEventsInDays
+                          };
+    if(postData) {
+        postData = ('action=' + eventManagerLoadAction + '&showHidden=' + eventManagerShowHiddenEvents + 
+                    '&showPastEventsInDays=' + eventManagerShowPastEventsInDays) + postData;
+    }
+    else {
+        postData = defaultPostData;
+    }
+    
     if(fullRefresh) {
-        var postData = 
-            {
-                action: eventManagerLoadAction,
-                showHidden: eventManagerShowHiddenEvents,
-		showPastEventsInDays: eventManagerShowPastEventsInDays
-            };
         $(eventManagerJTableDiv).jtable('load', postData);   
     }
     else {
@@ -1006,13 +1137,19 @@ function ReloadUserHostedEventsTable(fullRefresh)
     }
 }
 
-function ReloadCurrentEventsTable(fullRefresh)
+function ReloadCurrentEventsTable(fullRefresh, postData)
 {
+    var defaultPostData = {
+                            action: currentEventViewerLoadAction
+                          };
+    if(postData) {
+        postData = ('action=' + currentEventViewerLoadAction) + postData;
+    }
+    else {
+        postData = defaultPostData;
+    }
+    
     if(fullRefresh) {
-        var postData = 
-            {
-                action: currentEventViewerLoadAction
-            };
         $(currentEventViewerJTableDiv).jtable('load', postData);   
     }
     else {
@@ -1103,6 +1240,7 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
          inline: true,
          yearRange: '-0:+1',
          changeYear: true,
+         changeMonth: true,
          constrainInput: true,
          showButtonPanel: true,
          showOtherMonths: true,
@@ -1122,21 +1260,21 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
         minTime = gameTime;
     }
 
+    var isMobile = isMobileView();
+
     var options = {
-        disableTextInput: true,
-        disableTouchKeyboard: true,
+        disableTextInput: false,
+        disableTouchKeyboard: false,
         minTime: minTime,
-        selectOnBlur: true,
+        selectOnBlur: !isMobile,
+        useSelect: isMobile,
         step: 15
     };
     
     $('#gameTime' + eventIdSuffix).timepicker(options);
     
-    // Apply input mask to date field
-    $('#gameDate' + eventIdSuffix).mask('9999-99-99');
-    
     // Switch comments section to mobile width, if needed
-    if(isMobileView()) {
+    if(isMobile) {
         $('#message' + eventIdSuffix).addClass('textareaMobile');
         $('#eventDialogToolbar' + eventIdSuffix).addClass('mobileDlgToolbarContainer');
     }
@@ -1233,12 +1371,11 @@ function ValidateEventFormFields(eventId)
     } else if (isPrivateEvent && (numPlayersNeeded > (numPlayersAllowed + 1))) { // Event creator is implicitly allowed to join event
         alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
     } else {
-        var curDateMoment = moment().utc();
         var gameDateWithTZ = moment.tz(gameDate + " " + gameTime, "YYYY-MM-DD h:mmA", gameTimezone);
         var gameTimeMoment = moment(gameDateWithTZ).utc();
         eventInfo.gameTimeMoment = gameTimeMoment;
 
-        if (gameTimeMoment.isBefore(curDateMoment)) {
+        if (gameTimeMoment.isBefore(curMoment)) {
             alert("Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past");
         }
         else {
@@ -1247,6 +1384,51 @@ function ValidateEventFormFields(eventId)
     }
     
     return eventInfo;
+}
+
+function ValidateSearchFormFields(searchFieldClass)
+{
+    var gameStartDate = $('#gameFilterStartDate').val();
+    var gameStartTime = $('#gameFilterStartTime').val();
+    var gameStartTimezone = $('#ddlTimeZonesStart option:selected').text();
+    
+    var gameEndDate = $('#gameFilterEndDate').val();
+    var gameEndTime = $('#gameFilterEndTime').val();
+    var gameEndTimezone = $('#ddlTimeZonesEnd option:selected').text();
+    
+    var curMoment = moment().utc();
+    var searchEventsInfo = new SearchEventsFormInfo(curMoment, curMoment, searchFieldClass);
+    
+    // Regular expression for time format
+    var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
+
+    // Verify that required fields are filled out and have valid data
+    if(gameStartDate.length === 0) {
+        alert("Unable to filter by date range: Must select a start date");
+    } else if (gameStartTime.length === 0) {
+        alert("Unable to filter by date range: Must select a start time");
+    } else if (!gameStartTime.match(regexTime)) {
+        alert("Unable to filter by date range: Must enter a valid start time");
+    } else if(gameEndDate.length === 0) {
+        alert("Unable to filter by date range: Must select a end date");
+    } else if (gameEndTime.length === 0) {
+        alert("Unable to filter by date range: Must select a end time");
+    } else if (!gameEndTime.match(regexTime)) {
+        alert("Unable to filter by date range: Must enter a valid end time");
+    } else {
+        var gameStartDateTimeWithTZ = moment.tz(gameStartDate + " " + gameStartTime, "YYYY-MM-DD h:mmA", gameStartTimezone);
+        var gameStartDateTimeMoment = moment(gameStartDateTimeWithTZ).utc();
+        var gameEndDateTimeWithTZ = moment.tz(gameEndDate + " " + gameEndTime, "YYYY-MM-DD h:mmA", gameEndTimezone);
+        var gameEndDateTimeMoment = moment(gameEndDateTimeWithTZ).utc();        
+        
+        searchEventsInfo.gameStartDateTimeMoment = gameStartDateTimeMoment;
+        searchEventsInfo.gameEndDateTimeMoment = gameEndDateTimeMoment;
+        searchEventsInfo.postData += ('&gameFilterStartDateTime=' + gameStartDateTimeMoment.toISOString() + 
+                                     '&gameFilterEndDateTime=' + gameEndDateTimeMoment.toISOString());
+        searchEventsInfo.validated = true;
+    }
+    
+    return searchEventsInfo;
 }
 
 function EventFormInfo(displayDatetime, comments, isGlobalGame, isExistingGame, gameTimeMoment, selGameTitle)
@@ -1258,6 +1440,18 @@ function EventFormInfo(displayDatetime, comments, isGlobalGame, isExistingGame, 
     this.gameTimeMoment = gameTimeMoment;
     this.selGameTitle = selGameTitle;
     this.validated = false;
+}
+
+function SearchEventsFormInfo(gameStartDateTimeMoment, gameEndDateTimeMoment, searchFieldClass)
+{
+    this.gameStartDateTimeMoment = gameStartDateTimeMoment;
+    this.gameEndDateTimeMoment = gameEndDateTimeMoment;
+    this.validated = false;
+    
+    this.postData = '';
+    if(($(searchFieldClass).length) > 0) {
+        this.postData = $(searchFieldClass).serialize();
+    }
 }
 
 function EditEvent(eventId, $dialog)

@@ -4,6 +4,7 @@ function EditProfileOnReady()
         inline: true,
         yearRange: '-125:-2',
         changeYear: true,
+        changeMonth: true,
         constrainInput: true,
         showButtonPanel: true,
         showOtherMonths: true,

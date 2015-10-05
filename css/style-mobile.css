@@ -28,7 +28,29 @@
     .signupInp input{
 		width: 100%;
     }
-	
+    
+    .overlayPanel {
+	background-color:gray;
+	z-index: 100000;
+	padding-top: 15%;
+        opacity: 0.85;
+    }
+
+    .overlayPanelElementContainer {
+        width: 40% !important;
+        height: 8%;
+        float: left;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    
+    .overlayPanelControlElement {
+        opacity: 0.7;
+        z-index: 100001;
+        margin-left: 5%;
+        width: 80% !important;
+    }
+    
 	#mobileLoginForm input {
 		width: 100%;
 	}

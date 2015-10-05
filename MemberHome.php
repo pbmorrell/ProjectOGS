@@ -3,6 +3,7 @@
     $sessionRequired = true;
     $sessionAllowed = true;
     include "Header.php";
+    $gamingHandler = new GamingHandler();
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -44,12 +45,54 @@
 							<a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">See Event Feed</a>
                                                     </li>
                                                     <li class="icon fa-bullseye">
-							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Results</a>
+							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
                                                     </li>
                                                     <div id="searchPanel" class="overlayPanel">
-							<input type="text" id="search" placeholder=" Search Events" class="overlayPanelElement" /><br/><br/>
-							<button class="controlBtn button icon fa-cogs overlayPanelElement" id="searchBtn">Search</button>
-							<button class="controlBtn button overlayPanelElement" id="closePanelBtn">Close</button>
+                                                        <form name="searchForm" method="POST" action="">
+                                                            <!--<input type="text" id="search" placeholder=" Search Events" class="overlayPanelElement" /><br/><br/>-->
+                                                            <div><a href="#" class="fa fa-plus-square overlayPanelToggleElement" 
+                                                                    onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
+                                                            </div>
+                                                            <div id="dateRangeFilterDiv" style="display:none">
+                                                                <div id="dateRangeFilterStart" class="overlayPanelContent">
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">Start Date:</label><br />
+                                                                        <input id="gameFilterStartDate" class="overlayPanelElement" name="gameFilterStartDate" type="text" maxlength="50" placeholder=" Start Date">
+                                                                    </div>
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">Start Time:</label><br />
+                                                                        <input id="gameFilterStartTime" class="overlayPanelElement" name="gameFilterStartTime" type="text" maxlength="9" placeholder=" Start Time">
+                                                                    </div>
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">Time Zone:</label><br />
+                                                                         <?php 
+                                                                            echo $gamingHandler->GetTimezoneList($dataAccess, -1, 'Start'); 
+                                                                         ?>
+                                                                    </div>
+                                                                </div><br />
+                                                                <div id="dateRangeFilterEnd" class="overlayPanelContent">
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">End Date:</label><br />
+                                                                        <input id="gameFilterEndDate" class="overlayPanelElement" name="gameFilterEndDate" type="text" maxlength="50" placeholder=" End Date">
+                                                                    </div>
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">End Time:</label><br />
+                                                                        <input id="gameFilterEndTime" class="overlayPanelElement" name="gameFilterEndTime" type="text" maxlength="9" placeholder=" End Time">
+                                                                    </div>
+                                                                    <div class="overlayPanelElementContainer">
+                                                                        <label class="overlayPanelLabel">Time Zone:</label><br />
+                                                                         <?php 
+                                                                            echo $gamingHandler->GetTimezoneList($dataAccess, -1, 'End'); 
+                                                                         ?>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <br /><br />
+                                                            <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
+                                                            <button class="controlBtn button overlayPanelControlElement" id="closePanelBtn">Close</button>
+                                                        </form>
+                                                        <br />
                                                     </div>
 						</ul>
                                             </section>

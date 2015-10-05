@@ -252,10 +252,11 @@ class GamingHandler
     }
 	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, 
-                                           $pageSize, $showHiddenEvents, $showPastEventsDays)
+                                           $pageSize, $showHiddenEvents, $showPastEventsDays, $startDateTime, $endDateTime)
     {
         $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
-                                                   $startIndex, $pageSize, -1, $showHiddenEvents, $showPastEventsDays);
+                                                   $startIndex, $pageSize, -1, $showHiddenEvents, $showPastEventsDays, 
+                                                   $startDateTime, $endDateTime);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -285,16 +286,19 @@ class GamingHandler
 
         $jTableResult = [];
         $jTableResult['Result'] = 'OK';
-        $jTableResult['TotalRecordCount'] = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays);
+        $jTableResult['TotalRecordCount'] = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, 
+                                                                               $showPastEventsDays, $startDateTime, $endDateTime);
         $jTableResult['Records'] = $rows;
         return json_encode($jTableResult);
     }
 	
-    public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize)
+    public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize,
+                                                 $startDateTime, $endDateTime)
     {
         $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
-                                                   $startIndex, $pageSize, -1, false, "-1", true);
-	$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, "-1", true);
+                                                   $startIndex, $pageSize, -1, false, "-1", true, $startDateTime, $endDateTime);
+	$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, "-1", true, $startDateTime, 
+                                                                    $endDateTime);
 	$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
 
         $rows = [];
@@ -1045,7 +1049,8 @@ class GamingHandler
 	
     public function GetScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
                                       $paginationEnabled = false, $startIndex = "0", $pageSize = "10", 
-                                      $eventId = -1, $showHiddenEvents = false, $showPastEventsDays = "-1", $excludeEventsForUser = false)
+                                      $eventId = -1, $showHiddenEvents = false, $showPastEventsDays = "-1", 
+                                      $excludeEventsForUser = false, $startDateTime = "", $endDateTime = "")
     {
 	$limitClause = "";
 	if($paginationEnabled) {
@@ -1095,9 +1100,18 @@ class GamingHandler
             $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
             $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
             array_push($queryParms, $parmShowPastEventsDays);
+        }        
+        else if(strlen($startDateTime) > 0) {            
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` >= :startDateTime) ";
+            $parmStartDateTime = new QueryParameter(':startDateTime', $startDateTime, PDO::PARAM_STR);
+            array_push($queryParms, $parmStartDateTime);
+            
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` <= :endDateTime) ";
+            $parmEndDateTime = new QueryParameter(':endDateTime', $endDateTime, PDO::PARAM_STR);
+            array_push($queryParms, $parmEndDateTime);
         }
 	else {
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // Only show future events
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // By default, only show future events
 	}
 		
 	// Replace first "AND" with a "WHERE"
@@ -1201,7 +1215,8 @@ class GamingHandler
 	}
     }
 	
-    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays = "-1", $excludeEventsForUser = false)
+    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays = "-1", 
+                                                 $excludeEventsForUser = false, $startDateTime = "", $endDateTime = "")
     {
 	$userTotalScheduledGamesCnt = 0;
 		
@@ -1237,6 +1252,15 @@ class GamingHandler
             $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
             $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
             array_push($queryParms, $parmShowPastEventsDays);
+        }
+        else if(strlen($startDateTime) > 0) {            
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` >= :startDateTime) ";
+            $parmStartDateTime = new QueryParameter(':startDateTime', $startDateTime, PDO::PARAM_STR);
+            array_push($queryParms, $parmStartDateTime);
+            
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` <= :endDateTime) ";
+            $parmEndDateTime = new QueryParameter(':endDateTime', $endDateTime, PDO::PARAM_STR);
+            array_push($queryParms, $parmEndDateTime);
         }
 	else {
             $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // Only show future events
