@@ -10,7 +10,6 @@ var activePanel = panelEnum.CurrentEventFeed;
 var eventManagerLoadAction = 'GetUserOwnedEventsForJTable';
 var eventManagerJTableDiv = "#manageEventsContent";
 var eventManagerShowHiddenEvents = 0;
-var eventManagerShowPastEventsInDays = 0;
 
 var currentEventViewerJTableDiv = "#currentEventsContent";
 var currentEventViewerLoadAction = 'GetCurrentEventsForJTable';
@@ -105,21 +104,37 @@ function MemberHomeOnReady()
     $('#ddlTimeZonesStart').addClass('overlayPanelElement');
     $('#ddlTimeZonesEnd').addClass('overlayPanelElement');
     
+    // Add checked handler to filter checkboxes
+    $('#searchPanel .overlayPanelToggleActiveChk').each(function() {
+	$(this).change(function() {
+            var toggleLinkId = '#' + $(this).attr('linkId');
+            var groupId = '#' + $(this).attr('groupId');
+            if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
+		$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
+                $(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
+            }
+            else {
+		$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
+                $(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
+            }
+	});
+    });
+	
     // Attach event handler to search button
     $('#searchBtn').click(function() {
         var isCurEvtFeed = (activePanel === panelEnum.CurrentEventFeed);
-        var searchFieldClass = '.searchPanelCurEvtsFilterFld';
-        if(isCurEvtFeed) {
-            searchFieldClass = '.searchPanelEvtMgrFilterFld';
+        var searchFieldClass = '.searchPanelCurEvtsFilter';
+        if(!isCurEvtFeed) {
+            searchFieldClass = '.searchPanelEvtMgrFilter';
         }
         
-        var searchEventInfo = ValidateSearchFormFields(searchFieldClass);
+        var searchEventInfo = ValidateSearchFormFields(searchFieldClass, false);
         if(searchEventInfo.validated) {
             if (isCurEvtFeed) {
-                ReloadCurrentEventsTable(true, searchEventInfo.postData);
+                ReloadCurrentEventsTable(true);
             }
             else {
-                ReloadUserHostedEventsTable(true, searchEventInfo.postData);
+                ReloadUserHostedEventsTable(true);
             }
         }
         
@@ -251,11 +266,11 @@ function LoadEventManager()
                 width: '11%',
                 display: function (data) {					
                     // Create PlayersSignedUp display object
-                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblEvt' + data.record.ID + '" class="fa fa-plus-square" /></label>');
+                    var eventId = data.record.ID;
+                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblEvt' + eventId + '" class="fa fa-plus-square" /></label>');
                     $expandImage.click(function () {
-                        var eventId = data.record.ID;
 			var tableRow = $(this).closest('tr');
-                        var curLblId = "#lblEvt" + data.record.ID;
+                        var curLblId = "#lblEvt" + eventId;
                         
                         // If we are just toggling the current child table display, close it, change icon back to + (expand), and return
                         if($(eventManagerJTableDiv).jtable('isChildRowOpen', tableRow, true)) {
@@ -326,7 +341,6 @@ function LoadEventManager()
         {
             action: eventManagerLoadAction,
             showHidden: eventManagerShowHiddenEvents,
-            showPastEventsInDays: eventManagerShowPastEventsInDays
         };
 		
     $(eventManagerJTableDiv).jtable('load', postData);
@@ -457,11 +471,11 @@ function LoadCurrentEventViewer()
                 width: '11%',
                 display: function (data) {					
                     // Create PlayersSignedUp display object
-                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblCurEvt' + data.record.ID + '" class="fa fa-plus-square" /></label>');
+                    var eventId = data.record.ID;
+                    var $expandImage = $('<label>' + data.record.PlayersSignedUp + '&nbsp;&nbsp;<label id="lblCurEvt' + eventId + '" class="fa fa-plus-square" /></label>');
                     $expandImage.click(function () {
-                        var eventId = data.record.ID;
 			var tableRow = $(this).closest('tr');
-                        var curLblId = "#lblCurEvt" + data.record.ID;
+                        var curLblId = "#lblCurEvt" + eventId;
                         
                         // If we are just toggling the current child table display, close it, change icon back to + (expand), and return
                         if($(currentEventViewerJTableDiv).jtable('isChildRowOpen', tableRow, true)) {
@@ -697,10 +711,12 @@ function ToggleSearchDivDisplay(curDiv, curToggleLink)
     var isExpand = $(curToggleLink).hasClass('fa-plus-square');
     
     if(isExpand) {
+        $(curDiv).removeClass('overlayPanelGroupBorder').addClass('overlayPanelGroupBorder');
         $(curDiv).slideDown('slow');
         $(curToggleLink).removeClass('fa-plus-square').addClass('fa-minus-square');
     }
     else {
+        $(curDiv).removeClass('overlayPanelGroupBorder');
         $(curDiv).slideUp('slow');
         $(curToggleLink).removeClass('fa-minus-square').addClass('fa-plus-square');
     }
@@ -717,12 +733,6 @@ function EventManagerOnReady()
 {
     $('#toggleHiddenEvents').change(function() {
         eventManagerShowHiddenEvents = ($(this).is(':checked')) ? 1 : 0;
-        var fullRefresh = true;
-        ReloadUserHostedEventsTable(fullRefresh);
-    });
-	
-    $('#toggleShowPastEvents').change(function() {
-        eventManagerShowPastEventsInDays = $(this).val();
         var fullRefresh = true;
         ReloadUserHostedEventsTable(fullRefresh);
     });
@@ -1038,7 +1048,8 @@ function DeleteEvents(selectedEventIds)
             url: "AJAXHandler.php",
             data: "action=EventEditorDeleteEvents&" + $.param({'eventIds': selectedEventIds}),
             success: function(response){
-                ReloadUserHostedEventsTable(true);
+                var fullRefresh = false;
+                ReloadUserHostedEventsTable(fullRefresh);
 		alert(response);
 		return true;
             }
@@ -1113,23 +1124,12 @@ function LeaveEvents(selectedEventIds)
     }
 }
 
-function ReloadUserHostedEventsTable(fullRefresh, postData)
-{
-    var defaultPostData = {
-                            action: eventManagerLoadAction,
-                            showHidden: eventManagerShowHiddenEvents,
-                            showPastEventsInDays: eventManagerShowPastEventsInDays
-                          };
-    if(postData) {
-        postData = ('action=' + eventManagerLoadAction + '&showHidden=' + eventManagerShowHiddenEvents + 
-                    '&showPastEventsInDays=' + eventManagerShowPastEventsInDays) + postData;
-    }
-    else {
-        postData = defaultPostData;
-    }
-    
+function ReloadUserHostedEventsTable(fullRefresh)
+{    
     if(fullRefresh) {
-        $(eventManagerJTableDiv).jtable('load', postData);   
+        var searchFormData = ValidateSearchFormFields('.searchPanelEvtMgrFilter', true);
+        var postData = ('action=' + eventManagerLoadAction + '&showHidden=' + eventManagerShowHiddenEvents) + searchFormData.postData;
+        $(eventManagerJTableDiv).jtable('load', postData);
     }
     else {
         // Reload event list with same POST arguments
@@ -1137,19 +1137,11 @@ function ReloadUserHostedEventsTable(fullRefresh, postData)
     }
 }
 
-function ReloadCurrentEventsTable(fullRefresh, postData)
-{
-    var defaultPostData = {
-                            action: currentEventViewerLoadAction
-                          };
-    if(postData) {
-        postData = ('action=' + currentEventViewerLoadAction) + postData;
-    }
-    else {
-        postData = defaultPostData;
-    }
-    
+function ReloadCurrentEventsTable(fullRefresh)
+{    
     if(fullRefresh) {
+        var searchFormData = ValidateSearchFormFields('.searchPanelCurEvtsFilter', true);
+        var postData = ('action=' + currentEventViewerLoadAction) + searchFormData.postData;
         $(currentEventViewerJTableDiv).jtable('load', postData);   
     }
     else {
@@ -1386,48 +1378,63 @@ function ValidateEventFormFields(eventId)
     return eventInfo;
 }
 
-function ValidateSearchFormFields(searchFieldClass)
+function ValidateSearchFormFields(searchFieldClass, suppressAlerts)
 {
-    var gameStartDate = $('#gameFilterStartDate').val();
-    var gameStartTime = $('#gameFilterStartTime').val();
-    var gameStartTimezone = $('#ddlTimeZonesStart option:selected').text();
-    
-    var gameEndDate = $('#gameFilterEndDate').val();
-    var gameEndTime = $('#gameFilterEndTime').val();
-    var gameEndTimezone = $('#ddlTimeZonesEnd option:selected').text();
-    
-    var curMoment = moment().utc();
-    var searchEventsInfo = new SearchEventsFormInfo(curMoment, curMoment, searchFieldClass);
-    
-    // Regular expression for time format
-    var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
+    var searchEventsInfo = new SearchEventsFormInfo();
+	
+    // Search fields are considered validated if not included in current active search filters
+    var dateFieldsValidated = true;
+    var titlesFieldValidated = true;
+	
+    // Date filters
+    if(($('#dateRangeFilterLink').length) && ($('#dateRangeFilterLink').hasClass('overlayPanelToggleElementActive'))) {
+	dateFieldsValidated = false;
+	var gameStartDate = $('#gameFilterStartDate').val();
+	var gameStartTime = $('#gameFilterStartTime').val();
+	var gameStartTimezone = $('#ddlTimeZonesStart option:selected').text();
+		
+	var gameEndDate = $('#gameFilterEndDate').val();
+	var gameEndTime = $('#gameFilterEndTime').val();
+	var gameEndTimezone = $('#ddlTimeZonesEnd option:selected').text();
+		
+	// Regular expression for time format
+	var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
 
-    // Verify that required fields are filled out and have valid data
-    if(gameStartDate.length === 0) {
-        alert("Unable to filter by date range: Must select a start date");
-    } else if (gameStartTime.length === 0) {
-        alert("Unable to filter by date range: Must select a start time");
-    } else if (!gameStartTime.match(regexTime)) {
-        alert("Unable to filter by date range: Must enter a valid start time");
-    } else if(gameEndDate.length === 0) {
-        alert("Unable to filter by date range: Must select a end date");
-    } else if (gameEndTime.length === 0) {
-        alert("Unable to filter by date range: Must select a end time");
-    } else if (!gameEndTime.match(regexTime)) {
-        alert("Unable to filter by date range: Must enter a valid end time");
-    } else {
-        var gameStartDateTimeWithTZ = moment.tz(gameStartDate + " " + gameStartTime, "YYYY-MM-DD h:mmA", gameStartTimezone);
-        var gameStartDateTimeMoment = moment(gameStartDateTimeWithTZ).utc();
-        var gameEndDateTimeWithTZ = moment.tz(gameEndDate + " " + gameEndTime, "YYYY-MM-DD h:mmA", gameEndTimezone);
-        var gameEndDateTimeMoment = moment(gameEndDateTimeWithTZ).utc();        
-        
-        searchEventsInfo.gameStartDateTimeMoment = gameStartDateTimeMoment;
-        searchEventsInfo.gameEndDateTimeMoment = gameEndDateTimeMoment;
-        searchEventsInfo.postData += ('&gameFilterStartDateTime=' + gameStartDateTimeMoment.toISOString() + 
-                                     '&gameFilterEndDateTime=' + gameEndDateTimeMoment.toISOString());
-        searchEventsInfo.validated = true;
+	// Verify that required fields are filled out and have valid data
+	if(gameStartDate.length === 0) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a start date");
+	} else if (gameStartTime.length === 0) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a start time");
+	} else if (!gameStartTime.match(regexTime)) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must enter a valid start time");
+	} else if(gameEndDate.length === 0) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a end date");
+	} else if (gameEndTime.length === 0) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a end time");
+	} else if (!gameEndTime.match(regexTime)) {
+            if(!suppressAlerts)  alert("Unable to filter by date range: Must enter a valid end time");
+	} else {
+            // Cannot add date range filters directly to post data via serialize() call -- 
+            //  we must convert them to UTC first, then manually add to post data
+            var gameStartDateTimeWithTZ = moment.tz(gameStartDate + " " + gameStartTime, "YYYY-MM-DD h:mmA", gameStartTimezone);
+            var gameStartDateTimeMoment = moment(gameStartDateTimeWithTZ).utc();
+            var gameEndDateTimeWithTZ = moment.tz(gameEndDate + " " + gameEndTime, "YYYY-MM-DD h:mmA", gameEndTimezone);
+            var gameEndDateTimeMoment = moment(gameEndDateTimeWithTZ).utc();        
+			
+            searchEventsInfo.gameStartDateTimeMoment = gameStartDateTimeMoment;
+            searchEventsInfo.gameEndDateTimeMoment = gameEndDateTimeMoment;
+            searchEventsInfo.postData += ('&gameFilterStartDateTime=' + gameStartDateTimeMoment.toISOString() + 
+					  '&gameFilterEndDateTime=' + gameEndDateTimeMoment.toISOString());
+            dateFieldsValidated = true;
+	}
     }
     
+    var filterFields = $(searchFieldClass).find('*[name]').filter('.filterFieldActive');
+    if(filterFields && filterFields.length) {
+        searchEventsInfo.postData += ('&' + (filterFields.serialize()));
+    }
+    
+    searchEventsInfo.validated = dateFieldsValidated && titlesFieldValidated;
     return searchEventsInfo;
 }
 
@@ -1442,16 +1449,12 @@ function EventFormInfo(displayDatetime, comments, isGlobalGame, isExistingGame, 
     this.validated = false;
 }
 
-function SearchEventsFormInfo(gameStartDateTimeMoment, gameEndDateTimeMoment, searchFieldClass)
+function SearchEventsFormInfo()
 {
-    this.gameStartDateTimeMoment = gameStartDateTimeMoment;
-    this.gameEndDateTimeMoment = gameEndDateTimeMoment;
+    this.gameStartDateTimeMoment = '';
+    this.gameEndDateTimeMoment = '';
     this.validated = false;
-    
     this.postData = '';
-    if(($(searchFieldClass).length) > 0) {
-        this.postData = $(searchFieldClass).serialize();
-    }
 }
 
 function EditEvent(eventId, $dialog)

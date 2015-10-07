@@ -77,11 +77,43 @@ class DataAccess
             return null;
         }
     }
+    
+    public function GetResultSetWithPositionalParms($valArray)
+    {
+        try {
+            if($this->curStatement->execute($valArray)) {
+                return $this->curStatement->fetchAll(PDO::FETCH_ASSOC);
+            }
+            else {
+                return null;
+            }
+        }
+        catch(PDOException $e){
+            $this->errorResult = 'Could not retrieve result set for SQL: "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+            return false;
+        }
+    }
 	
     public function GetSingleResult()
     {
         try{
             if($this->curStatement->execute()){
+                return $this->curStatement->fetch(PDO::FETCH_ASSOC);
+            }
+            else {
+                return null;
+            }
+        }
+        catch(PDOException $e){
+            $this->errorResult = 'Could not retrieve single-result query for SQL: "' . $this->curStatement->queryString . '". Exception: ' . $e->getMessage();
+            return null;
+        }
+    }
+    
+    public function GetSingleResultWithPositionalParms($valArray)
+    {
+        try{
+            if($this->curStatement->execute($valArray)){
                 return $this->curStatement->fetch(PDO::FETCH_ASSOC);
             }
             else {

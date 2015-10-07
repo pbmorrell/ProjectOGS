@@ -92,6 +92,37 @@ class GamingHandler
         
         return $userGames;
     }
+    
+    public function LoadAllGameTitles($dataAccess, $logger)
+    {
+        $getGameTitlesQuery = "SELECT DISTINCT `Name`, 0 AS IsGlobalGameTitle FROM `Gaming.UserGames` " .
+                              "UNION " .
+                              "SELECT DISTINCT `Name`, 1 AS IsGlobalGameTitle FROM `Configuration.Games` " .
+                              "ORDER BY `Name`;";
+        
+	$gameTitles = array();
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getGameTitlesQuery)){
+		$results = $dataAccess->GetResultSet();
+					
+		if($results != null){
+                    foreach($results as $row) {
+			$gameTitle = new Game(-1, $row['Name'], $row['IsGlobalGameTitle'] == 1);
+			array_push($gameTitles, $gameTitle);
+                    }
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve game titles. " . $errors);
+	}
+        
+        return $gameTitles;
+    }
 	
     public function EventEditorLoad($dataAccess, $logger, $userID, $eventId)
     {
@@ -250,13 +281,26 @@ class GamingHandler
 
         return $gameSelector;
     }
+    
+    public function ConstructGameTitleMultiSelector($dataAccess, $logger)
+    {
+        $gameSelector = '';
+        $userGames = $this->LoadAllGameTitles($dataAccess, $logger);
+        
+        foreach($userGames as $userGame) {
+            $gameSelector .= ('<label class="overlayPanelLbl"><input type="checkbox" name="filterGameTitles[]" value="' . 
+                                $userGame->Name . '" class="overlayPanelElement">' . $userGame->Name . '</label><br />');
+        }
+        
+        return $gameSelector;
+    }
 	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, 
-                                           $pageSize, $showHiddenEvents, $showPastEventsDays, $startDateTime, $endDateTime)
+                                           $pageSize, $showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles)
     {
         $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
-                                                   $startIndex, $pageSize, -1, $showHiddenEvents, $showPastEventsDays, 
-                                                   $startDateTime, $endDateTime);
+                                                   $startIndex, $pageSize, -1, $showHiddenEvents, false, $startDateTime, 
+                                                   $endDateTime, $existingGameTitles);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -287,18 +331,19 @@ class GamingHandler
         $jTableResult = [];
         $jTableResult['Result'] = 'OK';
         $jTableResult['TotalRecordCount'] = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, 
-                                                                               $showPastEventsDays, $startDateTime, $endDateTime);
+                                                                               false, $startDateTime, $endDateTime, $existingGameTitles);
         $jTableResult['Records'] = $rows;
         return json_encode($jTableResult);
     }
 	
     public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize,
-                                                 $startDateTime, $endDateTime)
+                                                 $startDateTime, $endDateTime, $existingGameTitles)
     {
         $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, 
-                                                   $startIndex, $pageSize, -1, false, "-1", true, $startDateTime, $endDateTime);
-	$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, "-1", true, $startDateTime, 
-                                                                    $endDateTime);
+                                                   $startIndex, $pageSize, -1, false, true, $startDateTime, 
+                                                   $endDateTime, $existingGameTitles);
+	$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, true, $startDateTime, 
+                                                                    $endDateTime, $existingGameTitles);
 	$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
 
         $rows = [];
@@ -1046,79 +1091,84 @@ class GamingHandler
                 break;
         }
     }
-	
-    public function GetScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
-                                      $paginationEnabled = false, $startIndex = "0", $pageSize = "10", 
-                                      $eventId = -1, $showHiddenEvents = false, $showPastEventsDays = "-1", 
-                                      $excludeEventsForUser = false, $startDateTime = "", $endDateTime = "")
+    
+    public function BuildWhereClauseForScheduledGameQuery($userID, &$queryParms, $eventId = -1, $showHiddenEvents = false, $excludeEventsForUser = false, 
+                                                          $startDateTime = "", $endDateTime = "", $existingGameTitles = [], $isCountOnly = false)
     {
-	$limitClause = "";
-	if($paginationEnabled) {
-            $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
-	}
-        
-        $queryParms = [];
         $eventWhereClause = "";
-		
-	// Determine if current user is member of the given event
-	$eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = :userID1) ";
-	$parmUserId1 = new QueryParameter(':userID1', $userID, PDO::PARAM_INT);
-	array_push($queryParms, $parmUserId1);
+        $eventMemberLeftJoinClause = "";
+        
+        if(!$isCountOnly) {
+            // Determine if current user is member of the given event
+            $eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = ?) ";
+            array_push($queryParms, $userID);
+        }
         
 	if(($userID > -1) && (!$excludeEventsForUser)) {
-            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` = :userID2) ";
-            $parmUserId2 = new QueryParameter(':userID2', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId2);
+            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` = ?) ";
+            array_push($queryParms, $userID);
         }
         else if(($userID > -1) && $excludeEventsForUser) {            
-            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` <> :userID2) ";
-            $parmUserId2 = new QueryParameter(':userID2', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId2);
+            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` <> ?) ";
+            array_push($queryParms, $userID);
 			
             // If excluding events for current user, also filter out any private events for which the current user is not an allowed member
             $eventWhereClause .= "AND ((e.`IsPublic` = 1) OR (e.`ID` IN ".
                                  "(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
-                                 " WHERE (`FK_User_ID` = :userID3) AND (`FK_Event_ID` = e.`ID`))".
+                                 " WHERE (`FK_User_ID` = ?) AND (`FK_Event_ID` = e.`ID`))".
                                  ")) ";
-            $parmUserId3 = new QueryParameter(':userID3', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId3);
+            
+            array_push($queryParms, $userID);
         }
 		
 	if($eventId > -1) {
-            $eventWhereClause .= "AND (e.`ID` = :eventId) ";
-            $parmEventId = new QueryParameter(':eventId', $eventId, PDO::PARAM_INT);
-            array_push($queryParms, $parmEventId);
+            $eventWhereClause .= "AND (e.`ID` = ?) ";
+            array_push($queryParms, $eventId);
         }
         
         if(!$showHiddenEvents) {
-            $eventWhereClause .= "AND (e.`IsActive` = :isActive) ";
-            $parmIsActive = new QueryParameter(':isActive', 1, PDO::PARAM_INT);
-            array_push($queryParms, $parmIsActive);
+            $eventWhereClause .= "AND (e.`IsActive` = 1) ";
         }
-		
-        if($showPastEventsDays !== "-1") {
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
-            $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
-            array_push($queryParms, $parmShowPastEventsDays);
-        }        
-        else if(strlen($startDateTime) > 0) {            
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` >= :startDateTime) ";
-            $parmStartDateTime = new QueryParameter(':startDateTime', $startDateTime, PDO::PARAM_STR);
-            array_push($queryParms, $parmStartDateTime);
+		     
+        if(strlen($startDateTime) > 0) {            
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` >= ?) ";
+            array_push($queryParms, $startDateTime);
             
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` <= :endDateTime) ";
-            $parmEndDateTime = new QueryParameter(':endDateTime', $endDateTime, PDO::PARAM_STR);
-            array_push($queryParms, $parmEndDateTime);
+            $eventWhereClause .= "AND (e.`EventScheduledForDate` <= ?) ";
+            array_push($queryParms, $endDateTime);
         }
 	else {
             $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // By default, only show future events
 	}
-		
+        
+        if((is_array($existingGameTitles)) && (count($existingGameTitles) > 0)) {
+            $gameTitleListForQuery = (str_repeat("?,", count($existingGameTitles) - 1)) . "?";
+            $eventWhereClause .= "AND (COALESCE(cg.`Name`, ug.`Name`) IN (" . $gameTitleListForQuery . ")) ";
+            $queryParms = array_merge($queryParms, $existingGameTitles);
+        }
+
 	// Replace first "AND" with a "WHERE"
 	$firstAndPos = stripos($eventWhereClause, "and");
 	if($firstAndPos !== false) {
             $eventWhereClause = "WHERE " . (substr($eventWhereClause, ($firstAndPos + 4)));
 	}
+        
+        return $eventMemberLeftJoinClause . $eventWhereClause;
+    }
+	
+    public function GetScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", 
+                                      $paginationEnabled = false, $startIndex = "0", $pageSize = "10", 
+                                      $eventId = -1, $showHiddenEvents = false, $excludeEventsForUser = false, 
+                                      $startDateTime = "", $endDateTime = "", $existingGameTitles = [])
+    {
+	$limitClause = "";
+	if($paginationEnabled) {
+            $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
+	}
+	
+        $queryParms = [];
+        $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, $eventId, $showHiddenEvents, $excludeEventsForUser, 
+                                                                         $startDateTime, $endDateTime, $existingGameTitles, false);
 		
         $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
                              "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
@@ -1132,7 +1182,6 @@ class GamingHandler
                              "INNER JOIN `Security.Users` AS u ON u.`ID` = e.`FK_User_ID_EventCreator` ".
                              "LEFT JOIN `Gaming.EventMembers` AS em ON (em.`FK_Event_ID` = e.`ID`) ". 
                              "LEFT JOIN `Security.Users` AS u2 ON em.`FK_User_ID` = u2.`ID` ".
-                             $eventMemberLeftJoinClause.
                              "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
                              "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
                              $eventWhereClause . 
@@ -1143,8 +1192,8 @@ class GamingHandler
         $errors = $dataAccess->CheckErrors();
         
 	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
-		$results = $dataAccess->GetResultSet();
+            if($dataAccess->BuildQuery($getUserGamesQuery)){
+		$results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
 					
 		if($results != null){
                     $lastEvtId = 0;
@@ -1215,74 +1264,28 @@ class GamingHandler
 	}
     }
 	
-    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $showPastEventsDays = "-1", 
-                                                 $excludeEventsForUser = false, $startDateTime = "", $endDateTime = "")
+    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $showHiddenEvents, $excludeEventsForUser = false, $startDateTime = "", 
+                                                 $endDateTime = "", $existingGameTitles = [])
     {
 	$userTotalScheduledGamesCnt = 0;
-		
+	
         $queryParms = [];
-	$eventWhereClause = "";
-		
-	if(($userID > -1) && (!$excludeEventsForUser)) {
-            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` = :userID) ";
-            $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId);
-        }
-        else if(($userID > -1) && $excludeEventsForUser) {
-            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` <> :userID) ";
-            $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId);
-			
-	// If excluding events for current user, also filter out any private events for which the current user is not an allowed member
-	$eventWhereClause .= "AND ((e.`IsPublic` = 1) OR (e.`ID` IN ".
-                             "(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
-                             " WHERE (`FK_User_ID` = :userID2) AND (`FK_Event_ID` = e.`ID`))".
-                             ")) ";
-            $parmUserId2 = new QueryParameter(':userID2', $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmUserId2);
-        }
-        
-        if(!$showHiddenEvents) {
-            $eventWhereClause .= "AND (e.`IsActive` = :isActive) ";
-            $parmIsActive = new QueryParameter(':isActive', 1, PDO::PARAM_INT);
-            array_push($queryParms, $parmIsActive);
-        }
-		
-        if($showPastEventsDays !== "-1") {
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` > (DATE_SUB(UTC_TIMESTAMP(), INTERVAL :daysOld DAY))) ";
-            $parmShowPastEventsDays = new QueryParameter(':daysOld', $showPastEventsDays, PDO::PARAM_INT);
-            array_push($queryParms, $parmShowPastEventsDays);
-        }
-        else if(strlen($startDateTime) > 0) {            
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` >= :startDateTime) ";
-            $parmStartDateTime = new QueryParameter(':startDateTime', $startDateTime, PDO::PARAM_STR);
-            array_push($queryParms, $parmStartDateTime);
-            
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` <= :endDateTime) ";
-            $parmEndDateTime = new QueryParameter(':endDateTime', $endDateTime, PDO::PARAM_STR);
-            array_push($queryParms, $parmEndDateTime);
-        }
-	else {
-            $eventWhereClause .= "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) "; // Only show future events
-	}
-		
-	// Replace first "AND" with a "WHERE"
-	$firstAndPos = stripos($eventWhereClause, "and");
-	if($firstAndPos !== false) {
-            $eventWhereClause = "WHERE " . (substr($eventWhereClause, ($firstAndPos + 4)));
-	}
+        $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, -1, $showHiddenEvents, $excludeEventsForUser, 
+                                                                         $startDateTime, $endDateTime, $existingGameTitles, true);
 		
         $getUserGamesQuery = "SELECT COUNT(e.`ID`) AS Cnt " .
                              "FROM `Gaming.Events` AS e ".
                              "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
                              "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+                             "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+                             "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
                              $eventWhereClause . ";";
         
         $errors = $dataAccess->CheckErrors();
         
 	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
-		$results = $dataAccess->GetSingleResult();
+            if($dataAccess->BuildQuery($getUserGamesQuery)){
+		$results = $dataAccess->GetSingleResultWithPositionalParms($queryParms);
 					
 		if($results != null){
                     $userTotalScheduledGamesCnt = $results['Cnt'];

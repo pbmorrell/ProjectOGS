@@ -383,12 +383,17 @@
                 
                 $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
                 $showHiddenEvents = ($showHidden === "1") ? true : false;	
-		$showPastEventsDays = isset($_POST['showPastEventsInDays']) ? filter_var($_POST['showPastEventsInDays'], FILTER_SANITIZE_STRING) : "-1";
+
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+                $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
+                $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING) : "";
+                if(strlen($customGameTitle) > 0) {
+                    array_push($existingGameTitles, $customGameTitle);
+                }
                 
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
-                                                            $startIndex, $pageSize, $showHiddenEvents, $showPastEventsDays, $startDateTime, $endDateTime);
+                                                            $startIndex, $pageSize, $showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles);
                 break;
             case "GetCurrentEventsForJTable":
 		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
@@ -398,9 +403,14 @@
 
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+                $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
+                $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING) : "";
+                if(strlen($customGameTitle) > 0) {
+                    array_push($existingGameTitles, $customGameTitle);
+                }
                 
 		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
-                                                                  $pageSize, $startDateTime, $endDateTime);
+                                                                  $pageSize, $startDateTime, $endDateTime, $existingGameTitles);
                 break;
             case "EventViewerJoinEvents":
 		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
