@@ -1518,7 +1518,7 @@ function CreateEvent($dialog)
                         ReloadGameTitleSelector(eventId);
                     }
                 
-                    swal('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!', "success");
+                    alert('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
                     $dialog.dialog('destroy').remove();
                 }
                 else {
