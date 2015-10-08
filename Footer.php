@@ -6,15 +6,21 @@
                 <!-- Footer -->
                 <footer id="footer">
                     <div class="row">
-                        <div class="6u">
+                       <div class="4u">
                             <section class="newsletter">
-                                <h2>Become an Insider</h2>
-                                <p>Sign up for our newsletter and never miss a beat.</p>
-                                <input type="email" maxlength="50" placeholder=" email address">
-                                <a href="#" class="button icon fa-sign-in">Sign Up!</a>
+                                <h2>Your Feedback is Important</h2>
+                                <p>We want to make Player Unite your home. How would you improve the site? Drop us a line below.</p>
+                                <a href="mailto:feedback@playerunite.com" class="button icon fa-comment">Comment</a>
                             </section>
-                       </div> 
-                       <div class="3u">
+                       </div>
+					   <div class="4u">
+                            <section class="newsletter">
+                                <h2>Help Expand Player Unite</h2>
+                                <p>Your donations will help cover our server hosting and future expansion cost.</p>
+                                <a href="#" class="button icon fa-credit-card">Donate</a>
+                            </section>
+                       </div>
+                       <div class="2u">
                             <section>
                                 <h2>Quick Links</h2>
                                 <ul class="style3">
@@ -27,15 +33,15 @@
                                 </ul>
                             </section>
                        </div>
-                       <div class="3u">
+                       <div class="2u">
                             <section>
                                 <h2>Contact Us</h2>
                                 <ul class="style3">
                                     <li class="icon fa-envelope">
-                                        <a href="mailto:ProjectOGS@placeholder.com" style="text-decoration:none;"> &nbsp Email</a>
+                                        <a href="mailto:support@playerunite.com" style="text-decoration:none;"> &nbsp Email</a>
                                     </li>
-                                    <li class="icon fa-twitch">
-                                        <a href="http://www.twitch.tv/pbmorrell" style="text-decoration:none;"> &nbsp Twitch</a>
+                                    <li class="icon fa-facebook-square">
+                                        <a href="#" style="text-decoration:none;"> &nbsp Facebook</a>
                                     </li>
                                 </ul>
                             </section>
