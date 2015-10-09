@@ -542,15 +542,21 @@
     }
 
     .overlayPanel {
-	background-color:gray;
 	z-index: 100000;
 	padding-top: 2%;
-        opacity: 0.85;
+    }
+	
+    .overlayPanelEvtMgr {
+	background-color:#84c9b6;
+    }
+	
+    .overlayPanelCurEvts {
+	background-color:#cf9c30;
     }
 
     .overlayPanelToggleGroup {
         margin-top: 1%;
-        width: 35%;
+        width: 45%;
     }
     
     .overlayPanelFilterGroup {
@@ -588,7 +594,7 @@
     }
     
     .overlayPanelElement {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
         width: 100%;
     }
@@ -602,25 +608,35 @@
     }
     
     .overlayPanelControlElement {
-        opacity: 0.7;
         z-index: 100001;
-        margin-left: 5%;
+        margin-left: 15%;
         width: 25% !important;
+        float: left;
+    }
+    
+    .overlayPanelControlElementGroup {
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 10px;
+        width: 100%;
+        height: auto;
+        overflow-y: auto;
+        z-index: 100000;
     }
     
     .overlayPanelToggleElementActive {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
         font-weight:bold;
         text-decoration: none;
-        color: turquoise;
+        color: blue;
         float: left;
     }
 	
     .overlayPanelToggleElementInactive {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
@@ -630,7 +646,7 @@
     }
 	
     .overlayPanelToggleActiveChk {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
 	margin-left: 2%;
 	margin-right: 5px;
@@ -638,14 +654,14 @@
     }
 	
     .overlayPanelLbl {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
 	color: white;
 	font-size: 1em;
     }
     
     .overlayPanelToggleActiveLbl {
-        opacity: 0.7;
+        opacity: 0.9;
         z-index: 100001;
 	color: white;
 	font-size: 1em;

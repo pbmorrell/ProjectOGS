@@ -49,7 +49,7 @@
                                                     <li class="icon fa-bullseye">
 							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
                                                     </li>
-                                                    <div id="searchPanel" class="overlayPanel">
+                                                    <div id="searchPanel" class="overlayPanel overlayPanelCurEvts">
                                                         <form name="searchForm" method="POST" action="">
                                                             <div class="overlayPanelToggleGroup"><a href="#" id="dateRangeFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
                                                                     onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
@@ -94,10 +94,11 @@
                                                                     </div>
                                                                 </div>
                                                             </div><br />
-                                                            <div class="overlayPanelToggleGroup"><a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-                                                                    onclick="return ToggleSearchDivDisplay('#gameTitleFilterDiv', this);">&nbsp;&nbsp;Game Title</a>
-								<input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" groupId="gameTitleFilterDiv" type="checkbox">
-								<label class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                            <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+																<a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                   onclick="return ToggleSearchDivDisplay('#gameTitleFilterDiv', this);">&nbsp;&nbsp;Game Title</a>
+																<input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" groupId="gameTitleFilterDiv" type="checkbox">
+																<label class="overlayPanelToggleActiveLbl">Activate Filter</label>
                                                             </div><br />
                                                             <div id="gameTitleFilterDiv" style="display:none" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                 <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
@@ -105,7 +106,7 @@
                                                                         <label class="overlayPanelLabel">Existing Game Titles:</label><br />
                                                                         <div class="fixedHeightScrollableContainerLarge">
                                                                             <?php 
-                                                                               echo $gamingHandler->ConstructGameTitleMultiSelector($dataAccess, $logger); 
+                                                                               echo $gamingHandler->ConstructGameTitleMultiSelector($dataAccess, $logger);
                                                                             ?>
                                                                         </div>
                                                                     </div>
@@ -118,8 +119,10 @@
                                                             </div>
                                                             
                                                             <br /><br />
-                                                            <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
-                                                            <button class="controlBtn button overlayPanelControlElement" id="closePanelBtn">Close</button>
+                                                            <div class="overlayPanelControlElementGroup">
+                                                                <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
+                                                                <button class="controlBtn button overlayPanelControlElement" id="closePanelBtn">Close</button>
+                                                            </div>
                                                         </form>
                                                         <br />
                                                     </div>

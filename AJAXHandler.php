@@ -5,6 +5,7 @@
     include_once 'classes/DBSessionHandler.class.php';
     include_once 'classes/Logger.class.php';
     include_once 'classes/User.class.php';
+    include_once 'classes/SearchParameters.class.php';
     include_once 'securimage/securimage.php';
     
     $dataAccess = new DataAccess();
@@ -328,7 +329,7 @@
 		$eventId = '';
 		if(isset($_GET['EventID'])) {
                     $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
-		}             
+		}
 
 		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);
 		break;
@@ -382,7 +383,7 @@
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
                 
                 $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
-                $showHiddenEvents = ($showHidden === "1") ? true : false;	
+                $showHiddenEvents = ($showHidden === "1") ? true : false;
 
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
@@ -392,8 +393,9 @@
                     array_push($existingGameTitles, $customGameTitle);
                 }
                 
+		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], [], [], true, true, true);
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
-                                                            $startIndex, $pageSize, $showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles);
+                                                            $startIndex, $pageSize, $searchParms);
                 break;
             case "GetCurrentEventsForJTable":
 		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
@@ -401,6 +403,7 @@
 		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
 
+		$showHiddenEvents = false;
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
@@ -409,8 +412,9 @@
                     array_push($existingGameTitles, $customGameTitle);
                 }
                 
+		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], [], [], true, true, true);
 		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
-                                                                  $pageSize, $startDateTime, $endDateTime, $existingGameTitles);
+                                                                  $pageSize, $searchParms);
                 break;
             case "EventViewerJoinEvents":
 		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);

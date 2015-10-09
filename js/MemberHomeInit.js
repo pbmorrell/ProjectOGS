@@ -1305,13 +1305,14 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
 
 function ToggleControlPanelDisplay(panelToToggle)
 {
+	// Toggle active view
     if($(panelToToggle).css('display') === 'none')
     {
 	// Hide active panel
 	if(activePanel !== panelEnum.None) {
             $(activePanel).hide();
 	}
-		
+			
 	// Fade in desired panel
 	activePanel = panelToToggle;
 	$(panelToToggle).fadeIn("slow", function() {});
@@ -1319,6 +1320,32 @@ function ToggleControlPanelDisplay(panelToToggle)
     else {
 	activePanel = panelEnum.None;
 	$(panelToToggle).fadeOut("fast", function() {});
+    }
+	
+    // Close search panel, if open
+    $('#searchPanel').slideReveal("hide");
+	
+    if(activePanel === panelEnum.CurrentEventFeed) {
+	// Change search panel style to reflect current view
+	$('#searchPanel').removeClass('overlayPanelEvtMgr').addClass('overlayPanelCurEvts');
+		
+	// Hide any search filter fields that are not associated with this particular view
+	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
+	var $exclusivelyEvtMgrFilters = $evtMgrFields.not('.searchPanelCurEvtsFilter');
+	var $exclusivelyCurEvtFilters = $evtMgrFields.not('.searchPanelEvtMgrFilter');
+	$exclusivelyEvtMgrFilters.hide();
+	$exclusivelyCurEvtFilters.show();
+    }
+    else {
+	// Change search panel style to reflect current view
+	$('#searchPanel').removeClass('overlayPanelCurEvts').addClass('overlayPanelEvtMgr');
+		
+	// Hide any search filter fields that are not associated with this particular view
+	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
+	var $exclusivelyEvtMgrFilters = $evtMgrFields.not('.searchPanelCurEvtsFilter');
+	var $exclusivelyCurEvtFilters = $evtMgrFields.not('.searchPanelEvtMgrFilter');
+	$exclusivelyCurEvtFilters.hide();
+	$exclusivelyEvtMgrFilters.show();
     }
 	
     return false;
