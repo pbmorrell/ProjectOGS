@@ -17,8 +17,6 @@
         <script src="js/moment-timezone-with-data.min.js"></script>
 	<script src="js/jTable/jquery.jtable.min.js"></script>
 	<script src="js/jquery.slidereveal.min.js"></script>
-        <script src="js/sweetalert.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="css/sweetalert.css" />
 	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body>

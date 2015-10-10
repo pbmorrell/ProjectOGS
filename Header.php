@@ -195,6 +195,10 @@
             '<link rel="stylesheet" href="css/style-desktop.css" />'.
         '</noscript>' . $jQueryUiCssPath.
         '<link rel="stylesheet" href="css/jquery.timepicker.css" />'.
+            
+        '<!-- For SweetAlert framework -->'.
+        '<script src="js/sweetalert.min.js"></script>'.
+        '<link rel="stylesheet" type="text/css" href="css/sweetalert.css" />'.
 
         '<script src="js/jquery.min.js"></script>'.
         '<script src="js/jquery.dropotron.min.js"></script>'.

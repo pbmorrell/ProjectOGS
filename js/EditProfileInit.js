@@ -62,16 +62,16 @@ function OnEditProfile(editProfileStatusId)
     var checkedPlatforms = $("input[name='platforms[]']:checked").length;
 
     if (validEmailRegEx.test(email) === false) {
-        alert("Unable to update account: Please enter a valid email address");
+        sweetAlert("Opps...", "Unable to update account: Please enter a valid email address", "error");
     }
     else if (password !== passwordConf) {
-        alert("Unable to update account: Your Password does not match the Password Confirmation");
+        sweetAlert("Opps...", "Unable to update account: Your Password does not match the Password Confirmation", "error");
     }
     else if (userName.trim().length === 0) {
-        alert("Unable to update account: The Username field must be filled");
+        sweetAlert("Opps...", "Unable to update account: The Username field must be filled", "error");
     }
     else if((email.trim().length === 0) || (dob.trim().length === 0) || (bio.trim().length === 0)) {
-        alert("Unable to update account: The Email, Birthdate and Autobiography fields must be filled");
+        sweetAlert("Opps...", "Unable to update account: The Email, Birthdate and Autobiography fields must be filled", "error");
     } 
     else if ((checkedPlatforms > 0) || ((checkedPlatforms === 0) && (confirm("No game platforms selected...proceed with update?")))) {
         $(editProfileStatusId).attr('class', 'preEditProfile');

@@ -1380,22 +1380,22 @@ function ValidateEventFormFields(eventId)
 
     // Verify that required fields are filled out and have valid data
     if(gameDate.length === 0) {
-        alert("Unable to " + alertTextType + " event: Must select a date");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please select a date", "error");
     } else if (gameTime.length === 0) {
-        alert("Unable to " + alertTextType + " event: Must select a time");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please select a time", "error");
     } else if (!gameTime.match(regexTime)) {
-        alert("Unable to " + alertTextType + " event: Must enter a valid time");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please enter a valid time", "error");
     } else if (comments.trim().length === 0) {
-        alert("Unable to " + alertTextType + " event: Please enter notes about your event");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please enter notes about your event", "error");
     } else if (isPrivateEvent && (numPlayersNeeded > (numPlayersAllowed + 1))) { // Event creator is implicitly allowed to join event
-        alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
+        sweetAlert("opps...", "Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event", "error");
     } else {
         var gameDateWithTZ = moment.tz(gameDate + " " + gameTime, "YYYY-MM-DD h:mmA", gameTimezone);
         var gameTimeMoment = moment(gameDateWithTZ).utc();
         eventInfo.gameTimeMoment = gameTimeMoment;
 
         if (gameTimeMoment.isBefore(curMoment)) {
-            alert("Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past");
+            sweetAlert("Opps...", "Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past", "error");
         }
         else {
             eventInfo.validated = true;
@@ -1507,7 +1507,7 @@ function EditEvent(eventId, $dialog)
                         ReloadGameTitleSelector(eventId);
                     }
 
-                    alert('Success - Updated event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    sweetAlert('Success', 'Updated event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!', 'success');
                     $dialog.dialog('destroy').remove();
                 }
                 else {
@@ -1545,7 +1545,7 @@ function CreateEvent($dialog)
                         ReloadGameTitleSelector(eventId);
                     }
                 
-                    alert('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    sweetAlert('Success', 'Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!', 'success');
                     $dialog.dialog('destroy').remove();
                 }
                 else {
