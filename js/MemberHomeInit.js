@@ -1397,22 +1397,22 @@ function ValidateEventFormFields(eventId)
 
     // Verify that required fields are filled out and have valid data
     if(gameDate.length === 0) {
-        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please select a date", "Error");
+        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please select a date", "error");
     } else if (gameTime.length === 0) {
-        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please select a time", "Error");
+        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please select a time", "error");
     } else if (!gameTime.match(regexTime)) {
-        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please enter a valid time", "Error");
+        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please enter a valid time", "error");
     } else if (comments.trim().length === 0) {
-        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please enter notes about your event", "Error");
+        sweetAlert("Oops...", "Unable to " + alertTextType + " event: Please enter notes about your event", "error");
     } else if (isPrivateEvent && (numPlayersNeeded > (numPlayersAllowed + 1))) { // Event creator is implicitly allowed to join event
-        sweetAlert("Oops...", "Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event", "Error");
+        sweetAlert("Oops...", "Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event", "error");
     } else {
         var gameDateWithTZ = moment.tz(gameDate + " " + gameTime, "YYYY-MM-DD h:mmA", gameTimezone);
         var gameTimeMoment = moment(gameDateWithTZ).utc();
         eventInfo.gameTimeMoment = gameTimeMoment;
 
         if (gameTimeMoment.isBefore(curMoment)) {
-            sweetAlert("Oops...", "Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past", "Error");
+            sweetAlert("Oops...", "Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past", "error");
         }
         else {
             eventInfo.validated = true;
