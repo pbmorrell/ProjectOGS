@@ -308,19 +308,19 @@ class Securimage
      * The color of the captcha text
      * @var Securimage_Color
      */
-    public $text_color     = '#707070';
+    public $text_color     = '#000000';
 
     /**
      * The color of the lines over the captcha
      * @var Securimage_Color
      */
-    public $line_color     = '#707070';
+    public $line_color     = '#A8A8A8';
 
     /**
      * The color of the noise that is drawn
      * @var Securimage_Color
      */
-    public $noise_color    = '#707070';
+    public $noise_color    = '#A8A8A8';
 
     /**
      * How transparent to make the text.

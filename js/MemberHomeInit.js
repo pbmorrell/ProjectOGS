@@ -807,7 +807,7 @@ function ToggleTableEventActivation(isActive)
     var $selectedRows = $(eventManagerJTableDiv).jtable('selectedRows');
 
     if($selectedRows.length === 0) {
-        alert("No events selected");
+        sweetAlert("No events selected");
         return;
     }
 
@@ -828,7 +828,7 @@ function DeleteTableEvents()
 {
     var $selectedRows = $(eventManagerJTableDiv).jtable('selectedRows');
     if($selectedRows.length === 0) {
-        alert("No events selected");
+        sweetAlert("No events selected");
         return;
     }
 
@@ -849,7 +849,7 @@ function JoinSelectedEvents()
 {
     var $selectedRows = $(currentEventViewerJTableDiv).jtable('selectedRows');
     if($selectedRows.length === 0) {
-        alert("No events selected");
+        sweetAlert("No events selected");
         return;
     }
 
@@ -869,7 +869,7 @@ function JoinSelectedEvents()
     });
 
     if(selectedEventIds.length === 0) {
-        alert("You are already a member of all selected events");
+        sweetAlert("You are already a member of all selected events");
         DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
     }
     else if(!JoinEvents(selectedEventIds)) {
@@ -882,7 +882,7 @@ function LeaveSelectedEvents()
 {
     var $selectedRows = $(currentEventViewerJTableDiv).jtable('selectedRows');
     if($selectedRows.length === 0) {
-        alert("No events selected");
+        sweetAlert("No events selected");
         return;
     }
 
@@ -902,7 +902,7 @@ function LeaveSelectedEvents()
     });
 
     if(selectedEventIds.length === 0) {
-        alert("You haven't joined any of the selected events yet");
+        sweetAlert("You haven't joined any of the selected events yet");
         DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
     }
     else if(!LeaveEvents(selectedEventIds)) {
@@ -1047,7 +1047,7 @@ function ToggleEventVisibility(selectedEventIds, isActive)
             data: "action=EventEditorToggleEventVisibility&" + $.param({'eventIds': selectedEventIds}) + "&isActive=" + isActive,
             success: function(response){
                 ReloadUserHostedEventsTable(true);
-		alert(response);
+		sweetAlert(response);
 		return true;
             }
         });
@@ -1079,7 +1079,7 @@ function DeleteEvents(selectedEventIds)
             success: function(response){
                 var fullRefresh = false;
                 ReloadUserHostedEventsTable(fullRefresh);
-		alert(response);
+		sweetAlert(response);
 		return true;
             }
         });
@@ -1105,7 +1105,7 @@ function JoinEvents(selectedEventIds)
             success: function(response){
 		var fullRefresh = false;
                 ReloadCurrentEventsTable(fullRefresh);
-		alert(response);
+		sweetAlert(response);
 		return true;
             }
         });
@@ -1131,7 +1131,7 @@ function LeaveEvents(selectedEventIds)
             success: function(response){
 		var fullRefresh = false;
                 ReloadCurrentEventsTable(fullRefresh);
-		alert(response);
+		sweetAlert(response);
 		return true;
             }
         });
@@ -1397,22 +1397,22 @@ function ValidateEventFormFields(eventId)
 
     // Verify that required fields are filled out and have valid data
     if(gameDate.length === 0) {
-        alert("Unable to " + alertTextType + " event: Must select a date");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please select a date", "error");
     } else if (gameTime.length === 0) {
-        alert("Unable to " + alertTextType + " event: Must select a time");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please select a time", "error");
     } else if (!gameTime.match(regexTime)) {
-        alert("Unable to " + alertTextType + " event: Must enter a valid time");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please enter a valid time", "error");
     } else if (comments.trim().length === 0) {
-        alert("Unable to " + alertTextType + " event: Please enter notes about your event");
+        sweetAlert("Opps...", "Unable to " + alertTextType + " event: Please enter notes about your event", "error");
     } else if (isPrivateEvent && (numPlayersNeeded > (numPlayersAllowed + 1))) { // Event creator is implicitly allowed to join event
-        alert("Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event");
+        sweetAlert("opps...", "Unable to " + alertTextType + " event: New set of allowed friends is smaller than the number of members required for this event", "error");
     } else {
         var gameDateWithTZ = moment.tz(gameDate + " " + gameTime, "YYYY-MM-DD h:mmA", gameTimezone);
         var gameTimeMoment = moment(gameDateWithTZ).utc();
         eventInfo.gameTimeMoment = gameTimeMoment;
 
         if (gameTimeMoment.isBefore(curMoment)) {
-            alert("Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past");
+            sweetAlert("Opps...", "Unable to " + alertTextType + " event: Scheduled game time '" + displayDatetime + "' is in the past", "error");
         }
         else {
             eventInfo.validated = true;
@@ -1446,17 +1446,17 @@ function ValidateSearchFormFields(searchFieldClass, suppressAlerts)
 
 	// Verify that required fields are filled out and have valid data
 	if(gameStartDate.length === 0) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a start date");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start date");
 	} else if (gameStartTime.length === 0) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a start time");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start time");
 	} else if (!gameStartTime.match(regexTime)) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must enter a valid start time");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid start time");
 	} else if(gameEndDate.length === 0) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a end date");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end date");
 	} else if (gameEndTime.length === 0) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must select a end time");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end time");
 	} else if (!gameEndTime.match(regexTime)) {
-            if(!suppressAlerts)  alert("Unable to filter by date range: Must enter a valid end time");
+            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid end time");
 	} else {
             // Cannot add date range filters directly to post data via serialize() call -- 
             //  we must convert them to UTC first, then manually add to post data
@@ -1524,11 +1524,11 @@ function EditEvent(eventId, $dialog)
                         ReloadGameTitleSelector(eventId);
                     }
 
-                    alert('Success - Updated event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    sweetAlert('Success', 'Updated event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!', 'success');
                     $dialog.dialog('destroy').remove();
                 }
                 else {
-                    alert(response);
+                    sweetAlert(response);
                 }
             }
         });
@@ -1562,11 +1562,11 @@ function CreateEvent($dialog)
                         ReloadGameTitleSelector(eventId);
                     }
                 
-                    alert('Success - Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!');
+                    sweetAlert('Success', 'Created event for game "' + eventInfo.selGameTitle + '" at ' + eventInfo.displayDatetime + '!', 'success');
                     $dialog.dialog('destroy').remove();
                 }
                 else {
-                    alert(response);
+                    sweetAlert(response);
                 }
             }
         });

@@ -72,16 +72,16 @@ function OnSignupButtonClick(email, password, passwordConf, captcha, actionURL, 
     var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
     if((email.trim().length === 0) || (password.trim().length === 0)) {
-        alert("Unable to create account: The Email Address and Password fields must be filled");
+        sweetAlert("Opps...", "Unable to create account: The Email Address and Password fields must be filled", "error");
     }
     else if (validEmailRegEx.test(email) === false) {
-        alert("Unable to create account: Please enter a valid email address");
+        sweetAlert("Opps...", "Unable to create account: Please enter a valid email address", "error");
     }
     else if (password !== passwordConf) {
-        alert("Unable to create account: Your Password does not match the Password Confirmation");
+        sweetAlert("Opps...", "Unable to create account: Your Password does not match the Password Confirmation", "error");
     }
     else if (captcha.trim().length === 0) {
-        alert("Unable to create account: Please enter the code displayed in the CAPTCHA image");
+        sweetAlert("Opps...", "Unable to create account: Please enter the code displayed in the CAPTCHA image", "error");
     }
     else {
         $.ajax({

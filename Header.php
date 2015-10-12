@@ -183,7 +183,7 @@
     
     $pageHeaderHTML = 
         '<meta charset="UTF-8">'.
-        '<title>Project OGS | ' . $welcomeUserName . '</title>'.
+        '<title>Player Unite | ' . $welcomeUserName . '</title>'.
         '<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
         '<meta name="description" content="" />'.
         '<meta name="keywords" content="" />'.
@@ -195,6 +195,10 @@
             '<link rel="stylesheet" href="css/style-desktop.css" />'.
         '</noscript>' . $jQueryUiCssPath.
         '<link rel="stylesheet" href="css/jquery.timepicker.css" />'.
+            
+        '<!-- For SweetAlert framework -->'.
+        '<script src="js/sweetalert.min.js"></script>'.
+        '<link rel="stylesheet" type="text/css" href="css/sweetalert.css" />'.
 
         '<script src="js/jquery.min.js"></script>'.
         '<script src="js/jquery.dropotron.min.js"></script>'.
