@@ -420,6 +420,11 @@ function isMobileView()
     return window.matchMedia("(max-width: 650px)").matches;
 }
 
+function isMobileViewHeight()
+{
+    return window.matchMedia("(max-height: 700px)").matches;
+}
+
 // Param "colsToCombine" expected to be in following format:
 //      Array of strings, each string representing a column name from a table on this page
 //      First column is the one that should contain the stacked text from the other columns

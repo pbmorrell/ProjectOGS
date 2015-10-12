@@ -31,12 +31,11 @@
     
     .overlayPanel {
 	z-index: 100000;
-	padding-top: 15%;
     }
 
     .overlayPanelToggleGroup {
         margin-top: 2%;
-        width: 90%;
+        width: 95%;
     }
     
     .overlayPanelFilterGroup {
@@ -65,8 +64,23 @@
     
     .overlayPanelControlElement {
         z-index: 100001;
-        margin-left: 5%;
         width: 80% !important;
+        height: 55px;
+        margin-left: 15%;
+        margin-top: 5px;
+    }
+    
+    .overlayPanelControlElementGroup {
+        position: absolute;
+        bottom: 10px;
+        overflow-y: auto;
+        width: 95%;
+        z-index: 100000;
+    }
+    
+    .overlayPanelFixedHeightScrollableContainer  {
+        width: 95%;
+        overflow-y: auto;
     }
     
     .fixedHeightScrollableContainerLarge  {

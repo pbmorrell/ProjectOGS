@@ -543,7 +543,6 @@
 
     .overlayPanel {
 	z-index: 100000;
-	padding-top: 2%;
     }
 	
     .overlayPanelEvtMgr {
@@ -556,7 +555,7 @@
 
     .overlayPanelToggleGroup {
         margin-top: 1%;
-        width: 45%;
+        width: 30%;
     }
     
     .overlayPanelFilterGroup {
@@ -594,7 +593,8 @@
     }
     
     .overlayPanelElement {
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
         width: 100%;
     }
@@ -602,30 +602,32 @@
     .overlayPanelLabel {
 	margin-right: 5px;
         font-weight:bold;
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
         color: white;
     }
     
     .overlayPanelControlElement {
-        z-index: 100001;
-        margin-left: 15%;
-        width: 25% !important;
+        z-index: inherit;
+        width: 250px !important;
+        height: 55px;
         float: left;
+        margin-left: 7%;
+        margin-top: 5px;
     }
     
     .overlayPanelControlElementGroup {
         position: absolute;
-        bottom: 0;
-        margin-bottom: 10px;
-        width: 100%;
-        height: auto;
+        bottom: 10px;
         overflow-y: auto;
+        width: 95%;
         z-index: 100000;
     }
     
     .overlayPanelToggleElementActive {
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
@@ -636,7 +638,8 @@
     }
 	
     .overlayPanelToggleElementInactive {
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
@@ -646,7 +649,8 @@
     }
 	
     .overlayPanelToggleActiveChk {
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
 	margin-left: 2%;
 	margin-right: 5px;
@@ -654,7 +658,8 @@
     }
 	
     .overlayPanelLbl {
-        opacity: 0.9;
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
 	color: white;
 	font-size: 1em;
@@ -662,6 +667,7 @@
     
     .overlayPanelToggleActiveLbl {
         opacity: 0.9;
+        filter: alpha(opacity=90); /* IE6+ */
         z-index: 100001;
 	color: white;
 	font-size: 1em;
@@ -678,6 +684,11 @@
         padding: 0.5em;
         width: 300px;
         height: 100px;
+        overflow-y: auto;
+    }
+    
+    .overlayPanelFixedHeightScrollableContainer  {
+        width: 95%;
         overflow-y: auto;
     }
 

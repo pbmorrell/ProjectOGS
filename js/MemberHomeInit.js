@@ -27,10 +27,39 @@ function MemberHomeOnReady()
     $('#searchPanel').slideReveal({
         trigger: $('#searchFilterLink'),
         position: "right",
-        push: false,
-        width: isMobile ? (Math.round($(window).width() * 0.75)) : (Math.round($(window).width() * 0.4))
+        push: false
     });
-	
+    
+    // Automatically size search panel fixed-height divs to proper height based on current browser viewport height
+    $(window).resize(function() {
+        isMobile = isMobileView();
+        var isMobileHeight = isMobileViewHeight();
+        
+        var ctrlElementDivHeightPct = 0.12;
+        var filterDivHeightPct = 0.75;
+        if(isMobileHeight) {
+            ctrlElementDivHeightPct = isMobile ? 0.2 : 0.3;
+            filterDivHeightPct = isMobile ? 0.65 : 0.55;
+        }
+        
+        $('#searchPanel').slideReveal("hide");
+        $('#searchPanel').slideReveal({
+            changeWidth: true,
+            width: isMobileHeight ? (Math.round($(window).width() * 0.8)) : (Math.round($(window).width() * 0.6))
+        });
+
+        var ctrlElementDivHeight = ctrlElementDivHeightPct * ($(window).height());
+        var filterDivHeight = filterDivHeightPct * ($(window).height());
+        $('.overlayPanelControlElementGroup').css('height', ctrlElementDivHeight.toString() + 'px');
+        $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
+        
+        var padding = isMobile ? "15%" : (isMobileHeight ? "7%" : "2%");
+        $('.overlayPanel').css('padding-top', padding);
+    });
+
+    $(window).trigger('resize');
+
+    // Set Close button to hide search panel
     $('#closePanelBtn').click(function() {
         $('#searchPanel').slideReveal("hide");
         return false;
@@ -1067,13 +1096,7 @@ function JoinEvents(selectedEventIds)
         confirmMsg = 'Are you sure you want to join this event?';
     }
     
-    if(confirm(confirmMsg)) {
-        // Serialize array of selected event IDs for POST Ajax call
-	var eventIdsForPost = [];
-	for(var i = 0; i < selectedEventIds.length; i++) {
-            eventIdsForPost.push({"name":"eventIds[]", "value": selectedEventIds[i].toString()});
-	}
-		
+    if(confirm(confirmMsg)) {		
 	// Make AJAX call to sign current user up for selected events
 	$.ajax({
             type: "POST",
@@ -1099,13 +1122,7 @@ function LeaveEvents(selectedEventIds)
         confirmMsg = 'Are you sure you want to leave this event?';
     }
     
-    if(confirm(confirmMsg)) {
-        // Serialize array of selected event IDs for POST Ajax call
-	var eventIdsForPost = [];
-	for(var i = 0; i < selectedEventIds.length; i++) {
-            eventIdsForPost.push({"name":"eventIds[]", "value": selectedEventIds[i].toString()});
-	}
-		
+    if(confirm(confirmMsg)) {		
 	// Make AJAX call to remove current user up from selected events
 	$.ajax({
             type: "POST",
@@ -1331,8 +1348,8 @@ function ToggleControlPanelDisplay(panelToToggle)
 		
 	// Hide any search filter fields that are not associated with this particular view
 	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
-	var $exclusivelyEvtMgrFilters = $evtMgrFields.not('.searchPanelCurEvtsFilter');
-	var $exclusivelyCurEvtFilters = $evtMgrFields.not('.searchPanelEvtMgrFilter');
+	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
+	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
 	$exclusivelyEvtMgrFilters.hide();
 	$exclusivelyCurEvtFilters.show();
     }
@@ -1342,8 +1359,8 @@ function ToggleControlPanelDisplay(panelToToggle)
 		
 	// Hide any search filter fields that are not associated with this particular view
 	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
-	var $exclusivelyEvtMgrFilters = $evtMgrFields.not('.searchPanelCurEvtsFilter');
-	var $exclusivelyCurEvtFilters = $evtMgrFields.not('.searchPanelEvtMgrFilter');
+	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
+	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
 	$exclusivelyCurEvtFilters.hide();
 	$exclusivelyEvtMgrFilters.show();
     }

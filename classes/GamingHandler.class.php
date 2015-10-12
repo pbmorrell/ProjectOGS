@@ -303,7 +303,10 @@ class GamingHandler
 	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, $searchParms)
     {
-        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, false, $searchParms);
+        $gameCnts = $this->GetCountScheduledGamesThisPage($dataAccess, $logger, $userID, false, $searchParms, $paginationEnabled, $startIndex, $pageSize);
+        $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
+        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, false, 
+                                                   $searchParms, $gameCnts);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -333,15 +336,18 @@ class GamingHandler
 
         $jTableResult = [];
         $jTableResult['Result'] = 'OK';
-        $jTableResult['TotalRecordCount'] = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
+        $jTableResult['TotalRecordCount'] = $totalScheduledGameCnt;
         $jTableResult['Records'] = $rows;
         return json_encode($jTableResult);
     }
 	
     public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, $searchParms)
     {
-        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, $searchParms);
-	$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
+        $gameCnts = $this->GetCountScheduledGamesThisPage($dataAccess, $logger, $userID, true, $searchParms, $paginationEnabled, $startIndex, $pageSize);
+        $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
+        
+        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, 
+                                                   $searchParms, $gameCnts);
 	$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
 
         $rows = [];
@@ -766,7 +772,7 @@ class GamingHandler
             try {				
 		if($dataAccess->BuildQuery($removeUserFromEventsQuery)){
                     $positionalParms = [$userID];
-                    $positionalParms = array_unique(array_merge($positionalParms, $eventIDs));
+                    $positionalParms = array_merge($positionalParms, $eventIDs);
                     $deleteSuccess = $dataAccess->ExecuteNonQueryWithPositionalParms($positionalParms);
 		}
 
@@ -1090,7 +1096,8 @@ class GamingHandler
         }
     }
     
-    public function BuildWhereClauseForScheduledGameQuery($userID, &$queryParms, $eventId = -1, $excludeEventsForUser = false, $isCountOnly = false, $searchParms = null)
+    public function BuildWhereClauseForScheduledGameQuery($userID, &$queryParms, $eventId = -1, $excludeEventsForUser = false, 
+                                                          $isCountOnly = false, $searchParms = null)
     {
         $eventWhereClause = "";
         $eventMemberLeftJoinClause = "";
@@ -1156,10 +1163,19 @@ class GamingHandler
     }
 	
     public function GetScheduledGames($dataAccess, $logger, $userID, $orderBy = "DisplayDate ASC", $paginationEnabled = false, $startIndex = "0", 
-                                      $pageSize = "10", $eventId = -1, $excludeEventsForUser = false, $searchParms = null)
+                                      $pageSize = "10", $eventId = -1, $excludeEventsForUser = false, $searchParms = null, $gameCnts = [])
     {
 	$limitClause = "";
+        $totalRecordsToProcess = 0;
+        $totReqMemberCnt = 0;
+        
+        if(count($gameCnts) > 0) {
+            $totalRecordsToProcess = $gameCnts["GameCnt"];
+            $totReqMemberCnt = $gameCnts["TotReqMemberCnt"];            
+        }
+        
 	if($paginationEnabled) {
+            $pageSize = ($totReqMemberCnt > 0) ? $totReqMemberCnt : $pageSize;
             $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
 	}
 	
@@ -1202,6 +1218,11 @@ class GamingHandler
                             // If transitioning to new game from old one, set event member array and joined status of last game
                             $this->FinalizeLastUserGame($lastUserGame, $evtMembers, $lastRequiredMemberCount, $lastThisUserIsJoined);
 							
+                            if(($totalRecordsToProcess > 0) && (count($userGames) == $totalRecordsToProcess)) {
+                                $lastUserGame = null;
+                                break;
+                            }
+                            
                             // Get user friends allowed to sign up for this event, if it's private
                             $eventAllowedFriends = [];
                             if($row['IsPublic'] == 0) {
@@ -1259,7 +1280,7 @@ class GamingHandler
             $lastUserGame->JoinStatus = $joinStatus;
 	}
     }
-	
+
     private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null)
     {
 	$userTotalScheduledGamesCnt = 0;
@@ -1293,6 +1314,48 @@ class GamingHandler
 	}
         
         return $userTotalScheduledGamesCnt;
+    }
+    
+    private function GetCountScheduledGamesThisPage($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null,
+                                                    $paginationEnabled = false, $startIndex = 0, $pageSize = 10)
+    {
+	$userTotalScheduledGamesCnt = 0;
+        $totalRequiredMembers = 0;
+	
+        $queryParms = [];
+	$limitClause = "";
+	if($paginationEnabled) {
+            $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
+	}
+        $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, -1, $excludeEventsForUser, true, $searchParms);
+		
+        $getUserGamesQuery = "SELECT COUNT(`ID`) AS Cnt, SUM(`RequiredMemberCount`) AS TotReqMemberCnt FROM " .
+                             "(SELECT e.`ID`, e.`RequiredMemberCount` FROM `Gaming.Events` AS e ".
+                             "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
+                             "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+                             "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+                             "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
+                             $eventWhereClause . $limitClause . ") AS derivedEventTable;";
+        
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getUserGamesQuery)){
+		$results = $dataAccess->GetSingleResultWithPositionalParms($queryParms);
+					
+		if($results != null){
+                    $userTotalScheduledGamesCnt = $results['Cnt'];
+                    $totalRequiredMembers = $results['TotReqMemberCnt'];
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve count of user scheduled games for current table page. " . $errors);
+	}
+        
+        return ["GameCnt" => $userTotalScheduledGamesCnt, "TotReqMemberCnt" => $totalRequiredMembers];
     }
 	
     public function GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID)
