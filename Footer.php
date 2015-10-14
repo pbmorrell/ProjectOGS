@@ -10,7 +10,7 @@
                             <section class="newsletter">
                                 <h2>Your Feedback is Important</h2>
                                 <p>We want to make Player Unite your home. How would you improve the site? Drop us a line below.</p>
-                                <a href="mailto:feedback@playerunite.com" class="button icon fa-comment">Comment</a>
+                                <a href="mailto:feedback@playerunite.com?subject=Player Unite Feedback" class="button icon fa-comment">Comment</a>
                             </section>
                        </div>
 					   <div class="4u">
@@ -38,7 +38,7 @@
                                 <h2>Contact Us</h2>
                                 <ul class="style3">
                                     <li class="icon fa-envelope">
-                                        <a href="mailto:support@playerunite.com" style="text-decoration:none;"> &nbsp Email</a>
+                                        <a href="mailto:support@playerunite.com?subject=General Support" style="text-decoration:none;"> &nbsp Email</a>
                                     </li>
                                     <li class="icon fa-facebook-square">
                                         <a href="#" style="text-decoration:none;"> &nbsp Facebook</a>

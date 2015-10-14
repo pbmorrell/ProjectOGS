@@ -36,6 +36,9 @@
                                                             </form>
                                                         </div>
                                                         <div id="loginErr" class="mobilePreLogin">&nbsp;</div>
+                                                        <br/>
+                                                        <h2>First Time User</h2>
+                                                        <a href="Index.php?action=Signup" class="button icon fa-cogs">Sign Up</a>
                                                     </header>
 						</section>
                                             </div>
