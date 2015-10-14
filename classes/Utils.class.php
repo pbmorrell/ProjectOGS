@@ -53,7 +53,21 @@ class Utils
 		
 	return $standardTime;
     }
-	
+    
+    public static function SearchGameArrayByEventID($gameArray, $id)
+    {
+	$foundGame = null;
+	foreach($gameArray as $game)
+	{
+            if($game->EventID === $id) {
+		$foundGame = $game;
+		break;
+            }
+	}
+		
+	return $foundGame;
+    }
+    
     public static function SearchUserArrayByID($userArray, $id)
     {
 	$foundUser = null;

@@ -15,47 +15,49 @@
         <?php echo $pageHeaderHTML; ?>
         <script src="js/moment.min.js"></script>
         <script src="js/moment-timezone-with-data.min.js"></script>
-	<script src="js/jTable/jquery.jtable.min.js"></script>
-	<script src="js/jquery.slidereveal.min.js"></script>
-	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
+		<script src="js/jTable/jquery.jtable.min.js"></script>
+		<script src="js/jquery.slidereveal.min.js"></script>
+		<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body>
-	<?php echo $headerHTML; ?>
-	<!-- Main Wrapper -->
-	<div id="main-wrapper">
+		<?php echo $headerHTML; ?>
+		<!-- Main Wrapper -->
+		<div id="main-wrapper">
             <div class="container">
-		<div class="row">
+				<div class="row">
                     <div class="12u">
-			<div id="main">
+						<div id="main">
                             <div class="row">
-				<div class="controlPanelSection">						
+								<div class="controlPanelSection">						
                                     <!-- Content -->
                                     <div id="content">							
-					<section class="box ctaz">
+										<section class="box ctaz">
                                             <section>
                                                 <h2>Control Panel</h2>
-						<ul class="style3 contact">
+												<ul class="style3 contact">
                                                     <li class="icon fa-calendar">
-							<a href="#" onclick="return DisplayCreateEventDialog();" style="text-decoration:none;">Schedule Event</a>
+														<a href="#" onclick="return DisplayCreateEventDialog();" style="text-decoration:none;">Schedule Event</a>
                                                     </li>
                                                     <li class="icon fa-gamepad">
-							<a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage Your Events</a>
+														<a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage Your Events</a>
                                                     </li>
                                                     <li class="icon fa-flask">
-							<a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">See Event Feed</a>
+														<a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">See Event Feed</a>
                                                     </li>
                                                     <li class="icon fa-bullseye">
-							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
+														<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
                                                     </li>
+													<div id="modalOverlay" class='overlayPanelModalBackground'></div>
                                                     <div id="searchPanel" class="overlayPanel overlayPanelCurEvts">
                                                         <form name="searchForm" method="POST" action="">
                                                             <div class="overlayPanelFixedHeightScrollableContainer">
                                                                 <div class="overlayPanelToggleGroup"><a href="#" id="dateRangeFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
                                                                         onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
-                                                                    <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" groupId="dateRangeFilterDiv" type="checkbox">
+                                                                    <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" 
+																	       groupId="dateRangeFilterDiv" type="checkbox">
                                                                     <label class="overlayPanelToggleActiveLbl">Activate Filter</label>
                                                                 </div><br />
-                                                                <div id="dateRangeFilterDiv" style="display:none" class="overlayPanelFilterGroup">
+                                                                <div id="dateRangeFilterDiv" class="overlayPanelFilterGroup">
                                                                     <div id="dateRangeFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainer">
                                                                             <label class="overlayPanelLabel">Start Date:</label><br />
@@ -94,12 +96,13 @@
                                                                     </div>
                                                                 </div><br />
                                                                 <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
-                                                                                                                                    <a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                    <a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
                                                                        onclick="return ToggleSearchDivDisplay('#gameTitleFilterDiv', this);">&nbsp;&nbsp;Game Title</a>
-                                                                                                                                    <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" groupId="gameTitleFilterDiv" type="checkbox">
-                                                                                                                                    <label class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" 
+																		   groupId="gameTitleFilterDiv" type="checkbox">
+                                                                    <label class="overlayPanelToggleActiveLbl">Activate Filter</label>
                                                                 </div><br />
-                                                                <div id="gameTitleFilterDiv" style="display:none" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+                                                                <div id="gameTitleFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerWide">
                                                                             <label class="overlayPanelLabel">Existing Game Titles:</label><br />
@@ -115,6 +118,30 @@
                                                                                    maxlength="50" placeholder=" Custom Title Search">
                                                                         </div>
                                                                     </div>
+                                                                </div><br />
+                                                                <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter">
+                                                                    <a href="#" id="eventCreatorFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                       onclick="return ToggleSearchDivDisplay('#eventCreatorFilterDiv', this);">&nbsp;&nbsp;Event Creator</a>
+                                                                    <input id="eventCreatorFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="eventCreatorFilterLink" 
+																		   groupId="eventCreatorFilterDiv" type="checkbox">
+                                                                    <label class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                </div><br />
+                                                                <div id="eventCreatorFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter">
+                                                                    <div id="eventCreatorFilterStart" class="overlayPanelFilterSubGroup">
+                                                                        <div class="overlayPanelElementContainerWide">
+                                                                            <label class="overlayPanelLabel">Users:</label><br />
+                                                                            <div class="fixedHeightScrollableContainerLarge">
+                                                                                <?php 
+                                                                                   echo $gamingHandler->ConstructUserMultiSelector($dataAccess, $logger);
+                                                                                ?>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerWide">
+                                                                            <label class="overlayPanelLabel">Or Enter A Username:</label><br />
+                                                                            <input id="gameCustomUserFilter" class="overlayPanelElement" name="gameCustomUserFilter" type="text" 
+                                                                                   maxlength="50" placeholder=" Custom User Search">
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             
                                                             </div>
@@ -125,12 +152,12 @@
                                                         </form>
                                                         <br />
                                                     </div>
-						</ul>
+												</ul>
                                             </section>
-					</section>				
+										</section>				
                                     </div>
-				</div>
-				<div id="manageEventsDiv" class="9u jTableContainer">
+								</div>
+								<div id="manageEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
                                     <h2>Manage Your Events</h2>
                                     <label style="float:right;">
@@ -140,22 +167,22 @@
                                     <div id="manageEventsContent">
                                     </div>
                                     </section>
-				</div>
-				<div id="currentEventsDiv" class="9u jTableContainer">					
+								</div>
+								<div id="currentEventsDiv" class="9u jTableContainer">					
                                     <section class="box style1">
                                     <h2>Current Events</h2>
                                     <span id="totalGamesToJoin" class="byline"></span><br/><br/>
                                     <div id="currentEventsContent">
                                     </div>
                                     </section><br/>
-				</div>
+								</div>
                             </div>
-			</div>
+						</div>
                     </div>
-		</div>
+				</div>
             </div>
-	</div>
-	<!-- Footer Wrapper -->
+		</div>
+		<!-- Footer Wrapper -->
         <?php include 'Footer.php'; ?>
         <!-- Footer Wrapper -->
     </body>

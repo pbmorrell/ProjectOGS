@@ -28,14 +28,9 @@
     .signupInp input{
 		width: 100%;
     }
-    
-    .overlayPanel {
-	z-index: 100000;
-    }
 
     .overlayPanelToggleGroup {
         margin-top: 2%;
-        width: 95%;
     }
     
     .overlayPanelFilterGroup {
@@ -63,19 +58,10 @@
     }
     
     .overlayPanelControlElement {
-        z-index: 100001;
         width: 80% !important;
         height: 55px;
         margin-left: 15%;
         margin-top: 5px;
-    }
-    
-    .overlayPanelControlElementGroup {
-        position: absolute;
-        bottom: 10px;
-        overflow-y: auto;
-        width: 95%;
-        z-index: 100000;
     }
     
     .overlayPanelFixedHeightScrollableContainer  {
@@ -96,20 +82,20 @@
 		width: 100%;
 	}
 
-        .controlPanelSection h2 {
-            font-size: 1.8em;
-            text-align: center;
-        }
+    .controlPanelSection h2 {
+        font-size: 1.8em;
+        text-align: center;
+    }
         
-        .controlPanelSection a {
-            font-size: 1.6em;
-        }
+    .controlPanelSection a {
+        font-size: 1.6em;
+    }
         
-        .jTableContainer h2 {
-            margin-top: 5%;
-            font-size: 1.8em;
-            text-align: center;
-        }
+    .jTableContainer h2 {
+        margin-top: 5%;
+        font-size: 1.8em;
+        text-align: center;
+    }
         
 	section,
 	article
@@ -124,17 +110,17 @@
 		margin: 0 0 1.5em 0;
 	}
 
-		.image img
-		{
-			display: block;
-			width: 100%;
-		}
+	.image img
+	{
+		display: block;
+		width: 100%;
+	}
 
-		.image.left
-		{
-			width: 30%;
-			margin: 0 2em 0.75em 0;
-		}
+	.image.left
+	{
+		width: 30%;
+		margin: 0 2em 0.75em 0;
+	}
 
 	.box
 	{
@@ -142,10 +128,10 @@
 		margin: 0 0 10px 0;
 	}
 
-		.box.cta
-		{
-			text-align: center;
-		}
+	.box.cta
+	{
+		text-align: center;
+	}
 
 	.button,
 	.bigbutton

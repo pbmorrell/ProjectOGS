@@ -537,7 +537,8 @@ CREATE TABLE IF NOT EXISTS `Security.Users` (
   `Password` varchar(255) NOT NULL,
   `Gender` char(1) DEFAULT NULL,
   `Birthdate` date DEFAULT NULL,
-  `Autobiography` text
+  `Autobiography` text,
+  `IsActive` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
 
 --
@@ -549,7 +550,6 @@ INSERT INTO `Security.Users` (`ID`, `FK_Timezone_ID`, `UserName`, `FirstName`, `
 (29, 142, 'Paul Morrell', 'Paul', 'Morrell', 'pbmorrell@att.net', 0, '$2y$10$7BNqIlWNifBCvlVowyzWVuIPlVomA.bbKwQE88EVeTbA.acmUtGDy', 'M', '1983-11-27', 'Adult gamer, Looking for other friends to play with. Must have a mic!'),
 (31, 142, 'gamerTest', 'Gamer', 'Test', 'gamerTest@ogs.com', 0, '$2y$10$WKKurt8XlSKH.0wAnDhX2etlBYghz7z1xliFZvRYrhAA2UvYPG1Si', 'M', '2013-07-31', 'my bio'),
 (44, 144, 'gamerTest2', 'Gamer2', 'Test', 'gamerTest2@ogs.com', 0, '$2y$10$UwLWePLi.rkexdOFdWCOSeAvlf/U1v/fsZ29Cns7Y7vQJj8gNLV8m', 'M', '1985-07-21', 'here''s my bio'),
-(59, NULL, '', '', '', 'paulbmorrell@gmail.com', 0, '$2y$10$xniOC06w2edOnG92XGPZn.ZlSYuXVAOVjMGf1H.YFLJ4ptVrxfEua', NULL, NULL, NULL),
 (79, 143, 'gamerTest3', 'Gamer', 'Test3', 'gamertest3@gamers.com', 1, '$2y$10$cyaJMPsmQO4zwXMLxvzylec9byh854QcsWc9UcqnRvnSTU.Xw24xW', 'M', '2013-08-20', 'Bio'),
 (82, 163, 'pbmorrell', 'Pablo', 'Morello', 'pbmorrell@att2.net', 0, '$2y$10$nQmCZOkK.eEhPTQ4AinMpeQZ6kRRd.1gE0S3HBCdZdarfY6GW0jte', 'F', '1952-11-13', 'I am the Unicorn Master of the Universe.'),
 (83, 144, 'theGiles01', 'The', 'Giles', 'thegiles01@gmail.com', 0, '$2y$10$TIzWuxcK9fCryA3xYSo0w.H.2RrWPsY9MjcAxex7VZBM7Dv9o2/j6', 'M', '1986-08-20', 'I am the Master of the Universe (no unicorns)'),
@@ -693,7 +693,7 @@ ALTER TABLE `Security.UserRoles`
 -- Indexes for table `Security.Users`
 --
 ALTER TABLE `Security.Users`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_TimeZoneID` (`FK_Timezone_ID`);
+  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_TimeZoneID` (`FK_Timezone_ID`), ADD KEY `IDX_IsActive` (`IsActive`);
 
 --
 -- Indexes for table `Security.UserSessions`

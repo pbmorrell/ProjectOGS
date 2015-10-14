@@ -501,7 +501,7 @@
     }
 
     #loginBtn
-    {
+       {
         background: #32353a;
         color: #fff;
         line-height: 2.1em;
@@ -511,7 +511,7 @@
     }
 	
     .captchaInput {
-	max-width:6em;
+		max-width:6em;
     }
 	
     .captchaImage {
@@ -520,14 +520,14 @@
     }
 	
     .captchaInputDiv {
-	margin-bottom: 0.5em;
-	display:inline-block;
-	vertical-align: middle;
+		margin-bottom: 0.5em;
+		display:inline-block;
+		vertical-align: middle;
     }
 
     .captchaImageDiv {
-	display:inline-block;
-	vertical-align: middle;
+		display:inline-block;
+		vertical-align: middle;
     }	
 	
     .desktopAdStyle {
@@ -541,8 +541,22 @@
         max-width: 100%;        
     }
 
-    .overlayPanel {
+    .overlayMode {
+	overflow: hidden;
+        position: fixed;
+    }
+	
+    .overlayPanelModalBackground {
 	z-index: 100000;
+	background:
+	linear-gradient(
+            rgba(128, 128, 128, 0.45),
+            rgba(128, 128, 128, 0.45)
+	);
+    }
+	
+    .overlayPanel {
+	z-index: 100001;
     }
 	
     .overlayPanelEvtMgr {
@@ -555,7 +569,6 @@
 
     .overlayPanelToggleGroup {
         margin-top: 1%;
-        width: 30%;
     }
     
     .overlayPanelFilterGroup {
@@ -595,21 +608,18 @@
     .overlayPanelElement {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
         width: 100%;
     }
     
     .overlayPanelLabel {
-	margin-right: 5px;
+		margin-right: 5px;
         font-weight:bold;
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
         color: white;
     }
     
     .overlayPanelControlElement {
-        z-index: inherit;
         width: 250px !important;
         height: 55px;
         float: left;
@@ -621,14 +631,13 @@
         position: absolute;
         bottom: 10px;
         overflow-y: auto;
+        height: auto;
         width: 95%;
-        z-index: 100000;
     }
     
     .overlayPanelToggleElementActive {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
         font-weight:bold;
@@ -640,7 +649,6 @@
     .overlayPanelToggleElementInactive {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
         margin-left: 3%;
         font-size: 1.5em;
         text-decoration: none;
@@ -651,26 +659,23 @@
     .overlayPanelToggleActiveChk {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
-	margin-left: 2%;
-	margin-right: 5px;
+		margin-left: 2%;
+		margin-right: 5px;
         float: right;
     }
 	
     .overlayPanelLbl {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
-	color: white;
-	font-size: 1em;
+		color: white;
+		font-size: 1em;
     }
     
     .overlayPanelToggleActiveLbl {
         opacity: 0.9;
         filter: alpha(opacity=90); /* IE6+ */
-        z-index: 100001;
-	color: white;
-	font-size: 1em;
+		color: white;
+		font-size: 1em;
         float: right;
     }
     

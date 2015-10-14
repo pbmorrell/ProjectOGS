@@ -24,46 +24,73 @@ function MemberHomeOnReady()
     var isMobile = isMobileView();
     
     // Set up search filter panel
+    $('#modalOverlay').slideReveal({
+        position: "right",
+        push: false
+    });	
+	
     $('#searchPanel').slideReveal({
-        trigger: $('#searchFilterLink'),
         position: "right",
         push: false
     });
     
+    $('#searchFilterLink').click( function() {
+	if (!$('#modalOverlay').data("slide-reveal")) { // Show
+            $('#modalOverlay').slideReveal("show");
+            $('#searchPanel').slideReveal("show");
+            $('body').addClass('overlayMode');
+            return false;
+	} else { // Hide
+            $('body').removeClass('overlayMode');
+            return CloseSearchPanel();
+	}
+    });
+	
     // Automatically size search panel fixed-height divs to proper height based on current browser viewport height
     $(window).resize(function() {
         isMobile = isMobileView();
         var isMobileHeight = isMobileViewHeight();
-        
-        var ctrlElementDivHeightPct = 0.12;
-        var filterDivHeightPct = 0.75;
+		
+        var filterDivHeightPct = 0.92;
         if(isMobileHeight) {
-            ctrlElementDivHeightPct = isMobile ? 0.2 : 0.3;
-            filterDivHeightPct = isMobile ? 0.65 : 0.55;
+            filterDivHeightPct = 0.65;
         }
         
-        $('#searchPanel').slideReveal("hide");
+        var curWindowWidth = $(window).width();
+        var toggleGroupWidth = curWindowWidth * 0.15;
+        if(isMobile)                    toggleGroupWidth = curWindowWidth * 0.75;
+        else if(curWindowWidth < 1000)  toggleGroupWidth = curWindowWidth * 0.45;
+        
+        $('.overlayPanelToggleGroup').css('width', toggleGroupWidth.toString() + "px");
+        
+	CloseSearchPanel();
+		
+        $('#modalOverlay').slideReveal({
+            changeWidth: true,
+            width: curWindowWidth + 20
+        });		
         $('#searchPanel').slideReveal({
             changeWidth: true,
-            width: isMobileHeight ? (Math.round($(window).width() * 0.8)) : (Math.round($(window).width() * 0.6))
+            width: isMobileHeight ? (Math.round(curWindowWidth * 0.8)) : (Math.round(curWindowWidth * 0.6))
         });
-
-        var ctrlElementDivHeight = ctrlElementDivHeightPct * ($(window).height());
+		
         var filterDivHeight = filterDivHeightPct * ($(window).height());
-        $('.overlayPanelControlElementGroup').css('height', ctrlElementDivHeight.toString() + 'px');
         $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
         
-        var padding = isMobile ? "15%" : (isMobileHeight ? "7%" : "2%");
-        $('.overlayPanel').css('padding-top', padding);
+        var padding = isMobile ? (isMobileHeight ? "20%" : "20%") : (isMobileHeight ? "7%" : "2%");
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', padding);
     });
 
     $(window).trigger('resize');
 
+    // Hide all filters initially, showing only filter name and toggle in un-expanded state
+    $('.overlayPanelFilterGroup').hide();
+	
+    // Initialize search filter display to match current view
+    DisplaySearchFiltersByCurrentView();
+	
     // Set Close button to hide search panel
-    $('#closePanelBtn').click(function() {
-        $('#searchPanel').slideReveal("hide");
-        return false;
-    });
+    $('#closePanelBtn').click(CloseSearchPanel);
     
     // Initialize Game Filter Date datepickers
     $('#gameFilterStartDate').datepicker({
@@ -135,18 +162,18 @@ function MemberHomeOnReady()
     
     // Add checked handler to filter checkboxes
     $('#searchPanel .overlayPanelToggleActiveChk').each(function() {
-	$(this).change(function() {
-            var toggleLinkId = '#' + $(this).attr('linkId');
-            var groupId = '#' + $(this).attr('groupId');
-            if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
-		$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
-                $(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
-            }
-            else {
-		$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
-                $(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
-            }
-	});
+		$(this).change(function() {
+			var toggleLinkId = '#' + $(this).attr('linkId');
+			var groupId = '#' + $(this).attr('groupId');
+			if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
+				$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
+				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
+			}
+			else {
+				$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
+				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
+			}
+		});
     });
 	
     // Attach event handler to search button
@@ -171,6 +198,19 @@ function MemberHomeOnReady()
     });
 }
 
+function CloseSearchPanel()
+{
+    $('#modalOverlay').slideReveal("hide");
+    $('#searchPanel').slideReveal("hide");
+    $('body').removeClass('overlayMode');
+    return false;
+}
+
+function DisableScrolling()
+{
+    return false;
+}
+
 function OnViewportWidthChanged(newViewType)
 {
     var curVisibleTable = (activePanel === panelEnum.CurrentEventFeed) ? currentEventViewerJTableDiv : eventManagerJTableDiv;
@@ -187,7 +227,7 @@ function OnViewportWidthChanged(newViewType)
                 $('#gameFilterEndDate').prop('readonly', true);
                 
                 if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
-		else                                                 FormatEventManagerTableForCurrentView(true);
+				else                                                 FormatEventManagerTableForCurrentView(true);
             }
             break;
         case "desktop":
@@ -198,7 +238,7 @@ function OnViewportWidthChanged(newViewType)
             $('#gameFilterEndDate').prop('readonly', false);
             
             if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
-            else 						 FormatEventManagerTableForCurrentView(false);
+            else 						 						 FormatEventManagerTableForCurrentView(false);
             break;
     }
 }
@@ -1322,7 +1362,7 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
 
 function ToggleControlPanelDisplay(panelToToggle)
 {
-	// Toggle active view
+    // Toggle active view
     if($(panelToToggle).css('display') === 'none')
     {
 	// Hide active panel
@@ -1340,14 +1380,20 @@ function ToggleControlPanelDisplay(panelToToggle)
     }
 	
     // Close search panel, if open
-    $('#searchPanel').slideReveal("hide");
+    CloseSearchPanel();
 	
+    DisplaySearchFiltersByCurrentView();
+    return false;
+}
+
+function DisplaySearchFiltersByCurrentView()
+{
     if(activePanel === panelEnum.CurrentEventFeed) {
 	// Change search panel style to reflect current view
 	$('#searchPanel').removeClass('overlayPanelEvtMgr').addClass('overlayPanelCurEvts');
-		
+			
 	// Hide any search filter fields that are not associated with this particular view
-	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
+	var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
 	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
 	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
 	$exclusivelyEvtMgrFilters.hide();
@@ -1356,16 +1402,14 @@ function ToggleControlPanelDisplay(panelToToggle)
     else {
 	// Change search panel style to reflect current view
 	$('#searchPanel').removeClass('overlayPanelCurEvts').addClass('overlayPanelEvtMgr');
-		
+			
 	// Hide any search filter fields that are not associated with this particular view
-	var $evtMgrFilters = $('#searchPanel .searchPanelEvtMgrFilter,#searchPanel .searchPanelCurEvtsFilter');
+	var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
 	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
 	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
 	$exclusivelyCurEvtFilters.hide();
 	$exclusivelyEvtMgrFilters.show();
     }
-	
-    return false;
 }
 
 function ValidateEventFormFields(eventId)
@@ -1428,49 +1472,48 @@ function ValidateSearchFormFields(searchFieldClass, suppressAlerts)
 	
     // Search fields are considered validated if not included in current active search filters
     var dateFieldsValidated = true;
-    var titlesFieldValidated = true;
 	
     // Date filters
     if(($('#dateRangeFilterLink').length) && ($('#dateRangeFilterLink').hasClass('overlayPanelToggleElementActive'))) {
-	dateFieldsValidated = false;
-	var gameStartDate = $('#gameFilterStartDate').val();
-	var gameStartTime = $('#gameFilterStartTime').val();
-	var gameStartTimezone = $('#ddlTimeZonesStart option:selected').text();
-		
-	var gameEndDate = $('#gameFilterEndDate').val();
-	var gameEndTime = $('#gameFilterEndTime').val();
-	var gameEndTimezone = $('#ddlTimeZonesEnd option:selected').text();
-		
-	// Regular expression for time format
-	var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
-
-	// Verify that required fields are filled out and have valid data
-	if(gameStartDate.length === 0) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start date");
-	} else if (gameStartTime.length === 0) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start time");
-	} else if (!gameStartTime.match(regexTime)) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid start time");
-	} else if(gameEndDate.length === 0) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end date");
-	} else if (gameEndTime.length === 0) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end time");
-	} else if (!gameEndTime.match(regexTime)) {
-            if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid end time");
-	} else {
-            // Cannot add date range filters directly to post data via serialize() call -- 
-            //  we must convert them to UTC first, then manually add to post data
-            var gameStartDateTimeWithTZ = moment.tz(gameStartDate + " " + gameStartTime, "YYYY-MM-DD h:mmA", gameStartTimezone);
-            var gameStartDateTimeMoment = moment(gameStartDateTimeWithTZ).utc();
-            var gameEndDateTimeWithTZ = moment.tz(gameEndDate + " " + gameEndTime, "YYYY-MM-DD h:mmA", gameEndTimezone);
-            var gameEndDateTimeMoment = moment(gameEndDateTimeWithTZ).utc();        
+		dateFieldsValidated = false;
+		var gameStartDate = $('#gameFilterStartDate').val();
+		var gameStartTime = $('#gameFilterStartTime').val();
+		var gameStartTimezone = $('#ddlTimeZonesStart option:selected').text();
 			
-            searchEventsInfo.gameStartDateTimeMoment = gameStartDateTimeMoment;
-            searchEventsInfo.gameEndDateTimeMoment = gameEndDateTimeMoment;
-            searchEventsInfo.postData += ('&gameFilterStartDateTime=' + gameStartDateTimeMoment.toISOString() + 
-					  '&gameFilterEndDateTime=' + gameEndDateTimeMoment.toISOString());
-            dateFieldsValidated = true;
-	}
+		var gameEndDate = $('#gameFilterEndDate').val();
+		var gameEndTime = $('#gameFilterEndTime').val();
+		var gameEndTimezone = $('#ddlTimeZonesEnd option:selected').text();
+			
+		// Regular expression for time format
+		var regexTime = /^\d{1,2}:\d{2}([apAP][mM])?$/;
+
+		// Verify that required fields are filled out and have valid data
+		if(gameStartDate.length === 0) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start date");
+		} else if (gameStartTime.length === 0) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a start time");
+		} else if (!gameStartTime.match(regexTime)) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid start time");
+		} else if(gameEndDate.length === 0) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end date");
+		} else if (gameEndTime.length === 0) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must select a end time");
+		} else if (!gameEndTime.match(regexTime)) {
+			if(!suppressAlerts)  sweetAlert("Unable to filter by date range: Must enter a valid end time");
+		} else {
+			// Cannot add date range filters directly to post data via serialize() call -- 
+			//  we must convert them to UTC first, then manually add to post data
+			var gameStartDateTimeWithTZ = moment.tz(gameStartDate + " " + gameStartTime, "YYYY-MM-DD h:mmA", gameStartTimezone);
+			var gameStartDateTimeMoment = moment(gameStartDateTimeWithTZ).utc();
+			var gameEndDateTimeWithTZ = moment.tz(gameEndDate + " " + gameEndTime, "YYYY-MM-DD h:mmA", gameEndTimezone);
+			var gameEndDateTimeMoment = moment(gameEndDateTimeWithTZ).utc();        
+			
+			searchEventsInfo.gameStartDateTimeMoment = gameStartDateTimeMoment;
+			searchEventsInfo.gameEndDateTimeMoment = gameEndDateTimeMoment;
+			searchEventsInfo.postData += ('&gameFilterStartDateTime=' + gameStartDateTimeMoment.toISOString() + 
+										  '&gameFilterEndDateTime=' + gameEndDateTimeMoment.toISOString());
+			dateFieldsValidated = true;
+		}
     }
     
     var filterFields = $(searchFieldClass).find('*[name]').filter('.filterFieldActive');
@@ -1478,7 +1521,7 @@ function ValidateSearchFormFields(searchFieldClass, suppressAlerts)
         searchEventsInfo.postData += ('&' + (filterFields.serialize()));
     }
     
-    searchEventsInfo.validated = dateFieldsValidated && titlesFieldValidated;
+    searchEventsInfo.validated = dateFieldsValidated;
     return searchEventsInfo;
 }
 
