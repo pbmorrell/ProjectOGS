@@ -121,6 +121,12 @@
 		width: 30%;
 		margin: 0 2em 0.75em 0;
 	}
+        
+	.image.right
+	{
+                width: 30%;
+		margin: 0em 0 2.5em 2.5em;
+	}
 
 	.box
 	{
