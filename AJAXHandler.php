@@ -392,8 +392,12 @@
                 if(strlen($customGameTitle) > 0) {
                     array_push($existingGameTitles, $customGameTitle);
                 }
+				
+				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+                $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
                 
-				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], [], [], true, true, true, false);
+				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, [], true, true, true, false, 
+													"", $customJoinedUserEntry);
 				echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $searchParms);
                 break;
@@ -415,7 +419,11 @@
 				$activeUsers = (isset($_POST['filterActiveUsers'])) ? ($_POST['filterActiveUsers']) : [];
                 $customUserEntry = isset($_POST['gameCustomUserFilter']) ? trim(filter_var($_POST['gameCustomUserFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, [], [], true, true, true, false, $customUserEntry);
+				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+                $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
+				
+				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, [], true, true, true, false, 
+													$customUserEntry, $customJoinedUserEntry);
 				echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                   $pageSize, $searchParms);
                 break;

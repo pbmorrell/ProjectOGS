@@ -27,6 +27,7 @@
                 <input id="loginUsername" name="loginUsername" type="text" maxlength="100" placeholder=" Username">
                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password">
                 <button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;
+                <button type="button" class="button icon fa-cogs" id="signupBtnLoginForm">Sign Up</button>
             </form>
         </div>';
     

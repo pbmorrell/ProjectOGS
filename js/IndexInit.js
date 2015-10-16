@@ -1,3 +1,10 @@
+function indexOnReady()
+{
+    // This function accounts for possibility that the default index page will be requested
+    // (such as when someone navigates to this website without specifying "Index.php")
+    IndexOnReady();
+}
+
 function IndexOnReady()
 {
     var getAction = GetURLParamVal('action');

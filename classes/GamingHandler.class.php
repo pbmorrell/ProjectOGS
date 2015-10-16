@@ -150,34 +150,36 @@ class GamingHandler
         return $gameTitles;
     }
 	
-    public function LoadAllActiveUsers($dataAccess, $logger)
+    public function LoadAllActiveUsers($dataAccess, $logger, $curUserID)
     {
         $getActiveUsersQuery = "SELECT DISTINCT `ID`, TRIM(`UserName`) AS UserName FROM `Security.Users` " .
-                               "WHERE (`IsActive` = 1) AND (LENGTH(TRIM(`UserName`)) > 0) " .
+                               "WHERE (`IsActive` = 1) AND (LENGTH(TRIM(`UserName`)) > 0) AND (`ID` <> :userID) " .
                                "ORDER BY `UserName`;";
         
+        $parmUserId = new QueryParameter(':userID', $curUserID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
     	$activeUsers = array();
         $errors = $dataAccess->CheckErrors();
         
-	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($getActiveUsersQuery)){
-		$results = $dataAccess->GetResultSet();
+		if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getActiveUsersQuery, $queryParms)){
+				$results = $dataAccess->GetResultSet();
 					
-		if($results != null){
+				if($results != null){
                     foreach($results as $row) {
                         $user = User::constructDefaultUser();
                         $user->UserID = $row['ID'];
                         $user->UserName = $row['UserName'];
                         array_push($activeUsers, $user);
                     }
-		}
+				}
             }
-	}
+		}
         
-	$errors = $dataAccess->CheckErrors();
-	if(strlen($errors) > 0) {
+		$errors = $dataAccess->CheckErrors();
+		if(strlen($errors) > 0) {
             $logger->LogError("Could not retrieve active users. " . $errors);
-	}
+		}
         
         return $activeUsers;
     }
@@ -358,13 +360,13 @@ class GamingHandler
         return $gameSelector;
     }
 	
-    public function ConstructUserMultiSelector($dataAccess, $logger)
+    public function ConstructUserMultiSelector($dataAccess, $logger, $groupId, $userID)
     {
         $userSelector = '';
-        $users = $this->LoadAllActiveUsers($dataAccess, $logger);
+        $users = $this->LoadAllActiveUsers($dataAccess, $logger, $userID);
         
         foreach($users as $user) {
-            $userSelector .= ('<label class="overlayPanelLbl"><input type="checkbox" name="filterActiveUsers[]" value="' . 
+            $userSelector .= ('<label class="overlayPanelLbl"><input type="checkbox" name="' . $groupId . '" value="' . 
                                 $user->UserID . '" class="overlayPanelElement">' . $user->UserName . '</label><br />');
         }
         
@@ -373,23 +375,46 @@ class GamingHandler
 	
     public function JTableEventManagerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, $searchParms)
     {
-        $eventIDs = $this->GetScheduledGameIDsForCurrentPage($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
-                                                             $startIndex, $pageSize);
-        
-        $eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
-        $userAllowedFriendsByEvent = $this->LoadUserFriends($dataAccess, $logger, $userID, $eventIDs);
-        $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
-        
-        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, 
-                                                   false, $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
+        $eventIDs = [];
+        $scheduledGames = [];
+		$totalScheduledGameCnt = -1;
+		
+		// If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
+		if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
+			// In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
+			// the results further in a later step before applying the LIMIT
+			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, false, 
+													  $startIndex, $pageSize);
+			
+			if(count($eventIDs) > 0) {
+				$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
+				$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
+														  $startIndex, $pageSize, $joinedMemberEventIds);
+				$filterCountByJoinedUsers = true;
+				$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
+			}
+		}
+		else {
+			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
+													  $startIndex, $pageSize);
+		}
+			
+		if(count($eventIDs) > 0) {
+			$eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
+			$userAllowedFriendsByEvent = $this->LoadUserFriends($dataAccess, $logger, $userID, $eventIDs);
+			$scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, 
+													   false, $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
+		}
 
+		if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
+		
         $rows = [];
         foreach($scheduledGames as $game) {
             $playersSignedUp = $game->EventMembers;
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+				$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
@@ -401,9 +426,9 @@ class GamingHandler
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-		"PlayersSignedUpData" => $playersSignedUpData,
+				"PlayersSignedUpData" => $playersSignedUpData,
                 "Edit" => '',
-		"Hidden" => !$game->Visible ? 'Yes' : 'No'
+				"Hidden" => !$game->Visible ? 'Yes' : 'No'
             );
 
             array_push($rows, $row);
@@ -417,17 +442,42 @@ class GamingHandler
     }
 	
     public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, $searchParms)
-    {
-        $eventIDs = $this->GetScheduledGameIDsForCurrentPage($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
-                                                             $startIndex, $pageSize);
-        
-        $eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
-        $userAllowedFriendsByEvent = [];
-        $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
-        
-        $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, 
-                                                   $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
-	$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
+    {												  
+		$eventIDs = [];
+		$scheduledGames = [];
+		$totalScheduledGameCnt = -1;
+
+		// If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
+		if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
+			// In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
+			// the results further in a later step before applying the LIMIT
+			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, false, 
+													  $startIndex, $pageSize);
+			
+			if(count($eventIDs) > 0) {
+				$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
+				$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
+														  $startIndex, $pageSize, $joinedMemberEventIds);
+				$filterCountByJoinedUsers = true;
+				$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
+			}
+		}
+		else {
+			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
+													  $startIndex, $pageSize);				
+		}
+		
+		if(count($eventIDs) > 0) {
+			$eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
+			$userAllowedFriendsByEvent = [];
+			
+			$scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, 
+													   $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
+		}
+
+		
+		if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
+		$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -435,22 +485,22 @@ class GamingHandler
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+				$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
             $row = array (
                 "ID" => $game->EventID,
-		"TotalGamesToJoinCount" => $totalGameCntNotJoined,
-		"UserName" => $game->EventCreatorUserName,
+				"TotalGamesToJoinCount" => $totalGameCntNotJoined,
+				"UserName" => $game->EventCreatorUserName,
                 "GameTitle" => $game->Name,
                 "Platform" => $game->SelectedPlatformText,
                 "DisplayDate" => $game->ScheduledDate,
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-		"PlayersSignedUpData" => $playersSignedUpData,
-		"Joined" => $game->JoinStatus
+				"PlayersSignedUpData" => $playersSignedUpData,
+				"Joined" => $game->JoinStatus
             );
 
             array_push($rows, $row);
@@ -715,29 +765,30 @@ class GamingHandler
     
     private function AddNewGameToUserGameList($dataAccess, $logger, $userID, $gameName)
     {
-        $addNewUserGameQuery = "INSERT INTO `Gaming.UserGames` (`FK_User_ID`,`Name`) " .
-                               "VALUES (:FKUserId, :gameName);";
+        $addNewUserGameQuery = "INSERT INTO `Gaming.UserGames` (`FK_User_ID`,`Name`, `CreatedDate`, `ModifiedDate`) " .
+                               "VALUES (:FKUserId, :gameName, NOW(), NOW()) ". 
+							   "ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `ModifiedDate` = NOW();";
 		
-	$parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
-	$parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
-	$queryParms = array($parmUserId, $parmGameName);
+		$parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
+		$parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
+		$queryParms = array($parmUserId, $parmGameName);
 			
-	$errors = $dataAccess->CheckErrors();
+		$errors = $dataAccess->CheckErrors();
 
-	if(strlen($errors) == 0) {
+		if(strlen($errors) == 0) {
             if($dataAccess->BuildQuery($addNewUserGameQuery, $queryParms)){
-		$dataAccess->ExecuteNonQuery();
+				$dataAccess->ExecuteNonQuery();
             }
 				
             $errors = $dataAccess->CheckErrors();
 
             if(strlen($errors) == 0) {
-		return $dataAccess->GetLastInsertId();
+				return $dataAccess->GetLastInsertId();
             }
-	}
+		}
 	
         $logger->LogError("Could not add new user game title '". $gameName . "' for userID " . $userID . ". " . $errors);
-	return -1;
+		return -1;
     }
     
     public function AddUsersToEvent($dataAccess, $logger, $eventID, $joinedUsers)
@@ -1195,7 +1246,7 @@ class GamingHandler
                 $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "Hidden":
-		// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
+			// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
                 $queryOrderByClause = "(CASE WHEN e.`IsActive` = 0 THEN 1 ELSE 0 END) " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "DisplayDate":
@@ -1215,7 +1266,7 @@ class GamingHandler
     }
     
     public function BuildWhereClauseForScheduledGameQuery($userID, &$queryParms, $eventId = -1, $excludeEventsForUser = false, 
-                                                          $isCountOnly = false, $searchParms = null, $eventIDs = [], $orderBy = "")
+                                                          $isCountOnly = false, $searchParms = null, $eventIDs = [], $orderBy = "", $joinedMemberEventIds = [])
     {
         $eventWhereClause = "";
         $eventMemberLeftJoinClause = "";
@@ -1239,6 +1290,13 @@ class GamingHandler
             $queryParms = array_merge($queryParms, $eventIDs);
             return $eventMemberLeftJoinClause . $eventWhereClause;
         }
+		
+	// Filter by events that have the specified members
+        if(count($joinedMemberEventIds) > 0) {
+            $joinedEventIDListForQuery = (str_repeat("?,", count($joinedMemberEventIds) - 1)) . "?";
+            $eventWhereClause = "AND (e.`ID` IN (" . $joinedEventIDListForQuery . ")) ";
+            $queryParms = array_merge($queryParms, $joinedMemberEventIds);
+        }
         
 	if(($userID > -1) && (!$excludeEventsForUser)) {
             $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` = ?) ";
@@ -1252,7 +1310,7 @@ class GamingHandler
                 $queryParms = array_merge($queryParms, $searchParms->EventCreators);
 
                 $eventWhereClause .= "OR (LOWER(u.`UserName`) = ?)) ";
-                array_push($queryParms, strtolower($searchParms->CustomEventCreatorName));					
+                array_push($queryParms, strtolower($searchParms->CustomEventCreatorName));
             }
             else if(((is_array($searchParms->EventCreators)) && (count($searchParms->EventCreators) > 0)) || (strlen($searchParms->CustomEventCreatorName) > 0)) {
                 if(((is_array($searchParms->EventCreators)) && (count($searchParms->EventCreators) > 0))) {
@@ -1292,7 +1350,7 @@ class GamingHandler
             if(strlen($searchParms->StartDateTime) > 0) {            
 		$eventWhereClause .= "AND (e.`EventScheduledForDate` >= ?) ";
 		array_push($queryParms, $searchParms->StartDateTime);
-						
+								
 		$eventWhereClause .= "AND (e.`EventScheduledForDate` <= ?) ";
 		array_push($queryParms, $searchParms->EndDateTime);
             }
@@ -1402,33 +1460,68 @@ class GamingHandler
         $userGame->JoinStatus = $joinStatus;
     }
 
-    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null)
+    private function GetTotalCountScheduledGames($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null, $filterCountByJoinedUsers = false)
     {
 	$userTotalScheduledGamesCnt = 0;
 	
         $queryParms = [];
         $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, -1, $excludeEventsForUser, true, $searchParms);
 		
-        $getUserGamesQuery = "SELECT COUNT(e.`ID`) AS Cnt " .
-                             "FROM `Gaming.Events` AS e ".
-                             "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
-                             "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
-                             "INNER JOIN `Security.Users` AS u ON u.`ID` = e.`FK_User_ID_EventCreator` ".
-                             "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
-                             "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
-                             $eventWhereClause . ";";
-        
-        $errors = $dataAccess->CheckErrors();
-        
-	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($getUserGamesQuery)){
-		$results = $dataAccess->GetSingleResultWithPositionalParms($queryParms);
-					
-		if($results != null){
-                    $userTotalScheduledGamesCnt = $results['Cnt'];
+	if(!$filterCountByJoinedUsers) {
+            $getUserGamesQuery = "SELECT COUNT(e.`ID`) AS Cnt " .
+				 "FROM `Gaming.Events` AS e ".
+				 "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
+				 "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+				 "INNER JOIN `Security.Users` AS u ON u.`ID` = e.`FK_User_ID_EventCreator` ".
+				 "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+				 "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
+				 $eventWhereClause . ";";
+			
+            $errors = $dataAccess->CheckErrors();
+			
+            if(strlen($errors) == 0) {
+		if($dataAccess->BuildQuery($getUserGamesQuery)){
+                    $results = $dataAccess->GetSingleResultWithPositionalParms($queryParms);
+						
+                    if($results != null){
+			$userTotalScheduledGamesCnt = $results['Cnt'];
+                    }
 		}
             }
 	}
+	else {
+            $getUserGamesQuery = "SELECT e.`ID` AS EventID, em2.`FK_User_ID` AS UserID, LOWER(u2.`UserName`) AS UserName " .
+				 "FROM `Gaming.Events` AS e ".
+				 "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
+				 "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
+				 "INNER JOIN `Security.Users` AS u ON u.`ID` = e.`FK_User_ID_EventCreator` ".
+				 "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+				 "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
+				 "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) " .
+				 "LEFT JOIN `Security.Users` AS u2 ON (u2.`ID` = em2.`FK_User_ID`) " .
+				 $eventWhereClause . ";";
+			
+            $errors = $dataAccess->CheckErrors();
+			
+            if(strlen($errors) == 0) {
+		if($dataAccess->BuildQuery($getUserGamesQuery)){
+                    $results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
+						
+                    if($results != null){
+			$eventIdList = [];
+                        foreach($results as $row) {
+                            if((in_array($row['UserID'], $searchParms->JoinedUsers)) || 
+                               (strtolower($searchParms->CustomJoinedUserName) == $row['UserName'])) {
+                                $eventIdList[] = $row['EventID'];
+                            }
+                        }
+						
+                        $eventsWithJoinedMembers = array_unique($eventIdList, SORT_NUMERIC);
+                        $userTotalScheduledGamesCnt = count($eventsWithJoinedMembers);
+                    }
+                }
+            }
+        }
         
 	$errors = $dataAccess->CheckErrors();
 	if(strlen($errors) > 0) {
@@ -1438,15 +1531,15 @@ class GamingHandler
         return $userTotalScheduledGamesCnt;
     }
     
-    private function GetScheduledGameIDsForCurrentPage($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null, $orderBy = "",
-                                                       $paginationEnabled = false, $startIndex = 0, $pageSize = 10)
-    {	
+    private function GetScheduledGameIDList($dataAccess, $logger, $userID, $excludeEventsForUser = false, $searchParms = null, $orderBy = "",
+                                            $paginationEnabled = false, $startIndex = 0, $pageSize = 10, $joinedMemberEventIds = [])
+    {
         $queryParms = [];
 	$limitClause = "";
 	if($paginationEnabled) {
             $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
 	}
-        $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, -1, $excludeEventsForUser, false, $searchParms, [], $orderBy);
+        $eventWhereClause = $this->BuildWhereClauseForScheduledGameQuery($userID, $queryParms, -1, $excludeEventsForUser, false, $searchParms, [], $orderBy, $joinedMemberEventIds);
 	$orderByClause = "ORDER BY " . $this->TranslateOrderByToQueryOrderByClause($orderBy);	
         
         $getUserGamesQuery = "SELECT DISTINCT e.`ID` FROM `Gaming.Events` AS e ".
@@ -1493,34 +1586,34 @@ class GamingHandler
                              "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) ". // Only show future events
                              "AND (e.`RequiredMemberCount` > (SELECT COUNT(`ID`) FROM `Gaming.EventMembers` WHERE `FK_Event_ID` = e.`ID`)) ".
                              "AND ((e.`IsPublic` = 1) OR (e.`ID` IN ".
-								"(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
-								" WHERE (`FK_User_ID` = :userID2) AND (`FK_Event_ID` = e.`ID`))".
-								")) ".
+							"(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
+							" WHERE (`FK_User_ID` = :userID2) AND (`FK_Event_ID` = e.`ID`))".
+							")) ".
                              "AND (e.`ID` NOT IN ".
-								"(SELECT `FK_Event_ID` FROM `Gaming.EventMembers`".
-								" WHERE (`FK_User_ID` = :userID3))".
-							 ");";
+							"(SELECT `FK_Event_ID` FROM `Gaming.EventMembers`".
+							" WHERE (`FK_User_ID` = :userID3))".
+                             ");";
 		
-		$parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-		$parmUserId2 = new QueryParameter(':userID2', $userID, PDO::PARAM_INT);
-		$parmUserId3 = new QueryParameter(':userID3', $userID, PDO::PARAM_INT);
-		$queryParms = array($parmUserId, $parmUserId2, $parmUserId3);
+	$parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+	$parmUserId2 = new QueryParameter(':userID2', $userID, PDO::PARAM_INT);
+	$parmUserId3 = new QueryParameter(':userID3', $userID, PDO::PARAM_INT);
+	$queryParms = array($parmUserId, $parmUserId2, $parmUserId3);
         $errors = $dataAccess->CheckErrors();
         
-		if(strlen($errors) == 0) {
-			if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
-				$results = $dataAccess->GetSingleResult();
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getUserGamesQuery, $queryParms)){
+		$results = $dataAccess->GetSingleResult();
 					
-				if($results != null){
-					$userTotalUnjoinedGamesCnt = $results['Cnt'];
-				}
-			}
+		if($results != null){
+                    $userTotalUnjoinedGamesCnt = $results['Cnt'];
 		}
+            }
+	}
         
-		$errors = $dataAccess->CheckErrors();
-		if(strlen($errors) > 0) {
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
             $logger->LogError("Could not retrieve count of user unjoined games. " . $errors);
-		}
+	}
         
         return $userTotalUnjoinedGamesCnt;
     }
@@ -1576,5 +1669,57 @@ class GamingHandler
 	}
         
         return $eventMembersByEvent;
+    }
+	
+    public function GetEventsJoinedByUsersInList($dataAccess, $logger, $filterUsers, $filterUserCustomName, $eventIDs)
+    {
+        $eventIdParamList = (str_repeat("?,", count($eventIDs) - 1)) . "?";
+	$whereClause = "WHERE (em.`FK_Event_ID` IN (" . $eventIdParamList . ")) ";
+	$queryParms = $eventIDs;
+		
+	if(((is_array($filterUsers)) && (count($filterUsers) > 0)) && (strlen($filterUserCustomName) > 0)) {
+            $joinedUserListForQuery = (str_repeat("?,", count($filterUsers) - 1)) . "?";
+            $whereClause .= "AND ((em.`FK_User_ID` IN (" . $joinedUserListForQuery . ")) ";
+            $queryParms = array_merge($queryParms, $filterUsers);
+
+            $whereClause .= "OR (LOWER(u.`UserName`) = ?)) ";
+            array_push($queryParms, strtolower($filterUserCustomName));
+	}
+	else if(((is_array($filterUsers)) && (count($filterUsers) > 0)) || (strlen($filterUserCustomName) > 0)) {
+            if(((is_array($filterUsers)) && (count($filterUsers) > 0))) {
+		$joinedUserListForQuery = (str_repeat("?,", count($filterUsers) - 1)) . "?";
+		$whereClause .= "AND (em.`FK_User_ID` IN (" . $joinedUserListForQuery . ")) ";
+		$queryParms = array_merge($queryParms, $filterUsers);
+            }
+            if(strlen($filterUserCustomName) > 0) {
+		$whereClause .= "AND (LOWER(u.`UserName`) = ?) ";
+		array_push($queryParms, strtolower($filterUserCustomName));
+            }
+	}
+        
+        $getEventsJoinedByUsersQuery = "SELECT DISTINCT em.`FK_Event_ID` as ID FROM `Gaming.EventMembers` AS em " .
+                                       "INNER JOIN `Security.Users` AS u ON em.`FK_User_ID` = u.`ID` " . $whereClause . ";";
+        
+        $joinedEventIDs = array();
+        $errors = $dataAccess->CheckErrors();
+        
+	if(strlen($errors) == 0) {
+            if($dataAccess->BuildQuery($getEventsJoinedByUsersQuery)){
+		$results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
+					
+		if($results != null){
+                    foreach($results as $row) {                        
+			array_push($joinedEventIDs, $row['ID']);
+                    }
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve events joined by specified users. " . $errors);
+	}
+        
+        return $joinedEventIDs;
     }
 }

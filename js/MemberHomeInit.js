@@ -35,15 +35,15 @@ function MemberHomeOnReady()
     });
     
     $('#searchFilterLink').click( function() {
-	if (!$('#modalOverlay').data("slide-reveal")) { // Show
+		if (!$('#modalOverlay').data("slide-reveal")) { // Show
             $('#modalOverlay').slideReveal("show");
             $('#searchPanel').slideReveal("show");
             $('body').addClass('overlayMode');
             return false;
-	} else { // Hide
+		} else { // Hide
             $('body').removeClass('overlayMode');
             return CloseSearchPanel();
-	}
+		}
     });
 	
     // Automatically size search panel fixed-height divs to proper height based on current browser viewport height
@@ -51,19 +51,19 @@ function MemberHomeOnReady()
         isMobile = isMobileView();
         var isMobileHeight = isMobileViewHeight();
 		
-        var filterDivHeightPct = 0.92;
+        var filterDivHeightPct = 0.9;
         if(isMobileHeight) {
             filterDivHeightPct = 0.65;
         }
         
         var curWindowWidth = $(window).width();
-        var toggleGroupWidth = curWindowWidth * 0.15;
+        var toggleGroupWidth = curWindowWidth * 0.2;
         if(isMobile)                    toggleGroupWidth = curWindowWidth * 0.75;
         else if(curWindowWidth < 1000)  toggleGroupWidth = curWindowWidth * 0.45;
         
         $('.overlayPanelToggleGroup').css('width', toggleGroupWidth.toString() + "px");
         
-	CloseSearchPanel();
+		CloseSearchPanel();
 		
         $('#modalOverlay').slideReveal({
             changeWidth: true,
@@ -165,13 +165,16 @@ function MemberHomeOnReady()
 		$(this).change(function() {
 			var toggleLinkId = '#' + $(this).attr('linkId');
 			var groupId = '#' + $(this).attr('groupId');
+			var lblId = '#' + $(this).attr('lblId');
 			if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
 				$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
 				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
+				$(lblId).text('Deactivate Filter');
 			}
 			else {
 				$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
 				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
+				$(lblId).text('Activate Filter');
 			}
 		});
     });
@@ -781,11 +784,13 @@ function ToggleSearchDivDisplay(curDiv, curToggleLink)
     
     if(isExpand) {
         $(curDiv).removeClass('overlayPanelGroupBorder').addClass('overlayPanelGroupBorder');
+		$(curDiv).removeClass('overlayPanelGroupExpanded').addClass('overlayPanelGroupExpanded');
         $(curDiv).slideDown('slow');
         $(curToggleLink).removeClass('fa-plus-square').addClass('fa-minus-square');
     }
     else {
         $(curDiv).removeClass('overlayPanelGroupBorder');
+		$(curDiv).removeClass('overlayPanelGroupExpanded');
         $(curDiv).slideUp('slow');
         $(curToggleLink).removeClass('fa-minus-square').addClass('fa-plus-square');
     }
@@ -1389,26 +1394,26 @@ function ToggleControlPanelDisplay(panelToToggle)
 function DisplaySearchFiltersByCurrentView()
 {
     if(activePanel === panelEnum.CurrentEventFeed) {
-	// Change search panel style to reflect current view
-	$('#searchPanel').removeClass('overlayPanelEvtMgr').addClass('overlayPanelCurEvts');
+		// Change search panel style to reflect current view
+		$('#searchPanel').removeClass('overlayPanelEvtMgr').addClass('overlayPanelCurEvts');
 			
-	// Hide any search filter fields that are not associated with this particular view
-	var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
-	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
-	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
-	$exclusivelyEvtMgrFilters.hide();
-	$exclusivelyCurEvtFilters.show();
+		// Hide any search filter fields that are not associated with this particular view
+		var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
+		var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
+		var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
+		$exclusivelyEvtMgrFilters.hide();
+		$exclusivelyCurEvtFilters.show();
     }
     else {
-	// Change search panel style to reflect current view
-	$('#searchPanel').removeClass('overlayPanelCurEvts').addClass('overlayPanelEvtMgr');
-			
-	// Hide any search filter fields that are not associated with this particular view
-	var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
-	var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
-	var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
-	$exclusivelyCurEvtFilters.hide();
-	$exclusivelyEvtMgrFilters.show();
+		// Change search panel style to reflect current view
+		$('#searchPanel').removeClass('overlayPanelCurEvts').addClass('overlayPanelEvtMgr');
+				
+		// Hide any search filter fields that are not associated with this particular view
+		var $evtMgrFilters = $('#searchPanel .overlayPanelToggleGroup.searchPanelEvtMgrFilter,#searchPanel .overlayPanelToggleGroup.searchPanelCurEvtsFilter');
+		var $exclusivelyEvtMgrFilters = $evtMgrFilters.not('.searchPanelCurEvtsFilter');
+		var $exclusivelyCurEvtFilters = $evtMgrFilters.not('.searchPanelEvtMgrFilter');
+		$exclusivelyCurEvtFilters.hide();
+		$exclusivelyEvtMgrFilters.show();
     }
 }
 

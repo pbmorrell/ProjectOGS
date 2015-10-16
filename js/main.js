@@ -56,6 +56,10 @@ function GlobalStartupActions()
 
             return false;
         });
+        
+        $('#signupBtnLoginForm').click(function() {
+            window.location.href = "Index.php?action=Signup";
+        });
     }
 }
 

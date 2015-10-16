@@ -8,6 +8,7 @@ class SearchParameters
     public $EventCreators = [];
 	public $CustomEventCreatorName = "";
     public $JoinedUsers = [];
+	public $CustomJoinedUserName = "";
     public $Platforms = [];
     public $ShowJoinedEvents = false;
     public $ShowOpenEvents = true;
@@ -15,7 +16,8 @@ class SearchParameters
     public $NoStartDateRestriction = false;
 	
     public function __construct($sh = false, $sdt = "", $edt = "", $gt = [], $ec = [], $ju = [], 
-								$p = [], $sje = false, $soe = true, $sufe = false, $nsd = false, $cecn = "")
+								$p = [], $sje = false, $soe = true, $sufe = false, $nsd = false, 
+								$cecn = "", $cjeu = "")
     {
         $this->ShowHiddenEvents = $sh;
 		$this->StartDateTime = $sdt;
@@ -29,5 +31,6 @@ class SearchParameters
 		$this->ShowUnjoinedFullEvents = $sufe;
 		$this->NoStartDateRestriction = $nsd;
 		$this->CustomEventCreatorName = $cecn;
+		$this->CustomJoinedUserName = $cjeu;
     }
 }
