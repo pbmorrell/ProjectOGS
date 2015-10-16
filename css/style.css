@@ -117,6 +117,10 @@
     {
         margin-bottom: 2em;
     }
+    
+    .byline{
+	font-style: oblique;
+    }
 
     section,
     article
@@ -219,6 +223,29 @@
     }
 
     ul.style3 li:first-child
+    {
+        border-top: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+    
+	ul.style4
+    {
+    }
+
+    ul.style4 p
+    {
+        margin-bottom: 0;
+    }
+
+    ul.style4 li
+    {
+        border-top: solid 1px rgba(255,255,255,0.1);
+        padding-top: 0.725em;
+        margin: 0.725em 2em 0em 2em;
+    }
+
+    ul.style4 li:first-child
     {
         border-top: 0;
         padding-top: 0;

@@ -52,6 +52,7 @@
                 <!-- Copyright -->
                 <div id="copyright">
                     &copy; <script>document.write(new Date().getFullYear());</script> Player Unite<br/> All Rights Reserved<br/>
+                    <a href="TermsPri.php" style="text-decoration:none;">Terms & Conditions | Privacy Policy</a>
                 </div>
                 <!-- Copyright -->
             </div>
