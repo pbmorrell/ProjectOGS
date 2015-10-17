@@ -21,14 +21,20 @@
     
     // Now build the page header HTML (nav) string, which will be echoed on all including pages and will be the login code
     // if no logged-in user
+    
+    // If this is the signup page, do not include "Signup" button in header
+    $signupBtn = '<button type="button" class="button icon fa-cogs" id="signupBtnLoginForm">Sign Up</button>';
+    if(strtolower($curPageName) === 'index') {
+        $signupBtn = "";
+    }
+    
     $pageHeaderLoginForm =
         '<div id="login">
             <form id="loginForm" name="loginForm" method="POST" action="">
                 <input id="loginUsername" name="loginUsername" type="text" maxlength="100" placeholder=" Username">
                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password">
-                <button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;
-                <button type="button" class="button icon fa-cogs" id="signupBtnLoginForm">Sign Up</button>
-            </form>
+                <button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;' . $signupBtn .
+            '</form>
         </div>';
     
     $loginErrorDiv = '<div id="loginErr" class="preLogin">&nbsp;</div>';

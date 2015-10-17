@@ -543,7 +543,7 @@
     }
 	
     .captchaInput {
-		max-width:6em;
+	max-width:6em;
     }
 	
     .captchaImage {
@@ -552,14 +552,14 @@
     }
 	
     .captchaInputDiv {
-		margin-bottom: 0.5em;
-		display:inline-block;
-		vertical-align: middle;
+	margin-bottom: 0.5em;
+	display:inline-block;
+	vertical-align: middle;
     }
 
     .captchaImageDiv {
-		display:inline-block;
-		vertical-align: middle;
+	display:inline-block;
+	vertical-align: middle;
     }	
 	
     .desktopAdStyle {
@@ -571,11 +571,6 @@
     .mobileAdStyle {
         min-width: 100%;
         max-width: 100%;        
-    }
-
-    .overlayMode {
-	overflow: hidden;
-        position: fixed;
     }
 	
     .overlayPanelModalBackground {
@@ -615,9 +610,9 @@
         border:1px solid blue;
     }
 	
-	.overlayPanelGroupExpanded {
-		margin-bottom: 3%;
-	}
+    .overlayPanelGroupExpanded {
+	margin-bottom: 3%;
+    }
     
     .overlayPanelFilterSubGroup {
         height: auto;
@@ -639,6 +634,22 @@
         float: left;
         margin-left: 5%;
         margin-right: 5%;
+    }
+	
+    .overlayPanelElementContainerCheckboxList {
+        width: 65% !important;
+        height: 8%;
+        float: left;
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+	
+    .overlayPanelElementContainerCheckboxListSibling {
+        width: 25% !important;
+        height: 8%;
+        float: left;
+        margin-left: 2%;
+        margin-right: 2%;
     }
     
     .overlayPanelElement {
@@ -745,7 +756,7 @@
     .fixedWidthScrollableContainer {
         border:none;
         box-sizing: border-box;
-        width: 375px;
+        width: 375px !important;
         overflow-x: auto;
     }
     
@@ -760,6 +771,10 @@
     .desktopViewFontSize {
 	font-size: 11px;
     }
+	
+	.tableHeaderFooterFixed {
+		position: fixed !important;
+	}
         
     .sectionHeader
     {

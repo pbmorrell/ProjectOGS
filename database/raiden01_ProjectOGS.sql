@@ -382,7 +382,9 @@ INSERT INTO `Gaming.UserFriends` (`ID`, `FK_User_ID_ThisUser`, `FK_User_ID_Frien
 CREATE TABLE IF NOT EXISTS `Gaming.UserGames` (
   `ID` bigint(20) NOT NULL,
   `FK_User_ID` bigint(11) NOT NULL,
-  `Name` varchar(50) NOT NULL
+  `Name` varchar(50) NOT NULL,
+  `CreatedDate` datetime NOT NULL,
+  `ModifiedDate` datetime NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 --
@@ -657,7 +659,7 @@ ALTER TABLE `Gaming.UserFriends`
 -- Indexes for table `Gaming.UserGames`
 --
 ALTER TABLE `Gaming.UserGames`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_UserGames_UserID` (`FK_User_ID`);
+  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_UserGames_UserID` (`FK_User_ID`),  ADD UNIQUE `IDX_Unique_UserID_Name`(`FK_User_ID`, `Name`);
 
 --
 -- Indexes for table `Gaming.UserPlatforms`

@@ -13,6 +13,8 @@ var eventManagerShowHiddenEvents = 0;
 
 var currentEventViewerJTableDiv = "#currentEventsContent";
 var currentEventViewerLoadAction = 'GetCurrentEventsForJTable';
+var lastWindowWidth = -1;
+var lastWindowHeight = -1;
 
 // Functions
 function MemberHomeOnReady()
@@ -34,51 +36,79 @@ function MemberHomeOnReady()
         push: false
     });
     
-    $('#searchFilterLink').click( function() {
-		if (!$('#modalOverlay').data("slide-reveal")) { // Show
+
+    $('#searchFilterLink').on('touchend', function(event) {
+	event.preventDefault();
+	if (!$('#modalOverlay').data("slide-reveal")) { // Show
             $('#modalOverlay').slideReveal("show");
             $('#searchPanel').slideReveal("show");
-            $('body').addClass('overlayMode');
-            return false;
-		} else { // Hide
-            $('body').removeClass('overlayMode');
-            return CloseSearchPanel();
-		}
+            
+            //$('#modalOverlay,#searchPanel').bind('touchmove', DisableScrolling);
+            //$(document).bind('touchmove', DisableScrolling);
+	} else { // Hide
+            CloseSearchPanel();
+	}
+    });
+    
+    $('#searchFilterLink').click( function(event) {
+	event.preventDefault();
+	if (!$('#modalOverlay').data("slide-reveal")) { // Show
+            $('#modalOverlay').slideReveal("show");
+            $('#searchPanel').slideReveal("show");
+	} else { // Hide
+            CloseSearchPanel();
+	}
     });
 	
     // Automatically size search panel fixed-height divs to proper height based on current browser viewport height
     $(window).resize(function() {
         isMobile = isMobileView();
         var isMobileHeight = isMobileViewHeight();
+        var curWindowWidth = $(window).width();
+        var curWindowHeight = $(window).height();
 		
         var filterDivHeightPct = 0.9;
         if(isMobileHeight) {
-            filterDivHeightPct = 0.65;
+            if(isMobile)  filterDivHeightPct = 0.85;
+            else          filterDivHeightPct = 0.65;
         }
         
-        var curWindowWidth = $(window).width();
         var toggleGroupWidth = curWindowWidth * 0.2;
-        if(isMobile)                    toggleGroupWidth = curWindowWidth * 0.75;
-        else if(curWindowWidth < 1000)  toggleGroupWidth = curWindowWidth * 0.45;
+        var searchPanelWidth = Math.round(curWindowWidth * 0.4);
+        
+        if(isMobile) {
+            toggleGroupWidth = curWindowWidth * 0.75;
+            searchPanelWidth = Math.round(curWindowWidth * 0.8);
+        }
+        else if(curWindowWidth < 1000) {
+            toggleGroupWidth = curWindowWidth * 0.45;
+            searchPanelWidth = Math.round(curWindowWidth * 0.6);
+        }
+        
+        var filterDivHeight = filterDivHeightPct * curWindowHeight;
+        $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
+
+        var padding = isMobile ? "20%" : (isMobileHeight ? "10%" : "2%");
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', padding);
         
         $('.overlayPanelToggleGroup').css('width', toggleGroupWidth.toString() + "px");
         
-		CloseSearchPanel();
-		
-        $('#modalOverlay').slideReveal({
-            changeWidth: true,
-            width: curWindowWidth + 20
-        });		
-        $('#searchPanel').slideReveal({
-            changeWidth: true,
-            width: isMobileHeight ? (Math.round(curWindowWidth * 0.8)) : (Math.round(curWindowWidth * 0.6))
-        });
-		
-        var filterDivHeight = filterDivHeightPct * ($(window).height());
-        $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
+        // If the resize event was triggered by scrolling or a minimal resize, don't need to hide search panel
+        if((Math.abs(curWindowWidth - lastWindowWidth) > 100) || (Math.abs(curWindowHeight - lastWindowHeight) > 100)) {
+            CloseSearchPanel();
+            
+            $('#modalOverlay').slideReveal({
+                changeWidth: true,
+                width: curWindowWidth + 20
+            });		
+            $('#searchPanel').slideReveal({
+                changeWidth: true,
+                width: searchPanelWidth
+            });
+        }
         
-        var padding = isMobile ? (isMobileHeight ? "20%" : "20%") : (isMobileHeight ? "7%" : "2%");
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', padding);
+	lastWindowWidth = curWindowWidth;
+        lastWindowHeight = curWindowHeight;
     });
 
     $(window).trigger('resize');
@@ -162,21 +192,21 @@ function MemberHomeOnReady()
     
     // Add checked handler to filter checkboxes
     $('#searchPanel .overlayPanelToggleActiveChk').each(function() {
-		$(this).change(function() {
-			var toggleLinkId = '#' + $(this).attr('linkId');
-			var groupId = '#' + $(this).attr('groupId');
-			var lblId = '#' + $(this).attr('lblId');
-			if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
-				$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
-				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
-				$(lblId).text('Deactivate Filter');
-			}
-			else {
-				$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
-				$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
-				$(lblId).text('Activate Filter');
-			}
-		});
+	$(this).change(function() {
+            var toggleLinkId = '#' + $(this).attr('linkId');
+            var groupId = '#' + $(this).attr('groupId');
+            var lblId = '#' + $(this).attr('lblId');
+            if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
+		$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
+		$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
+		$(lblId).text('Deactivate Filter');
+            }
+            else {
+		$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
+		$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
+		$(lblId).text('Activate Filter');
+            }
+	});
     });
 	
     // Attach event handler to search button
@@ -205,13 +235,13 @@ function CloseSearchPanel()
 {
     $('#modalOverlay').slideReveal("hide");
     $('#searchPanel').slideReveal("hide");
-    $('body').removeClass('overlayMode');
+    //$(document).unbind('touchmove', DisableScrolling);
     return false;
 }
 
-function DisableScrolling()
+function DisableScrolling(e)
 {
-    return false;
+    e.preventDefault();
 }
 
 function OnViewportWidthChanged(newViewType)
@@ -668,6 +698,10 @@ function FormatEventManagerTableForCurrentView(isMobile)
 		
 	// Enclose jTable containers in fixed-width scrollable divs
 	$(eventManagerJTableDiv + ' .jtable-main-container .jtable').addClass('fixedWidthScrollableContainer');
+	
+	// Fix table header and footer in place (make them 'sticky') for when table body is wide enough to require side-to-side scrolling
+	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
+	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
     }
     else {        
         // Expand Game & Console columns into two distinct columns again;
@@ -695,7 +729,11 @@ function FormatEventManagerTableForCurrentView(isMobile)
 	$(eventManagerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
 		
 	// Remove fixed-width scrollable container
-	$(eventManagerJTableDiv + ' .jtable-main-container .jtable').removeClass('fixedWidthScrollableContainer');
+	$(eventManagerJTableDiv + ' .jtable-main-container').removeClass('fixedWidthScrollableContainer');
+	
+	// Remove position:fixed style from table header and footer when viewport width wide enough to not require side-to-side scrolling
+	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed');
+	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed');
     }
 }
 
@@ -747,7 +785,11 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
 	$(currentEventViewerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
 		
 	// Enclose jTable containers in fixed-width scrollable divs
-	$(currentEventViewerJTableDiv + ' .jtable-main-container .jtable').addClass('fixedWidthScrollableContainer');
+	$(currentEventViewerJTableDiv + ' .jtable-main-container').addClass('fixedWidthScrollableContainer');
+		
+	// Fix table header and footer in place (make them 'sticky') for when table body is wide enough to require side-to-side scrolling
+	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
+	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
     }
     else {
         // Expand Game & Console columns into two distinct columns again;
@@ -772,9 +814,13 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
 		
 	// Make font size normal again
 	$(currentEventViewerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
-		
+			
 	// Remove fixed-width scrollable container
-	$(currentEventViewerJTableDiv + ' .jtable-main-container .jtable').removeClass('fixedWidthScrollableContainer');
+	$(currentEventViewerJTableDiv + ' .jtable-main-container').removeClass('fixedWidthScrollableContainer');
+		
+	// Remove position:fixed style from table header and footer when viewport width wide enough to not require side-to-side scrolling
+	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed');
+	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed');
     }
 }
 

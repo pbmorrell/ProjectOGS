@@ -161,25 +161,25 @@ class GamingHandler
     	$activeUsers = array();
         $errors = $dataAccess->CheckErrors();
         
-		if(strlen($errors) == 0) {
+	if(strlen($errors) == 0) {
             if($dataAccess->BuildQuery($getActiveUsersQuery, $queryParms)){
-				$results = $dataAccess->GetResultSet();
+		$results = $dataAccess->GetResultSet();
 					
-				if($results != null){
+		if($results != null){
                     foreach($results as $row) {
                         $user = User::constructDefaultUser();
                         $user->UserID = $row['ID'];
                         $user->UserName = $row['UserName'];
                         array_push($activeUsers, $user);
                     }
-				}
+		}
             }
-		}
+	}
         
-		$errors = $dataAccess->CheckErrors();
-		if(strlen($errors) > 0) {
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
             $logger->LogError("Could not retrieve active users. " . $errors);
-		}
+	}
         
         return $activeUsers;
     }
@@ -377,36 +377,36 @@ class GamingHandler
     {
         $eventIDs = [];
         $scheduledGames = [];
-		$totalScheduledGameCnt = -1;
+	$totalScheduledGameCnt = -1;
 		
-		// If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
-		if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
-			// In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
-			// the results further in a later step before applying the LIMIT
-			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, false, 
-													  $startIndex, $pageSize);
+	// If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
+	if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
+            // In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
+            // the results further in a later step before applying the LIMIT
+            $eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, false, 
+                                                      $startIndex, $pageSize);
 			
-			if(count($eventIDs) > 0) {
-				$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
-				$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
-														  $startIndex, $pageSize, $joinedMemberEventIds);
-				$filterCountByJoinedUsers = true;
-				$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
-			}
-		}
-		else {
-			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
-													  $startIndex, $pageSize);
-		}
+            if(count($eventIDs) > 0) {
+		$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
+		$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
+							  $startIndex, $pageSize, $joinedMemberEventIds);
+		$filterCountByJoinedUsers = true;
+		$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
+            }
+	}
+	else {
+            $eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
+                                                      $startIndex, $pageSize);
+	}
 			
-		if(count($eventIDs) > 0) {
-			$eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
-			$userAllowedFriendsByEvent = $this->LoadUserFriends($dataAccess, $logger, $userID, $eventIDs);
-			$scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, 
-													   false, $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
-		}
+	if(count($eventIDs) > 0) {
+            $eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
+            $userAllowedFriendsByEvent = $this->LoadUserFriends($dataAccess, $logger, $userID, $eventIDs);
+            $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, 
+                                                       false, $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
+	}
 
-		if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
+	if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms);
 		
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -414,7 +414,7 @@ class GamingHandler
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-				$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
@@ -426,9 +426,9 @@ class GamingHandler
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-				"PlayersSignedUpData" => $playersSignedUpData,
+		"PlayersSignedUpData" => $playersSignedUpData,
                 "Edit" => '',
-				"Hidden" => !$game->Visible ? 'Yes' : 'No'
+		"Hidden" => !$game->Visible ? 'Yes' : 'No'
             );
 
             array_push($rows, $row);
@@ -443,41 +443,40 @@ class GamingHandler
 	
     public function JTableCurrentEventViewerLoad($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, $searchParms)
     {												  
-		$eventIDs = [];
-		$scheduledGames = [];
-		$totalScheduledGameCnt = -1;
+        $eventIDs = [];
+        $scheduledGames = [];
+        $totalScheduledGameCnt = -1;
 
-		// If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
-		if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
-			// In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
-			// the results further in a later step before applying the LIMIT
-			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, false, 
-													  $startIndex, $pageSize);
-			
-			if(count($eventIDs) > 0) {
-				$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
-				$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
-														  $startIndex, $pageSize, $joinedMemberEventIds);
-				$filterCountByJoinedUsers = true;
-				$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
-			}
-		}
-		else {
-			$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
-													  $startIndex, $pageSize);				
-		}
-		
-		if(count($eventIDs) > 0) {
-			$eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
-			$userAllowedFriendsByEvent = [];
-			
-			$scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, 
-													   $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
-		}
+        // If filtering on joined users, must run two additional queries (passes) to return the requested events while maintaining proper paging and ordering
+        if(((is_array($searchParms->JoinedUsers)) && (count($searchParms->JoinedUsers) > 0)) || (strlen($searchParms->CustomJoinedUserName) > 0)) {
+            // In this case, we must get the complete list of distinct event IDs for the search criteria, without a LIMIT clause, because we need to filter
+            // the results further in a later step before applying the LIMIT
+            $eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, false, 
+                                                      $startIndex, $pageSize);
 
+            if(count($eventIDs) > 0) {
+                $joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
+                $eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
+                                                          $startIndex, $pageSize, $joinedMemberEventIds);
+                $filterCountByJoinedUsers = true;
+                $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
+            }
+        }
+        else {
+            $eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, true, $searchParms, $orderBy, $paginationEnabled, 
+                                                      $startIndex, $pageSize);
+        }
+
+        if(count($eventIDs) > 0) {
+            $eventMembersByEvent = $this->GetEventMembers($dataAccess, $logger, $eventIDs);
+            $userAllowedFriendsByEvent = [];
+
+            $scheduledGames = $this->GetScheduledGames($dataAccess, $logger, $userID, $orderBy, $paginationEnabled, $startIndex, $pageSize, -1, true, 
+                                                       $searchParms, $eventIDs, $eventMembersByEvent, $userAllowedFriendsByEvent);
+        }
 		
-		if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
-		$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
+	if($totalScheduledGameCnt < 0)  $totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms);
+	$totalGameCntNotJoined = $this->GetTotalCountUnjoinedScheduledGames($dataAccess, $logger, $userID);
 
         $rows = [];
         foreach($scheduledGames as $game) {
@@ -485,22 +484,22 @@ class GamingHandler
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-				$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
             $row = array (
                 "ID" => $game->EventID,
-				"TotalGamesToJoinCount" => $totalGameCntNotJoined,
-				"UserName" => $game->EventCreatorUserName,
+		"TotalGamesToJoinCount" => $totalGameCntNotJoined,
+		"UserName" => $game->EventCreatorUserName,
                 "GameTitle" => $game->Name,
                 "Platform" => $game->SelectedPlatformText,
                 "DisplayDate" => $game->ScheduledDate,
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-				"PlayersSignedUpData" => $playersSignedUpData,
-				"Joined" => $game->JoinStatus
+		"PlayersSignedUpData" => $playersSignedUpData,
+		"Joined" => $game->JoinStatus
             );
 
             array_push($rows, $row);
@@ -767,28 +766,28 @@ class GamingHandler
     {
         $addNewUserGameQuery = "INSERT INTO `Gaming.UserGames` (`FK_User_ID`,`Name`, `CreatedDate`, `ModifiedDate`) " .
                                "VALUES (:FKUserId, :gameName, NOW(), NOW()) ". 
-							   "ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `ModifiedDate` = NOW();";
+                               "ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `ModifiedDate` = NOW();";
 		
-		$parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
-		$parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
-		$queryParms = array($parmUserId, $parmGameName);
-			
-		$errors = $dataAccess->CheckErrors();
+        $parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
+        $parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
+        $queryParms = array($parmUserId, $parmGameName);
 
-		if(strlen($errors) == 0) {
+        $errors = $dataAccess->CheckErrors();
+
+        if(strlen($errors) == 0) {
             if($dataAccess->BuildQuery($addNewUserGameQuery, $queryParms)){
-				$dataAccess->ExecuteNonQuery();
+		$dataAccess->ExecuteNonQuery();
             }
 				
             $errors = $dataAccess->CheckErrors();
 
             if(strlen($errors) == 0) {
-				return $dataAccess->GetLastInsertId();
+		return $dataAccess->GetLastInsertId();
             }
-		}
+	}
 	
         $logger->LogError("Could not add new user game title '". $gameName . "' for userID " . $userID . ". " . $errors);
-		return -1;
+	return -1;
     }
     
     public function AddUsersToEvent($dataAccess, $logger, $eventID, $joinedUsers)
@@ -1111,8 +1110,8 @@ class GamingHandler
             return $ddlTimeZonesErrorHTML;
         }
     }
-    
-    public function GetPlatformCheckboxList($dataAccess, $selectedPlatforms)
+	
+    public function GetPlatformCheckboxList($dataAccess, $selectedPlatforms, $groupId = 'platforms[]', $encloseInOverlayLabel = false)
     {
         $platformQuery = "SELECT `ID`, `Name` FROM `Configuration.Platforms` ORDER BY `Name`;";
         $ddlPlatformsHTML = "";
@@ -1129,9 +1128,15 @@ class GamingHandler
                         if(in_array($row['ID'], $selectedPlatforms)) {
                             $selected = "checked='checked'";
                         }
+						
+                        $curLine = "<input type='checkbox' name='" . $groupId . "' " . $selected . " value='" . $row['ID'] . "'>" . 
+                                   $row['Name'];
 
-                        $ddlPlatformsHTML = $ddlPlatformsHTML . "<input type='checkbox' name='platforms[]' " . 
-                                            $selected . " value='" . $row['ID'] . "'>" . $row['Name'] . "</input><br/>";
+                        if($encloseInOverlayLabel) {
+                            $curLine = '<label class="overlayPanelLbl"><input type="checkbox" class="overlayPanelElement" name="' . 
+                                       $groupId . '" ' . $selected . ' value="' . $row['ID'] . '">' . $row['Name'] . '</label><br />';
+                        }
+                        $ddlPlatformsHTML = $ddlPlatformsHTML . $curLine;
                     }
                 }
             }
@@ -1246,7 +1251,7 @@ class GamingHandler
                 $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "Hidden":
-			// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
+		// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
                 $queryOrderByClause = "(CASE WHEN e.`IsActive` = 0 THEN 1 ELSE 0 END) " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "DisplayDate":
@@ -1359,10 +1364,32 @@ class GamingHandler
             }
 	}
         
+        // Filter on game titles, if any
         if((is_array($searchParms->GameTitles)) && (count($searchParms->GameTitles) > 0)) {
             $gameTitleListForQuery = (str_repeat("?,", count($searchParms->GameTitles) - 1)) . "?";
             $eventWhereClause .= "AND (COALESCE(cg.`Name`, ug.`Name`) IN (" . $gameTitleListForQuery . ")) ";
             $queryParms = array_merge($queryParms, $searchParms->GameTitles);
+        }
+
+        // Filter on platforms, if any
+        if(((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0)) && (strlen($searchParms->CustomPlatformName) > 0)) {
+            $platformListForQuery = (str_repeat("?,", count($searchParms->Platforms) - 1)) . "?";
+            $eventWhereClause .= "AND ((p.`ID` IN (" . $platformListForQuery . ")) ";
+            $queryParms = array_merge($queryParms, $searchParms->Platforms);
+
+            $eventWhereClause .= "OR (LOWER(p.`Name`) = ?)) ";
+            array_push($queryParms, strtolower($searchParms->CustomPlatformName));
+        }
+        else if(((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0)) || (strlen($searchParms->CustomPlatformName) > 0)) {
+            if(((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0))) {
+                $platformListForQuery = (str_repeat("?,", count($searchParms->Platforms) - 1)) . "?";
+                $eventWhereClause .= "AND (p.`ID` IN (" . $platformListForQuery . ")) ";
+                $queryParms = array_merge($queryParms, $searchParms->Platforms);
+            }
+            if(strlen($searchParms->CustomPlatformName) > 0) {
+                $eventWhereClause .= "AND (LOWER(p.`Name`) = ?) ";
+                array_push($queryParms, strtolower($searchParms->CustomPlatformName));
+            }
         }
 
 	// Replace first "AND" with a "WHERE"

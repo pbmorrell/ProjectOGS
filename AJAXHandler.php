@@ -326,15 +326,15 @@
                 }
                 break;
             case "EventEditorLoad":
-				$eventId = '';
-				if(isset($_GET['EventID'])) {
+		$eventId = '';
+		if(isset($_GET['EventID'])) {
                     $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
-				}
+		}
 
-				echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);
-				break;
+		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);
+		break;
             case "EventManagerLoad":
-				echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
+		echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
                 break;
             case "EventEditorCreateEvent":
                 $pvtEventFriends = (isset($_POST['pvtEventFriends'])) ? ($_POST['pvtEventFriends']) : [];
@@ -374,13 +374,13 @@
                 echo $gamingHandler->EventEditorDeleteEvents($dataAccess, $logger, $_POST['eventIds']);
                 break;
             case "ReloadGameTitleSelector":
-				echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID, '');
-				break;
+		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID, '');
+		break;
             case "GetUserOwnedEventsForJTable":
-				$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
-				$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-				$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-				$paginationEnabled = ($startIndex === "-1") ? false : true;
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
                 
                 $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
                 $showHiddenEvents = ($showHidden === "1") ? true : false;
@@ -393,21 +393,24 @@
                     array_push($existingGameTitles, $customGameTitle);
                 }
 				
-				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+		$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
                 $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
                 
-				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, [], true, true, true, false, 
-													"", $customJoinedUserEntry);
-				echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
+                $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
+                $customPlatformEntry = isset($_POST['customPlatformFilter']) ? trim(filter_var($_POST['customPlatformFilter'], FILTER_SANITIZE_STRING)) : "";
+                
+		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
+                                                    true, true, true, false, "", $customJoinedUserEntry, $customPlatformEntry);
+		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $searchParms);
                 break;
             case "GetCurrentEventsForJTable":
-				$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
-				$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-				$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-				$paginationEnabled = ($startIndex === "-1") ? false : true;
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
 
-				$showHiddenEvents = false;
+		$showHiddenEvents = false;
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
@@ -416,26 +419,29 @@
                     array_push($existingGameTitles, $customGameTitle);
                 }
 				
-				$activeUsers = (isset($_POST['filterActiveUsers'])) ? ($_POST['filterActiveUsers']) : [];
+		$activeUsers = (isset($_POST['filterActiveUsers'])) ? ($_POST['filterActiveUsers']) : [];
                 $customUserEntry = isset($_POST['gameCustomUserFilter']) ? trim(filter_var($_POST['gameCustomUserFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+		$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
                 $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
+                
+                $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
+                $customPlatformEntry = isset($_POST['customPlatformFilter']) ? trim(filter_var($_POST['customPlatformFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-				$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, [], true, true, true, false, 
-													$customUserEntry, $customJoinedUserEntry);
-				echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
+		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, $platforms, 
+                                                    true, true, true, false, $customUserEntry, $customJoinedUserEntry, $customPlatformEntry);
+		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                   $pageSize, $searchParms);
                 break;
             case "EventViewerJoinEvents":
-				echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
                 break;
             case "EventViewerLeaveEvents":
-				echo $gamingHandler->RemoveUserFromEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+		echo $gamingHandler->RemoveUserFromEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
                 break;
             case "GetJoinedPlayersForEvent":
-				echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
-				break;
+		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
+		break;
         }
     }
     else {

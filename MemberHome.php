@@ -104,7 +104,7 @@
                                                                 </div><br />
                                                                 <div id="gameTitleFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxList">
                                                                             <label class="overlayPanelLabel">Select Game Titles:</label><br />
                                                                             <div class="fixedHeightScrollableContainerLarge">
                                                                                 <?php 
@@ -112,7 +112,7 @@
                                                                                 ?>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxListSibling">
                                                                             <label class="overlayPanelLabel">Or Enter A Title:</label><br />
                                                                             <input id="gameCustomTitleFilter" class="overlayPanelElement" name="gameCustomTitleFilter" type="text" 
                                                                                    maxlength="50" placeholder=" Custom Title Search">
@@ -128,7 +128,7 @@
                                                                 </div><br />
                                                                 <div id="eventCreatorFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter">
                                                                     <div id="eventCreatorFilterStart" class="overlayPanelFilterSubGroup">
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxList">
                                                                             <label class="overlayPanelLabel">Select Users:</label><br />
                                                                             <div class="fixedHeightScrollableContainerLarge">
                                                                                 <?php 
@@ -136,7 +136,7 @@
                                                                                 ?>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxListSibling">
                                                                             <label class="overlayPanelLabel">Or Enter A Username:</label><br />
                                                                             <input id="gameCustomUserFilter" class="overlayPanelElement" name="gameCustomUserFilter" type="text" 
                                                                                    maxlength="50" placeholder=" Custom User Search">
@@ -152,7 +152,7 @@
                                                                 </div><br />
                                                                 <div id="joinedUserFilterDiv" class="overlayPanelFilterGroup searchPanelEvtMgrFilter searchPanelCurEvtsFilter">
                                                                     <div id="joinedUserFilterStart" class="overlayPanelFilterSubGroup">
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxList">
                                                                             <label class="overlayPanelLabel">Select Users:</label><br />
                                                                             <div class="fixedHeightScrollableContainerLarge">
                                                                                 <?php 
@@ -160,10 +160,34 @@
                                                                                 ?>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="overlayPanelElementContainerWide">
+                                                                        <div class="overlayPanelElementContainerCheckboxListSibling">
                                                                             <label class="overlayPanelLabel">Or Enter A Username:</label><br />
                                                                             <input id="gameCustomJoinedUserFilter" class="overlayPanelElement" name="gameCustomJoinedUserFilter" type="text" 
                                                                                    maxlength="50" placeholder=" Custom User Search">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+                                                                    <a href="#" id="platformFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                       onclick="return ToggleSearchDivDisplay('#platformFilterDiv', this);">&nbsp;&nbsp;Console Type</a>
+                                                                    <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
+									   groupId="platformFilterDiv" lblId="platformFilterActiveToggleLabel" type="checkbox">
+                                                                    <label id="platformFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                </div><br />
+                                                                <div id="platformFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+                                                                    <div id="platformFilterStart" class="overlayPanelFilterSubGroup">
+                                                                        <div class="overlayPanelElementContainerCheckboxList">
+                                                                            <label class="overlayPanelLabel">Select Consoles:</label><br />
+                                                                            <div class="fixedHeightScrollableContainerLarge">
+                                                                                <?php 
+                                                                                   echo $gamingHandler->GetPlatformCheckboxList($dataAccess, [], 'filterPlatforms[]', true);
+                                                                                ?>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerCheckboxListSibling">
+                                                                            <label class="overlayPanelLabel">Or Enter A Console:</label><br />
+                                                                            <input id="customPlatformFilter" class="overlayPanelElement" name="customPlatformFilter" type="text" 
+                                                                                   maxlength="50" placeholder=" Custom Console Search">
                                                                         </div>
                                                                     </div>
                                                                 </div>
