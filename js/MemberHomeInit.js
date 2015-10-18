@@ -697,11 +697,7 @@ function FormatEventManagerTableForCurrentView(isMobile)
 	$(eventManagerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
 		
 	// Enclose jTable containers in fixed-width scrollable divs
-	$(eventManagerJTableDiv + ' .jtable-main-container .jtable').addClass('fixedWidthScrollableContainer');
-	
-	// Fix table header and footer in place (make them 'sticky') for when table body is wide enough to require side-to-side scrolling
-	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
-	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
+        $(eventManagerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedWidthScrollableContainer"></div>');
     }
     else {        
         // Expand Game & Console columns into two distinct columns again;
@@ -729,11 +725,7 @@ function FormatEventManagerTableForCurrentView(isMobile)
 	$(eventManagerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
 		
 	// Remove fixed-width scrollable container
-	$(eventManagerJTableDiv + ' .jtable-main-container').removeClass('fixedWidthScrollableContainer');
-	
-	// Remove position:fixed style from table header and footer when viewport width wide enough to not require side-to-side scrolling
-	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed');
-	//$(eventManagerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed');
+	$(eventManagerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
     }
 }
 
@@ -785,11 +777,7 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
 	$(currentEventViewerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
 		
 	// Enclose jTable containers in fixed-width scrollable divs
-	$(currentEventViewerJTableDiv + ' .jtable-main-container').addClass('fixedWidthScrollableContainer');
-		
-	// Fix table header and footer in place (make them 'sticky') for when table body is wide enough to require side-to-side scrolling
-	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
-	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed').addClass('tableHeaderFooterFixed');
+        $(currentEventViewerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedWidthScrollableContainer"></div>');
     }
     else {
         // Expand Game & Console columns into two distinct columns again;
@@ -816,11 +804,7 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
 	$(currentEventViewerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
 			
 	// Remove fixed-width scrollable container
-	$(currentEventViewerJTableDiv + ' .jtable-main-container').removeClass('fixedWidthScrollableContainer');
-		
-	// Remove position:fixed style from table header and footer when viewport width wide enough to not require side-to-side scrolling
-	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-title').removeClass('tableHeaderFooterFixed');
-	//$(currentEventViewerJTableDiv + '.jtable-main-container .jtable-bottom-panel').removeClass('tableHeaderFooterFixed');
+	$(currentEventViewerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
     }
 }
 

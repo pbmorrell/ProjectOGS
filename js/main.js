@@ -449,7 +449,7 @@ function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tab
     var destColIdx = $(tableContainerDiv + ' th:contains("' + colsToCombine[0] + '")').index();
     
     // For each displayed row
-    $(tableContainerDiv).find('table tbody tr').each(function() {
+    $(tableContainerDiv).children('.jTable').find('tbody tr').each(function() {
         var stackedTextCol = $(this).find('td').eq(destColIdx);
         var stackedText = $(stackedTextCol).text();
         

@@ -35,10 +35,11 @@
                                                                 <button type="submit" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</button>&nbsp;
                                                             </form>
                                                         </div>
-                                                        <div id="loginErr" class="mobilePreLogin">&nbsp;</div>
                                                         <br/>
-                                                        <h2>First Time User</h2>
+                                                        <h2>First Time User?</h2>
                                                         <a href="Index.php?action=Signup" class="button icon fa-cogs">Sign Up</a>
+                                                        <br />
+                                                        <div id="loginErr" class="mobilePreLogin">&nbsp;</div>
                                                     </header>
 						</section>
                                             </div>

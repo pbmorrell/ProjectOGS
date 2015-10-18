@@ -447,7 +447,8 @@ INSERT INTO `Security.PageRoles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
 (2, 8, 3),
 (3, 9, 3),
 (4, 10, 4),
-(5, 11, 4);
+(5, 11, 4),
+(6, 12, 4);
 
 -- --------------------------------------------------------
 
@@ -469,7 +470,8 @@ INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
 (8, 'MemberHome'),
 (9, 'EditProfile'),
 (10, 'MobileLogin'),
-(11, 'About');
+(11, 'About'),
+(12, 'TermsPri');
 
 -- --------------------------------------------------------
 
@@ -571,13 +573,6 @@ CREATE TABLE IF NOT EXISTS `Security.UserSessions` (
   `LastAccessTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `SessionData` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `Security.UserSessions`
---
-
-INSERT INTO `Security.UserSessions` (`ID`, `LastAccess`, `LastAccessTimestamp`, `SessionData`) VALUES
-('dcca0edba69791fb7f1b2b1a2a112b03', 1440767974, '2015-08-28 13:19:34', 'WebUser|O:4:"User":12:{s:6:"UserID";s:2:"29";s:13:"SecurityLevel";s:1:"3";s:10:"TimezoneID";s:3:"142";s:8:"UserName";s:12:"Paul Morrell";s:9:"FirstName";s:4:"Paul";s:8:"LastName";s:7:"Morrell";s:12:"EmailAddress";s:17:"pbmorrell@att.net";s:15:"IsPremiumMember";s:1:"0";s:6:"Gender";s:1:"M";s:9:"Birthdate";s:10:"1983-11-27";s:13:"Autobiography";s:69:"Adult gamer, Looking for other friends to play with. Must have a mic!";s:13:"GamePlatforms";a:1:{i:0;s:2:"11";}}lastActivity|i:1440767974;');
 
 --
 -- Indexes for dumped tables

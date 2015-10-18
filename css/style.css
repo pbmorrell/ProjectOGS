@@ -350,6 +350,7 @@
         font-weight:bold;
         background-color: black;
         float: left;
+        margin-top: 10px;
     }
 
     .loginError {
@@ -596,6 +597,11 @@
 
     .overlayPanelToggleGroup {
         margin-top: 1%;
+    }
+    
+    .overlayPanelToggleGroup:after {
+        content: "\000A";
+        white-space: pre;
     }
     
     .overlayPanelFilterGroup {

@@ -56,7 +56,7 @@
                                                                     <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" 
 								       groupId="dateRangeFilterDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
                                                                     <label id="dateRangeFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
-                                                                </div><br />
+                                                                </div>
                                                                 <div id="dateRangeFilterDiv" class="overlayPanelFilterGroup">
                                                                     <div id="dateRangeFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainer">
@@ -101,7 +101,7 @@
                                                                     <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" 
 									   groupId="gameTitleFilterDiv" lblId="gameTitleFilterActiveToggleLabel" type="checkbox">
                                                                     <label id="gameTitleFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
-                                                                </div><br />
+                                                                </div>
                                                                 <div id="gameTitleFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerCheckboxList">
@@ -125,7 +125,7 @@
                                                                     <input id="eventCreatorFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="eventCreatorFilterLink" 
 									   groupId="eventCreatorFilterDiv" lblId="eventCreatorFilterActiveToggleLabel" type="checkbox">
                                                                     <label id="eventCreatorFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
-                                                                </div><br />
+                                                                </div>
                                                                 <div id="eventCreatorFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter">
                                                                     <div id="eventCreatorFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerCheckboxList">
@@ -149,7 +149,7 @@
                                                                     <input id="joinedUserFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="joinedUserFilterLink" 
 									   groupId="joinedUserFilterDiv" lblId="joinedUserFilterActiveToggleLabel" type="checkbox">
                                                                     <label id="joinedUserFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
-                                                                </div><br />
+                                                                </div>
                                                                 <div id="joinedUserFilterDiv" class="overlayPanelFilterGroup searchPanelEvtMgrFilter searchPanelCurEvtsFilter">
                                                                     <div id="joinedUserFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerCheckboxList">
@@ -173,7 +173,7 @@
                                                                     <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
 									   groupId="platformFilterDiv" lblId="platformFilterActiveToggleLabel" type="checkbox">
                                                                     <label id="platformFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
-                                                                </div><br />
+                                                                </div>
                                                                 <div id="platformFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="platformFilterStart" class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerCheckboxList">

@@ -63,7 +63,10 @@ class GamingHandler
 			$objUser->LastName = $row['LastName'];
 			$objUser->UserName = $row['UserName'];
 			array_push($userFriends, $objUser);
-                        $lastEventId = $row['EventId'];
+                        
+                        if($loadingAllowedFriendsForEventList) {
+                            $lastEventId = $row['EventId'];
+                        }
                     }
                     
                     if($loadingAllowedFriendsForEventList) {
@@ -765,8 +768,8 @@ class GamingHandler
     private function AddNewGameToUserGameList($dataAccess, $logger, $userID, $gameName)
     {
         $addNewUserGameQuery = "INSERT INTO `Gaming.UserGames` (`FK_User_ID`,`Name`, `CreatedDate`, `ModifiedDate`) " .
-                               "VALUES (:FKUserId, :gameName, NOW(), NOW()) ". 
-                               "ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `ModifiedDate` = NOW();";
+                               "VALUES (:FKUserId, :gameName, UTC_TIMESTAMP(), UTC_TIMESTAMP()) ". 
+                               "ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `ModifiedDate` = UTC_TIMESTAMP();";
 		
         $parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
         $parmGameName = new QueryParameter(':gameName', $gameName, PDO::PARAM_STR);
