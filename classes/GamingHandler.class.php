@@ -1282,6 +1282,12 @@ class GamingHandler
         $eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = ?) ";
         array_push($queryParms, $userID);
         
+        if($searchParms->ShowFullEventsOnly || $searchParms->ShowOpenEventsOnly || (strripos($orderBy, "Joined") !== false)) {
+            // Get count of members joined to each event
+            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
+                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";            
+        }
+        
         if(count($eventIDs) > 0) {
             // Don't need to repeat the same work -- event ID list should already be properly filtered
             $eventIDListForQuery = (str_repeat("?,", count($eventIDs) - 1)) . "?";
@@ -1289,19 +1295,11 @@ class GamingHandler
             $queryParms = array_merge($queryParms, $eventIDs);
             return $eventMemberLeftJoinClause . $eventWhereClause;
         }
-		
-        if($searchParms->ShowFullEventsOnly) {
-            // Get count of members joined to each event
-            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
-                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";
-            
+        
+        if($searchParms->ShowFullEventsOnly) {            
             $eventWhereClause .= "AND (membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount`) ";
         }
-        else if($searchParms->ShowOpenEventsOnly) {
-            // Get count of members joined to each event
-            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
-                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";
-            
+        else if($searchParms->ShowOpenEventsOnly) {            
             $eventWhereClause .= "AND (membersByEvent.`JoinedCnt` < e.`RequiredMemberCount`) ";
         }
         

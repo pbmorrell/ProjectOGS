@@ -190,11 +190,7 @@ function MemberHomeOnReady()
     
     // Force user to select at least one of (but possibly both of) "Show My Joined Events" and 
     // "Show Events Open For Joining" search panel checkboxes
-    $('#evtStatusJoined,#evtStatusUnjoined').change(function() {
-        //var curId = $(this).attr('id');
-        var curChkBoxIsChecked = $(this).is(':checked');
-        //if(((curId === 'evtStatusJoined')))
-        
+    $('#evtStatusJoined,#evtStatusUnjoined').change(function() {        
         var joinedChkBoxIsChecked = $('#evtStatusJoined').is(':checked');
         var unjoinedChkBoxIsChecked = $('#evtStatusUnjoined').is(':checked');
         
