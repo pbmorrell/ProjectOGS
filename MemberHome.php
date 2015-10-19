@@ -191,7 +191,36 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            
+                                                                <br />
+                                                                <div id="joinStatusFilterDiv" class="overlayPanelFilterGroup overlayPanelGroupBorder">
+                                                                    <div id="joinStatusFilterStart" class="overlayPanelFilterSubGroup">
+                                                                        <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
+                                                                            <div><label class="overlayPanelLabel">Show My Joined Events</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusJoined" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="showJoined"></div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
+                                                                            <div><label class="overlayPanelLabel">Show Un-Joined Events</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusUnjoined" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="showUnjoined"></div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerWide searchPanelEvtMgrFilter">
+                                                                            <div><label class="overlayPanelLabel">Show Full Events Only</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusFull" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="showFull"></div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
+                                                                            <div><label class="overlayPanelLabel">Show Open Events Only</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusOpenOnly" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="openOnly"></div>
+                                                                        </div>
+                                                                        <div class="overlayPanelElementContainerWide searchPanelEvtMgrFilter">
+                                                                            <div><label class="overlayPanelLabel">Show Hidden Events</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusHidden" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="showHidden"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                             <div class="overlayPanelControlElementGroup">
                                                                 <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
@@ -208,10 +237,6 @@
 				<div id="manageEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
                                     <h2>Manage Your Events</h2>
-                                    <label style="float:right;">
-                                        <label><input type="checkbox" id="toggleHiddenEvents" />Show Hidden Events</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    </label>
-                                    <br /><br />
                                     <div id="manageEventsContent">
                                     </div>
                                     </section>

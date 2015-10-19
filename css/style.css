@@ -369,6 +369,7 @@
         font-weight:bold;
         background-color: black;
         float: left;
+        margin-top: 10px;
     }
 
     .deferOptionLinkStyle {
@@ -600,8 +601,8 @@
     }
     
     .overlayPanelToggleGroup:after {
-        content: "\000A";
-        white-space: pre;
+        content: "\a0\a";
+        white-space: pre !important;
     }
     
     .overlayPanelFilterGroup {
@@ -665,7 +666,7 @@
     }
     
     .overlayPanelLabel {
-		margin-right: 5px;
+	margin-right: 5px;
         font-weight:bold;
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */

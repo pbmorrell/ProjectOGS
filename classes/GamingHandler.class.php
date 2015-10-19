@@ -394,7 +394,7 @@ class GamingHandler
 		$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, false, $searchParms, $orderBy, $paginationEnabled, 
 							  $startIndex, $pageSize, $joinedMemberEventIds);
 		$filterCountByJoinedUsers = true;
-		$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, true, $searchParms, $filterCountByJoinedUsers);
+		$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, false, $searchParms, $filterCountByJoinedUsers);
             }
 	}
 	else {
@@ -1277,19 +1277,10 @@ class GamingHandler
                                                           $isCountOnly = false, $searchParms = null, $eventIDs = [], $orderBy = "", $joinedMemberEventIds = [])
     {
         $eventWhereClause = "";
-        $eventMemberLeftJoinClause = "";
         
-        if(!$isCountOnly) {
-            // Determine if current user is member of the given event
-            $eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = ?) ";
-            array_push($queryParms, $userID);
-        }
-        
-        if(strripos($orderBy, "Joined") !== false) {
-            // If sorting by Join status, must add extra LEFT JOIN clause to query
-            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
-                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";
-        }
+        // Determine if current user is member of the given event
+        $eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = ?) ";
+        array_push($queryParms, $userID);
         
         if(count($eventIDs) > 0) {
             // Don't need to repeat the same work -- event ID list should already be properly filtered
@@ -1299,6 +1290,21 @@ class GamingHandler
             return $eventMemberLeftJoinClause . $eventWhereClause;
         }
 		
+        if($searchParms->ShowFullEventsOnly) {
+            // Get count of members joined to each event
+            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
+                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";
+            
+            $eventWhereClause .= "AND (membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount`) ";
+        }
+        else if($searchParms->ShowOpenEventsOnly) {
+            // Get count of members joined to each event
+            $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
+                                          "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";
+            
+            $eventWhereClause .= "AND (membersByEvent.`JoinedCnt` < e.`RequiredMemberCount`) ";
+        }
+        
 	// Filter by events that have the specified members
         if(count($joinedMemberEventIds) > 0) {
             $joinedEventIDListForQuery = (str_repeat("?,", count($joinedMemberEventIds) - 1)) . "?";
@@ -1311,7 +1317,7 @@ class GamingHandler
             array_push($queryParms, $userID);
         }
         else if(($userID > -1) && $excludeEventsForUser) {
-            // If searching for events from certain event creators, filter on them -- otherwise, just exclude current user's events from event list
+            // If searching for events from certain event creators, filter on them
             if(((is_array($searchParms->EventCreators)) && (count($searchParms->EventCreators) > 0)) && (strlen($searchParms->CustomEventCreatorName) > 0)) {
                 $eventCreatorListForQuery = (str_repeat("?,", count($searchParms->EventCreators) - 1)) . "?";
                 $eventWhereClause .= "AND ((e.`FK_User_ID_EventCreator` IN (" . $eventCreatorListForQuery . ")) ";
@@ -1331,12 +1337,12 @@ class GamingHandler
                     array_push($queryParms, strtolower($searchParms->CustomEventCreatorName));
                 }
             }
-            else {
-                $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` <> ?) ";
-                array_push($queryParms, $userID);
-            }
-			
-            // If excluding events for current user, also filter out any private events for which the current user is not an allowed member
+
+            // Always filter out events created by current user from views setting $excludeEventsForUser to true
+            $eventWhereClause .= "AND (e.`FK_User_ID_EventCreator` <> ?) ";
+            array_push($queryParms, $userID);
+
+            // Also filter out any private events for which the current user is not an allowed member
             $eventWhereClause .= "AND ((e.`IsPublic` = 1) OR (e.`ID` IN ".
                                  "(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
                                  " WHERE (`FK_User_ID` = ?) AND (`FK_Event_ID` = e.`ID`))".
@@ -1352,6 +1358,14 @@ class GamingHandler
         
         if(!$searchParms->ShowHiddenEvents) {
             $eventWhereClause .= "AND (e.`IsActive` = 1) ";
+        }
+        
+        if($searchParms->ShowJoinedEvents && !$searchParms->ShowOpenEvents) {
+            $eventWhereClause .= "AND (em2.`ID` IS NOT NULL) ";
+        }
+        
+        if($searchParms->ShowOpenEvents && !$searchParms->ShowJoinedEvents) {
+            $eventWhereClause .= "AND (em2.`ID` IS NULL) ";
         }
 		     
 	if(!$searchParms->NoStartDateRestriction) {
@@ -1520,15 +1534,15 @@ class GamingHandler
             }
 	}
 	else {
-            $getUserGamesQuery = "SELECT e.`ID` AS EventID, em2.`FK_User_ID` AS UserID, LOWER(u2.`UserName`) AS UserName " .
+            $getUserGamesQuery = "SELECT e.`ID` AS EventID, em.`FK_User_ID` AS UserID, LOWER(u2.`UserName`) AS UserName " .
 				 "FROM `Gaming.Events` AS e ".
 				 "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
 				 "INNER JOIN `Configuration.Platforms` AS p ON p.`ID` = e.`FK_Platform_ID` ".
 				 "INNER JOIN `Security.Users` AS u ON u.`ID` = e.`FK_User_ID_EventCreator` ".
 				 "LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
 				 "LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
-				 "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) " .
-				 "LEFT JOIN `Security.Users` AS u2 ON (u2.`ID` = em2.`FK_User_ID`) " .
+				 "LEFT JOIN `Gaming.EventMembers` AS em ON (em.`FK_Event_ID` = e.`ID`) " .
+				 "LEFT JOIN `Security.Users` AS u2 ON (u2.`ID` = em.`FK_User_ID`) " .
 				 $eventWhereClause . ";";
 			
             $errors = $dataAccess->CheckErrors();

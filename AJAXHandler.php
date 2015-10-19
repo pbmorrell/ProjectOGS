@@ -381,9 +381,6 @@
 		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
 		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
-                
-                $showHidden = isset($_POST['showHidden']) ? filter_var($_POST['showHidden'], FILTER_SANITIZE_STRING) : "0";
-                $showHiddenEvents = ($showHidden === "1") ? true : false;
 
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
@@ -399,8 +396,13 @@
                 $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
                 $customPlatformEntry = isset($_POST['customPlatformFilter']) ? trim(filter_var($_POST['customPlatformFilter'], FILTER_SANITIZE_STRING)) : "";
                 
+                $evtStatusFilters = (isset($_POST['evtStatus'])) ? ($_POST['evtStatus']) : [];
+                $showFullEventsOnly = in_array('showFull', $evtStatusFilters);
+                $showOpenEventsOnly = false;
+                $showHiddenEvents = in_array('showHidden', $evtStatusFilters);
+                
 		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
-                                                    true, true, true, false, "", $customJoinedUserEntry, $customPlatformEntry);
+                                                    true, true, $showFullEventsOnly, false, "", $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $searchParms);
                 break;
@@ -427,9 +429,16 @@
                 
                 $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
                 $customPlatformEntry = isset($_POST['customPlatformFilter']) ? trim(filter_var($_POST['customPlatformFilter'], FILTER_SANITIZE_STRING)) : "";
+                
+                $evtStatusFilters = (isset($_POST['evtStatus'])) ? ($_POST['evtStatus']) : [];
+                $showJoinedEvents = in_array('showJoined', $evtStatusFilters);
+                $showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);
+                $showFullEventsOnly = false;
+                $showOpenEventsOnly = in_array('openOnly', $evtStatusFilters);
 				
-		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, $platforms, 
-                                                    true, true, true, false, $customUserEntry, $customJoinedUserEntry, $customPlatformEntry);
+		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, 
+                                                    $platforms, $showJoinedEvents, $showUnjoinedEvents, $showFullEventsOnly, false, $customUserEntry, 
+                                                    $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
 		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                   $pageSize, $searchParms);
                 break;
