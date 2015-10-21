@@ -451,6 +451,30 @@
             case "GetJoinedPlayersForEvent":
 		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
 		break;
+            case "GetPlatformDropdownListForEditor":
+                $selectorFieldName = isset($_POST['selectorFieldName']) ? filter_var($_POST['selectorFieldName'], FILTER_SANITIZE_STRING) : "";
+                echo $gamingHandler->GetPlatformDropdownList($dataAccess, -1, '', $selectorFieldName);
+                break;
+            case "GetCurrentGamerTagsForUser":
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "GamerTagName ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
+			
+                echo $securityHandler->LoadGamerTagsForUser($dataAccess, $logger, $objUser->UserID, -1, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+                break;
+            case "AddGamerTagForUser":
+		$platformID = isset($_POST['PlatformName']) ? filter_var($_POST['PlatformName'], FILTER_SANITIZE_STRING) : "";
+		$tagName = isset($_POST['GamerTagName']) ? filter_var($_POST['GamerTagName'], FILTER_SANITIZE_STRING) : "";
+				
+                echo $securityHandler->AddGamerTagForUser($dataAccess, $logger, $objUser->UserID, $platformID, $tagName);
+                break;
+            case "UpdateGamerTagsForUser":
+				
+                break;
+            case "DeleteGamerTagsForUser":
+                //echo $securityHandler->LoadGamerTagsForUser($dataAccess, $logger, $objUser->UserID);
+                break;
         }
     }
     else {

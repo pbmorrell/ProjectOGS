@@ -102,6 +102,8 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
+        <script src="js/jTable/jquery.jtable.min.js"></script>
+        <link rel="stylesheet" href="css/jTable/lightcolor/blue/jtable.min.css" />
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
@@ -121,7 +123,8 @@
                                                     <?php 
                                                         echo $welcomeHeaderText;
                                                     ?>&nbsp;
-                                                    <div class="submitFormDiv">
+                                                    <div class="submitFormDiv desktopButtonDisplay">
+                                                        <button type="button" class="controlBtn button icon fa-sitemap" id="gamerTagUpdateBtn">Manage Gamer Tags</button>
                                                         <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtn">Update Profile</button>
                                                     </div>
                                                 </h2>
@@ -187,13 +190,20 @@
                                                     </section>
                                                     <section class="4u">
                                                         <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on?<br /><label>(check all that apply)</label></p>
-                                                        <?php echo $gamingHandler->GetPlatformCheckboxList($dataAccess, $objUser->GamePlatforms); ?><br/><br/>
+                                                        <div class="fixedHeightScrollableContainer">
+                                                            <?php echo $gamingHandler->GetPlatformCheckboxList($dataAccess, $objUser->GamePlatforms); ?>
+                                                        </div>
+                                                        <br/><br/>
                                                         <p><i class="fa fa-comment"></i>&nbsp;&nbsp;Tell us about yourself.</p>
                                                         <?php
                                                             echo $bioHTML;
 							?>
-							<br/><br/>
-                                                        <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtnMobile">Update Profile</button>
+                                                        <div class="mobileButtonDisplay">
+                                                            <br/><br/>
+                                                            <button type="button" class="controlBtn button icon fa-sitemap" id="gamerTagUpdateBtnMobile">Manage Gamer Tags</button>
+                                                            <br/><br/>
+                                                            <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtnMobile">Update Profile</button>
+                                                        </div>
                                                     </section>
                                                 </div>
                                             </form>

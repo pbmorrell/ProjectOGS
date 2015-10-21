@@ -291,6 +291,40 @@ function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPo
     $dialog.dialog('open');
 }
 
+function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayContainerPosition, displayContainer, 
+                                    autoOpen, isModal, dlgWidth, dlgHeight)
+{
+    var width = dlgWidth;
+    var height = dlgHeight;
+    
+    if(isMobileView()) {
+        width = 0.66 * dlgWidth;
+        
+        if(height != 'auto')  height = 0.8 * dlgHeight;
+        displayContainerPosition = displayContainerPosition + "+10%";
+    }
+    
+    var $dialog = $(dialogHTML).dialog({
+            autoOpen: autoOpen,
+            title: title,
+            width: width,
+            height: height,
+            modal: isModal,
+            close: function(event, ui) {
+                $dialog.dialog('close');
+            }
+        }
+    );
+    
+    $dialog.dialog('option', 'position', {
+        my: dialogPosition,
+        at: displayContainerPosition,
+        of: displayContainer
+    });
+
+    $dialog.dialog('open');
+}
+
 function PrepareAutocompleteComboBox(textboxId)
 {
     $.widget( "custom.combobox", {

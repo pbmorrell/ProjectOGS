@@ -263,7 +263,7 @@ function OnViewportWidthChanged(newViewType)
                 $('#gameFilterEndDate').prop('readonly', true);
                 
                 if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
-				else                                                 FormatEventManagerTableForCurrentView(true);
+		else                                                 FormatEventManagerTableForCurrentView(true);
             }
             break;
         case "desktop":
@@ -274,7 +274,7 @@ function OnViewportWidthChanged(newViewType)
             $('#gameFilterEndDate').prop('readonly', false);
             
             if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
-            else 						 						 FormatEventManagerTableForCurrentView(false);
+            else 						 FormatEventManagerTableForCurrentView(false);
             break;
     }
 }
@@ -1276,7 +1276,7 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
             var action = $(eventVisibilityBtn).attr('myAction');
             var eventIds = [ eventId ];
             ToggleEventVisibility(eventIds, action);
-            $dialog.dialog('close');
+            $dialog.dialog('destroy').remove();
             return false;
         });
         
@@ -1284,7 +1284,7 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
         $('#deleteEventBtn' + eventIdSuffix).click(function() {
             var eventIds = [ eventId ];
             DeleteEvents(eventIds);
-            $dialog.dialog('close');
+            $dialog.dialog('destroy').remove();
             return false;
         });
         

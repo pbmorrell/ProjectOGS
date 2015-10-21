@@ -405,6 +405,34 @@ INSERT INTO `Gaming.UserGames` (`ID`, `FK_User_ID`, `Name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Gaming.UserGamerTags`
+--
+CREATE TABLE `Gaming.UserGamerTags` (
+  `ID` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `FK_User_ID` BIGINT NULL COMMENT '',
+  `FK_Platform_ID` INT NULL COMMENT '',
+  `GamerTagName` VARCHAR(50) NOT NULL COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '',
+  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC)  COMMENT '',
+  INDEX `IDX_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
+  INDEX `IDX_FK_Platform_ID` (`FK_Platform_ID` ASC)  COMMENT '',
+  CONSTRAINT `FK_UserGamerTags_UserID`
+    FOREIGN KEY (`FK_User_ID`)
+    REFERENCES `Security.Users` (`ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `FK_UserGamerTags_PlatformID`
+    FOREIGN KEY (`FK_Platform_ID`)
+    REFERENCES `Configuration.Platforms` (`ID`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Gaming.UserPlatforms`
 --
 

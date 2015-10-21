@@ -1133,7 +1133,7 @@ class GamingHandler
                         }
 						
                         $curLine = "<input type='checkbox' name='" . $groupId . "' " . $selected . " value='" . $row['ID'] . "'>" . 
-                                   $row['Name'];
+                                   $row['Name'] . "<br />";
 
                         if($encloseInOverlayLabel) {
                             $curLine = '<label class="overlayPanelLbl"><input type="checkbox" class="overlayPanelElement" name="' . 
@@ -1154,13 +1154,14 @@ class GamingHandler
         }
     }
     
-    public function GetPlatformDropdownList($dataAccess, $selectedPlatform, $eventId = '')
+    public function GetPlatformDropdownList($dataAccess, $selectedPlatform, $eventId = '', $platformListName = '')
     {
         $platformListId = ((strlen($eventId) == 0) ? 'ddlPlatforms' : ('ddlPlatforms' . $eventId));
+        $platformListName = ((strlen($platformListName) > 0) ? $platformListName : $platformListId);
         
         $platformQuery = "SELECT `ID`, `Name` FROM `Configuration.Platforms` ORDER BY `Name`;";
         $ddlPlatformsHTML = "";
-        $ddlPlatformsErrorHTML = "<select id='" . $platformListId . "' name='" . $platformListId . 
+        $ddlPlatformsErrorHTML = "<select id='" . $platformListId . "' name='" . $platformListName . 
                                  "'><option value='-1'>Cannot load console list, please try later</option></select><br/><br/>";
 
         $errors = $dataAccess->CheckErrors();
@@ -1169,7 +1170,7 @@ class GamingHandler
             if($dataAccess->BuildQuery($platformQuery)){
                 $results = $dataAccess->GetResultSet();
                 if($results != null){
-                    $ddlPlatformsHTML .= "<select id='" . $platformListId . "' name='" . $platformListId . "'>";
+                    $ddlPlatformsHTML .= "<select id='" . $platformListId . "' name='" . $platformListName . "'>";
                     foreach($results as $row){
                         if($row['ID'] == $selectedPlatform) {
                             $ddlPlatformsHTML .= "<option value='" . $row['ID'] . "' selected='true'>" . $row['Name'] . "</option>";
@@ -1288,6 +1289,13 @@ class GamingHandler
                                           "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";            
         }
         
+	if($eventId > -1) {
+            // If filtering on a specific event, no need to check further filters -- go ahead and return data for this event
+            $eventWhereClause .= "WHERE (e.`ID` = ?) ";
+            array_push($queryParms, $eventId);
+            return $eventMemberLeftJoinClause . $eventWhereClause;
+        }
+		
         if(count($eventIDs) > 0) {
             // Don't need to repeat the same work -- event ID list should already be properly filtered
             $eventIDListForQuery = (str_repeat("?,", count($eventIDs) - 1)) . "?";
@@ -1347,11 +1355,6 @@ class GamingHandler
                                  ")) ";
             
             array_push($queryParms, $userID);
-        }
-		
-	if($eventId > -1) {
-            $eventWhereClause .= "AND (e.`ID` = ?) ";
-            array_push($queryParms, $eventId);
         }
         
         if(!$searchParms->ShowHiddenEvents) {

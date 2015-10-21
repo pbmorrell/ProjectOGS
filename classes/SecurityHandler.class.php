@@ -444,6 +444,166 @@ class SecurityHandler
             return false;
 	}
     }
+    
+    public function LoadGamerTagsForUser($dataAccess, $logger, $userID, $gamerTagId = -1, $orderBy = "", $paginationEnabled = false, $startIndex = "0", $pageSize = "10")
+    {
+	$queryParms = [];
+	$whereClause = $this->BuildWhereClauseForLoadGamerTagsQuery($userID, $queryParms, $gamerTagId);
+		
+	$totalRecordCount = $this->GetTotalCountGamerTagsForUser($dataAccess, $logger, $userID, $whereClause, $queryParms);
+	$orderByClause = $this->TranslateGamerTagTableOrderByClause($orderBy);
+		
+	$limitClause = "";
+	if($paginationEnabled) {
+            $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
+	}
+		
+        $getGamerTagsQuery = "SELECT ugt.`ID`, p.`ID` as PlatformID, ugt.`GamerTagName`, p.`Name` as PlatformName FROM `Gaming.UserGamerTags` as ugt " .
+                             "INNER JOIN `Configuration.Platforms` as p ON p.`ID` = ugt.`FK_Platform_ID` " .
+                             $whereClause . $orderByClause . $limitClause . ";";
+        
+	$gamerTags = array();
+	$jTableResult = [];
+	$jTableStatus = "ERROR";
+	$jTableErrorMsg = "Database error: could not retrieve list of gamer tags. Please try again later.";
+        
+	if($dataAccess->BuildQuery($getGamerTagsQuery, $queryParms)){
+            $results = $dataAccess->GetResultSet();
+				
+            if($results != null){
+		foreach($results as $row) {
+                    $gamerTag = array (
+			"ID" => $row["ID"],
+			"GamerTagName" => $row["GamerTagName"],
+			"PlatformName" => $row["PlatformName"],
+			"PlatformID" => $row["PlatformID"]
+                    );
+					
+                    array_push($gamerTags, $gamerTag);
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve gamer tags. " . $errors);
+	}
+	else {
+            $jTableStatus = "OK";
+            $jTableErrorMsg = "";
+	}
+		
+	$jTableResult['Result'] = $jTableStatus;
+	$jTableResult['Message'] = $jTableErrorMsg;
+	$jTableResult['TotalRecordCount'] = $totalRecordCount;
+        
+	$jTableRecordFieldName = "Records";
+        $records = $gamerTags;
+	if($gamerTagId > -1) {
+            $jTableRecordFieldName = "Record";
+            $records = $gamerTags[0];
+	}
+        
+	$jTableResult[$jTableRecordFieldName] = $records;
+	return json_encode($jTableResult);
+    }
+	
+    public function BuildWhereClauseForLoadGamerTagsQuery($userID, &$queryParms, $gamerTagId)
+    {
+	$whereClause = "WHERE (ugt.`FK_User_ID` = :userID) ";
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+		
+	if($gamerTagId > -1) {
+            $whereClause .= "AND (ugt.`ID` = :gamerTagID) ";
+            $parmGamerTagId = new QueryParameter(':gamerTagID', $gamerTagId, PDO::PARAM_INT);
+            $queryParms[] = $parmGamerTagId;
+	}
+		
+	return $whereClause;
+    }
+	
+    public function TranslateGamerTagTableOrderByClause($orderBy)
+    {
+        $queryOrderByClause = "";
+        $orderByColumn = "";
+        $orderByDirection = "";
+
+	if(strlen($orderBy) == 0)  return $queryOrderByClause;
+		
+        sscanf($orderBy, "%s %s", $orderByColumn, $orderByDirection);
+        
+        switch($orderByColumn) {
+            case "GamerTagName":
+                $queryOrderByClause = "ugt.`GamerTagName` " . $orderByDirection;
+                break;
+            case "PlatformName":
+                $queryOrderByClause = "p.`Name` " . $orderByDirection;
+                break;
+        }
+        
+        return "ORDER BY " . $queryOrderByClause . " ";
+    }
+	
+    public function GetTotalCountGamerTagsForUser($dataAccess, $logger, $userID, $whereClause, $queryParms)
+    {								
+        $getGamerTagCntQuery = "SELECT COUNT(ugt.`ID`) as Cnt FROM `Gaming.UserGamerTags` as ugt " .
+                               "INNER JOIN `Configuration.Platforms` as p ON p.`ID` = ugt.`FK_Platform_ID` " .
+                               $whereClause . ";";
+        
+	$userGamerTagCnt = 0;
+        if($dataAccess->BuildQuery($getGamerTagCntQuery, $queryParms)){
+            $results = $dataAccess->GetSingleResult();
+
+            if($results != null){
+                $userGamerTagCnt = $results['Cnt'];
+            }
+        }
+		
+	return $userGamerTagCnt;
+    }
+	
+    public function AddGamerTagForUser($dataAccess, $logger, $userID, $platformID, $tagName)
+    {
+        $addNewGamerTagQuery = "INSERT INTO `Gaming.UserGamerTags` (`FK_User_ID`,`FK_Platform_ID`, `GamerTagName`) " .
+                               "VALUES (:FKUserId, :FKPlatformId, :tagName);";
+		
+        $parmUserId = new QueryParameter(':FKUserId', $userID, PDO::PARAM_INT);
+	$parmPlatformId = new QueryParameter(':FKPlatformId', $platformID, PDO::PARAM_INT);
+        $parmTagName = new QueryParameter(':tagName', $tagName, PDO::PARAM_STR);
+        $queryParms = array($parmUserId, $parmPlatformId, $parmTagName);
+	$lastInsertId = -1;
+        $errorMsg = "Database error: could not add new gamer tag name '" . $tagName . "'. Please try again later.";
+
+        if(strlen(trim($tagName)) > 0) {
+            if($dataAccess->BuildQuery($addNewGamerTagQuery, $queryParms)){
+                $dataAccess->ExecuteNonQuery();
+            }
+
+            $errors = $dataAccess->CheckErrors();
+
+            if(strlen($errors) == 0) {
+                $lastInsertId = $dataAccess->GetLastInsertId();
+            }
+        }
+        else {
+            $errors = "Tag name must be non-empty";
+            $errorMsg = "Input error: tag name must be non-empty. Please fill out the tag name field and try again.";
+        }
+	
+	$jTableResult = [];
+	$encodedResult = "";
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not add new gamer tag name '". $tagName . "' for userID " . $userID . ". " . $errors);
+            $jTableResult['Result'] = "ERROR";
+            $jTableResult['Message'] = $errorMsg;
+            $encodedResult = json_encode($jTableResult);
+	}
+	else {
+            $encodedResult = $this->LoadGamerTagsForUser($dataAccess, $logger, $userID, $lastInsertId);
+	}
+	return $encodedResult;
+    }
 	
     public function UpdateUsername($dataAccess, $logger, $userID)
     {        
