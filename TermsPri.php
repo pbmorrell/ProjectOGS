@@ -3,6 +3,7 @@
     $sessionRequired = false;
     $sessionAllowed = true;
     include "Header.php";
+    $updateDate = "10/16/2015";
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -28,7 +29,7 @@
                                             <article class="box features">
                                                 <header>
                                                     <h2>Terms & Conditions</h2>
-                                                    <span class="byline">Updated 10/16/2015</span>
+                                                    <span class="byline">Updated <?php echo $updateDate; ?></span>
                                                 </header>
                                                 <p>Welcome to our website. If you continue to browse and use this website, you are agreeing to comply with and be bound by the following terms and conditions of use, which together with our privacy policy govern Player Unite's relationship with you in relation to this website. If you disagree with any part of these terms and conditions, please do not use our website.</p>
                                                 <p>'Player Unite' or 'us' or 'we' refers to the owner of the website. The term 'you' refers to the user or viewer of our website.</p>
@@ -45,11 +46,11 @@
                                                 </ul>
                                                 <header>
                                                     <h2>Privacy Policy</h2>
-                                                    <span class="byline">Updated 10/17/2015</span>
+                                                    <span class="byline">Updated <?php echo $updateDate; ?></span>
                                                 </header>
                                                 <p>This privacy policy sets out how [business name] uses and protects any information that you give Player Unite when you use this website.</p>
                                                 <p>Player Unite is committed to ensuring that your privacy is protected. Should we ask you to provide certain information by which you can be identified when using this website, then you can be assured that it will only be used in accordance with this privacy statement.</p>
-                                                <p>Player Unite may change this policy from time to time by updating this page. You should check this page from time to time to ensure that you are happy with any changes. This policy is effective from [date].</p>
+                                                <p>Player Unite may change this policy from time to time by updating this page. You should check this page from time to time to ensure that you are happy with any changes. This policy is effective from 10/01/2015.</p>
                                                 <h2>What we collect</h2>
                                                 <p>We may collect the following information:</p>
                                                 <ul class="style4">

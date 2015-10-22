@@ -1193,7 +1193,7 @@ function JoinEvents(selectedEventIds)
             });
 
          // Show success message
-         sweetAlert("Events Joined!", "Your part of the team", "success");
+         sweetAlert("Events Joined!", "You're part of the team", "success");
       }
       else {
          // Show cancel message
