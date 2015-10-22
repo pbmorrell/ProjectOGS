@@ -92,7 +92,7 @@
     
     .fixedHeightScrollableContainerJumbo  {
         box-sizing: border-box;
-        padding: 0em 1em 0em;
+        padding: 0em;
         width: 100%;
         max-height: 320px;
         overflow-y: auto;

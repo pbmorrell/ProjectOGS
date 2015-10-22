@@ -470,10 +470,16 @@
                 echo $securityHandler->AddGamerTagForUser($dataAccess, $logger, $objUser->UserID, $platformID, $tagName);
                 break;
             case "UpdateGamerTagsForUser":
+		$gamerTagID = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
+		$platformID = isset($_POST['PlatformName']) ? filter_var($_POST['PlatformName'], FILTER_SANITIZE_STRING) : "";
+		$tagName = isset($_POST['GamerTagName']) ? filter_var($_POST['GamerTagName'], FILTER_SANITIZE_STRING) : "";
 				
+		echo $securityHandler->UpdateGamerTagForUser($dataAccess, $logger, $objUser->UserID, $gamerTagID, $platformID, $tagName);
                 break;
             case "DeleteGamerTagsForUser":
-                //echo $securityHandler->LoadGamerTagsForUser($dataAccess, $logger, $objUser->UserID);
+		$gamerTagID = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
+			
+                echo $securityHandler->DeleteGamerTagsForUser($dataAccess, $logger, $objUser->UserID, $gamerTagID);
                 break;
         }
     }

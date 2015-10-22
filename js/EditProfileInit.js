@@ -1,6 +1,5 @@
-var gamerTagManagerDlg = "gamerTagManagerDlg";
-var gamerTagManagerJTableDiv = "#manageGamerTagsDiv";
-var cachedPlatformList = undefined;
+var editProfileGamerTagManagerDlg = "gamerTagManagerDlg";
+var editProfileGamerTagManagerJTableDiv = "#manageGamerTagsDiv";
 
 function EditProfileOnReady()
 {
@@ -55,127 +54,29 @@ function EditProfileOnReady()
 
 function OnGamerTagUpdateClick()
 {
-    var dialogHTML = '<div id="' + gamerTagManagerDlg + '">' +
-			'<div class="box style3 paddingOverride">' +
-                            '<p><i class="fa fa-gamepad"></i> &nbsp; Add, update, or delete gamer tags tied to your user ID</p>' +
-                            '<div class="fixedHeightScrollableContainerJumbo">' +
-                                '<div id="manageGamerTagsDiv" class="jTableContainer">' +
-                                '</div>' + 
-                            '</div><br />' +
-                            '<div id="gamerTagDialogToolbar">' +
-                                '<button class="gamerTagManagerBtn icon fa-thumbs-o-down" id="cancelBtn">Cancel</button>' +
-                            '</div>' +
-			'</div>' +
-                     '</div>';
-
-    if(($('#' + gamerTagManagerDlg).length) && ($('#' + gamerTagManagerDlg + ' .jtable').length)) {
-        $('#' + gamerTagManagerDlg).dialog('open');
-    }
-    else {
-        displayJQueryDialogFromDiv(dialogHTML, "Gamer Tag Management", "top", "top", window, false, true, 600, "auto");
-        GamerTagManagerDialogOnReady($('#' + gamerTagManagerDlg).dialog());
-    }
+    OpenGamerTagViewer(editProfileGamerTagManagerDlg, editProfileGamerTagManagerJTableDiv, "Gamer Tag Management", "Your Gamer Tags", false, false);
 }
 
-function GamerTagManagerDialogOnReady($dialog)
-{
-    // Initialize jTable on currentEventsContent div
-    $(gamerTagManagerJTableDiv).jtable({
-        title: 'Your Gamer Tags',
-        paging: true,
-        pageSize: 10,
-        //pageSizes: [5, 10, 15, 20, 25],
-        pageSizeChangeArea: false,
-        sorting: true,
-        defaultSorting: 'GamerTagName ASC',
-        openChildAsAccordion: false,
-        actions: {
-            listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser",
-            createAction: "AJAXHandler.php?action=AddGamerTagForUser",
-            updateAction: "AJAXHandler.php?action=UpdateGamerTagsForUser",
-            deleteAction: "AJAXHandler.php?action=DeleteGamerTagsForUser"
-        },
-        fields: {
-            ID: {
-                key: true,
-                list: false
-            },
-            GamerTagName: {
-                title: 'Tag Name',
-                width: '65%',
-                sorting: true
-            },
-            PlatformName: {
-                title: 'Platform',
-                width: '35%',
-                input: function (data) {
-                    // Get list of platforms
-                    var selectorHTML = '<select id="ddlPlatforms" name="PlatformName"><option value="-1">DB error: could not load consoles</option></select>';
-                    if(!cachedPlatformList) {
-                        $.ajax({
-                            type: 'POST',
-                            url: 'AJAXHandler.php',
-                            data: 'action=GetPlatformDropdownListForEditor&selectorFieldName=PlatformName',
-                            async: false,
-                            success: function(response){
-                                if(response != 'ERROR') {
-                                    cachedPlatformList = response;
-                                }
-                            },
-                            error: function () {
-                                return selectorHTML;
-                            }
-                        });
-                    }
-                    
-                    return ConstructPlatformOptionList(data);
-
-                },
-                sorting: true
-            }
-        },
-	recordsLoaded: function(event, data) {
-            // Nothing to do here yet
-	}
-    });
-
-    // Load event list
-    $(gamerTagManagerJTableDiv).jtable('load');
-    
-    // Attach event handler to Cancel Event Creation/Update button
-    $('#cancelBtn').click(function() {
-        $dialog.dialog('close');
-        return false;
-    });
-}
-
-function ConstructPlatformOptionList(data)
-{
-    // Construct option list
-    var selectorHTML = cachedPlatformList;
-    if(data.formType == 'edit') {
-        var selectedPlatformId = data.record.PlatformID;
-        var selectedOptionIdx = cachedPlatformList.indexOf("<option value='" + selectedPlatformId + "'");
-        if(selectedOptionIdx >= 0) {
-            selectorHTML = cachedPlatformList.replace("<option value='" + selectedPlatformId + "'", "<option value='" + selectedPlatformId + "' selected='true'");
-        }
+function OnViewportWidthChanged(newViewType)
+{	
+    switch(newViewType) {
+        case "xtraSmall":
+        case "mobile":
+            // Hide page size change area in gamerTagManager table
+            $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').hide();
+			
+            // Decrease width of gamer tag manager dialog
+            $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 400);
+            break;
+        case "desktop":
+            // Show page size change area in gamerTagManager table
+            $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').show();
+			
+            // Increase width of gamer tag manager dialog
+            $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 600);
+            break;
     }
-
-    return selectorHTML;
 }
-
-//function OnViewportWidthChanged(newViewType)
-//{	
-//    switch(newViewType) {
-//        case "xtraSmall":
-//        case "mobile":
-//
-//            break;
-//        case "desktop":
-//
-//            break;
-//    }
-//}
 
 function OnEditProfile(editProfileStatusId)
 {

@@ -15,9 +15,10 @@
         <?php echo $pageHeaderHTML; ?>
         <script src="js/moment.min.js"></script>
         <script src="js/moment-timezone-with-data.min.js"></script>
-	<script src="js/jTable/jquery.jtable.min.js"></script>
-	<script src="js/jquery.slidereveal.min.js"></script>
-	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
+		<script src="js/jTable/jquery.jtable.min.js"></script>
+		<script src="js/jquery.slidereveal.min.js"></script>
+		<script src="js/GamerTagViewer.js"></script>
+		<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body>
 	<?php echo $headerHTML; ?>

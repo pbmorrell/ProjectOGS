@@ -1131,87 +1131,114 @@ function ToggleEventVisibility(selectedEventIds, isActive)
 }
 
 function DeleteEvents(selectedEventIds)
-{
-    var confirmMsg = 'Are you sure you want to delete all selected events?';
-    if(selectedEventIds.length === 1) {
-        confirmMsg = 'Are you sure you want to delete this event?';
-    }
-    
-    if(confirm(confirmMsg)) {
-        // Serialize array of selected event IDs for POST Ajax call
-	var eventIdsForPost = [];
-	for(var i = 0; i < selectedEventIds.length; i++) {
-            eventIdsForPost.push({"name":"eventIds[]", "value": selectedEventIds[i].toString()});
-	}
-		
-	// Make AJAX call to update Active status for given events
+{ 
+    sweetAlert({
+      title: "Confirm Delete",
+      text: "Are you sure you want to delete all selected events?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, do it!",
+      closeOnConfirm: false
+   },
+   function(isConfirm) {
+      if(isConfirm) {
+         // Make AJAX call to update Active status for given events
 	$.ajax({
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventEditorDeleteEvents&" + $.param({'eventIds': selectedEventIds}),
-            success: function(response){
-                var fullRefresh = false;
-                ReloadUserHostedEventsTable(fullRefresh);
-		sweetAlert(response);
-		return true;
+                success: function(){
+                    var fullRefresh = false;
+                    ReloadUserHostedEventsTable(fullRefresh);
+                    sweetAlert(response);
+                    return true;
             }
         });
-    }
-    else {
-        return false;
-    }
-}
 
+         // Show success message
+         sweetAlert("Events Deleted!", "Your events have been deleted", "success");
+      }
+      else {
+         // Show cancel message
+         sweetAlert("Events Deletion Canceled", "Your events have not been deleted", "info");
+      }
+   }
+);
+
+}
+		
 function JoinEvents(selectedEventIds)
 {
-    var confirmMsg = 'Are you sure you want to join all selected events?';
-    if(selectedEventIds.length === 1) {
-        confirmMsg = 'Are you sure you want to join this event?';
-    }
-    
-    if(confirm(confirmMsg)) {		
-	// Make AJAX call to sign current user up for selected events
+    sweetAlert({
+      title: "Confirm Join",
+      text: "Join this Event?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "You Bet!",
+      closeOnConfirm: false
+   },
+   function(isConfirm) {
+      if(isConfirm) {
+         // Make AJAX call to sign current user up for selected events
 	$.ajax({
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventViewerJoinEvents&" + $.param({'eventIds': selectedEventIds}),
-            success: function(response){
+            success: function(){
 		var fullRefresh = false;
                 ReloadCurrentEventsTable(fullRefresh);
 		sweetAlert(response);
 		return true;
             }
-        });
-    }
-    else {
-        return false;
-    }
+            });
+
+         // Show success message
+         sweetAlert("Events Joined!", "You're part of the team", "success");
+      }
+      else {
+         // Show cancel message
+         sweetAlert("Events not Joined", "Unable to join events", "info");
+      }
+   }
+);
+    
 }
 
 function LeaveEvents(selectedEventIds)
 {
-    var confirmMsg = 'Are you sure you want to leave all selected events?';
-    if(selectedEventIds.length === 1) {
-        confirmMsg = 'Are you sure you want to leave this event?';
-    }
-    
-    if(confirm(confirmMsg)) {		
-	// Make AJAX call to remove current user up from selected events
+    sweetAlert({
+      title: "Confirm Leave",
+      text: "Leave this Event?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yep, I want out!",
+      closeOnConfirm: false
+   },
+   function(isConfirm) {
+      if(isConfirm) {
+         // Make AJAX call to remove current user up from selected events
 	$.ajax({
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventViewerLeaveEvents&" + $.param({'eventIds': selectedEventIds}),
-            success: function(response){
+            success: function(){
 		var fullRefresh = false;
                 ReloadCurrentEventsTable(fullRefresh);
 		sweetAlert(response);
 		return true;
             }
         });
-    }
-    else {
-        return false;
-    }
+
+         // Show success message
+         sweetAlert("Events Left!", "You left the team behind...", "success");
+      }
+      else {
+         // Show cancel message
+         sweetAlert("Events Leave Canceled", "unable to leave events", "info");
+      }
+   }
+);
+    		
 }
 
 function ReloadUserHostedEventsTable(fullRefresh)

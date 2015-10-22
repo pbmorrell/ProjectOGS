@@ -605,6 +605,74 @@ class SecurityHandler
 	return $encodedResult;
     }
 	
+    public function UpdateGamerTagForUser($dataAccess, $logger, $userID, $gamerTagID, $platformID, $tagName)
+    {
+        $updateGamerTagQuery = "UPDATE `Gaming.UserGamerTags` " . 
+                               "SET `FK_Platform_ID` = :FKPlatformId, `GamerTagName` =  :tagName " .
+                               "WHERE `ID` = :gamerTagID;";
+		
+	$parmPlatformId = new QueryParameter(':FKPlatformId', $platformID, PDO::PARAM_INT);
+        $parmTagName = new QueryParameter(':tagName', $tagName, PDO::PARAM_STR);
+	$parmGamerTagId = new QueryParameter(':gamerTagID', $gamerTagID, PDO::PARAM_INT);
+        $queryParms = array($parmPlatformId, $parmTagName, $parmGamerTagId);
+        $errorMsg = "Database error: could not update gamer tag '" . $tagName . "'. Please try again later.";
+
+        if(strlen(trim($tagName)) > 0) {
+            if($dataAccess->BuildQuery($updateGamerTagQuery, $queryParms)){
+                $dataAccess->ExecuteNonQuery();
+            }
+
+            $errors = $dataAccess->CheckErrors();
+        }
+        else {
+            $errors = "Tag name must be non-empty";
+            $errorMsg = "Input error: tag name must be non-empty. Please fill out the tag name field and try again.";
+        }
+	
+	$jTableResult = [];
+	$encodedResult = "";
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not add new gamer tag name '". $tagName . "' for userID " . $userID . ". " . $errors);
+            $jTableResult['Result'] = "ERROR";
+            $jTableResult['Message'] = $errorMsg;
+            $encodedResult = json_encode($jTableResult);
+	}
+	else {
+            $jTableResult['Result'] = "OK";
+            $encodedResult = json_encode($jTableResult);
+	}
+	return $encodedResult;
+    }
+	
+    public function DeleteGamerTagsForUser($dataAccess, $logger, $userID, $gamerTagID)
+    {
+        $updateGamerTagQuery = "DELETE FROM `Gaming.UserGamerTags` WHERE `ID` = :gamerTagID;";
+		
+	$parmGamerTagId = new QueryParameter(':gamerTagID', $gamerTagID, PDO::PARAM_INT);
+        $queryParms = array($parmGamerTagId);
+        $errorMsg = "Database error: could not delete gamer tag. Please try again later.";
+
+	if($dataAccess->BuildQuery($updateGamerTagQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+	}
+
+	$errors = $dataAccess->CheckErrors();
+	
+	$jTableResult = [];
+	$encodedResult = "";
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not delete gamer tag ID '". $gamerTagID . "' for userID " . $userID . ". " . $errors);
+            $jTableResult['Result'] = "ERROR";
+            $jTableResult['Message'] = $errorMsg;
+            $encodedResult = json_encode($jTableResult);
+	}
+	else {
+            $jTableResult['Result'] = "OK";
+            $encodedResult = json_encode($jTableResult);
+	}
+	return $encodedResult;
+    }
+	
     public function UpdateUsername($dataAccess, $logger, $userID)
     {        
 	$updateSuccess = false;

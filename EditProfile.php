@@ -103,6 +103,7 @@
     <head>
         <?php echo $pageHeaderHTML; ?>
         <script src="js/jTable/jquery.jtable.min.js"></script>
+	<script src="js/GamerTagViewer.js"></script>
         <link rel="stylesheet" href="css/jTable/lightcolor/blue/jtable.min.css" />
     </head>
     <body class="">
