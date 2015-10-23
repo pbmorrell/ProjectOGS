@@ -54,7 +54,8 @@ function EditProfileOnReady()
 
 function OnGamerTagUpdateClick()
 {
-    OpenGamerTagViewer(editProfileGamerTagManagerDlg, editProfileGamerTagManagerJTableDiv, "Gamer Tag Management", "Your Gamer Tags", false, false);
+    OpenGamerTagViewer(editProfileGamerTagManagerDlg, editProfileGamerTagManagerJTableDiv.substring(1), "Gamer Tag Management", 
+                       "Your Gamer Tags", false, false, -1);
 }
 
 function OnViewportWidthChanged(newViewType)
@@ -62,18 +63,22 @@ function OnViewportWidthChanged(newViewType)
     switch(newViewType) {
         case "xtraSmall":
         case "mobile":
-            // Hide page size change area in gamerTagManager table
-            $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').hide();
-			
-            // Decrease width of gamer tag manager dialog
-            $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 400);
+            if(($('#' + editProfileGamerTagManagerDlg).length) && ($('#' + editProfileGamerTagManagerDlg + ' .jtable').length)) {
+                // Hide page size change area in gamerTagManager table
+                $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').hide();
+
+                // Decrease width of gamer tag manager dialog
+                $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 400);
+            }
             break;
         case "desktop":
-            // Show page size change area in gamerTagManager table
-            $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').show();
-			
-            // Increase width of gamer tag manager dialog
-            $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 600);
+            if(($('#' + editProfileGamerTagManagerDlg).length) && ($('#' + editProfileGamerTagManagerDlg + ' .jtable').length)) {
+                // Show page size change area in gamerTagManager table
+                $(editProfileGamerTagManagerJTableDiv + ' .jtable-page-size-change').show();
+
+                // Increase width of gamer tag manager dialog
+                $('#' + editProfileGamerTagManagerDlg).dialog('option', 'width', 600);
+            }
             break;
     }
 }

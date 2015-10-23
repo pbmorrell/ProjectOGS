@@ -417,7 +417,7 @@ class GamingHandler
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . "|" . $player->UserID . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 
@@ -487,7 +487,7 @@ class GamingHandler
 			
             $playersSignedUpData = "";
             foreach($playersSignedUp as $player) {
-		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . ",");
+		$playersSignedUpData .= ($player->EventMemberId . "|" . $player->UserDisplayName . "|" . $player->UserID . ",");
             }
             $playersSignedUpData = rtrim($playersSignedUpData, ",");
 

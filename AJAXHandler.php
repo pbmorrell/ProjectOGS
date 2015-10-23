@@ -460,8 +460,13 @@
 		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
 		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
 		$paginationEnabled = ($startIndex === "-1") ? false : true;
+                
+                // If retrieving gamer tags for the current user, userID param will be set to -1...otherwise, use the value of the
+                // userID param to retrieve gamer tag list
+                $userId = intval((isset($_GET['userID'])) ? (filter_var($_GET['userID'], FILTER_SANITIZE_STRING)) : "-1");
+                if($userId == -1)  $userId = $objUser->UserID;
 			
-                echo $securityHandler->LoadGamerTagsForUser($dataAccess, $logger, $objUser->UserID, -1, $orderBy, $paginationEnabled, $startIndex, $pageSize);
+                echo $securityHandler->LoadGamerTagsForUser($dataAccess, $logger, $userId, -1, $orderBy, $paginationEnabled, $startIndex, $pageSize);
                 break;
             case "AddGamerTagForUser":
 		$platformID = isset($_POST['PlatformName']) ? filter_var($_POST['PlatformName'], FILTER_SANITIZE_STRING) : "";

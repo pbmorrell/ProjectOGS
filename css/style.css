@@ -1443,6 +1443,35 @@
 	background-color: #D4902B;
     }
     
+    /* Custom theme for gamer tag viewer jTable: override lightcolor/green CSS to make table light blue */
+    #viewGamerTagsDiv div.jtable-main-container div.jtable-title {
+	background: #78b1ed !important;
+        color: #000;
+	background: -moz-linear-gradient(top, #78b1ed 0%, #5f9cdc 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #78b1ed), color-stop(100%, #5f9cdc));
+	background: -webkit-linear-gradient(top, #78b1ed 0%, #5f9cdc 100%);
+	background: -o-linear-gradient(top, #78b1ed 0%, #5f9cdc 100%);
+	background: -ms-linear-gradient(top, #78b1ed 0%, #5f9cdc 100%);
+	background: linear-gradient(to bottom, #78b1ed 0%, #5f9cdc 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#78b1ed', endColorstr='#5f9cdc', GradientType=0);
+	border-color: #417bb5;
+    }
+	
+    #viewGamerTagsDiv div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
+        background-color: #417bb5;
+    }
+	
+    #viewGamerTagsDiv div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
+			  div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
+	background-color: #78b1ed;
+	border-color: #417bb5;
+    }
+	
+    #viewGamerTagsDiv div.jtable-main-container table.jtable tbody > tr.jtable-row-selected,
+			  div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
+	background-color: #5f9cdc;
+    }
+    
     /* Custom theme for child tables: override lightcolor/green CSS to make child table headers black, and to not allow them to expand to fill the entire parent row space */
     table.jtable.jTableChild thead {
 	background: #000 !important;
@@ -1450,7 +1479,7 @@
     }
 
     table.jtable.jTableChild {
-        width: 33% !important;
+        width: 60% !important;
 	float: right !important;
         margin-bottom: 0.5em;
     }
@@ -1471,7 +1500,8 @@
     }
 	
     /* Limit width of jTable selects */
-    .jtable-main-container > .jtable-bottom-panel select {
+    .jtable-main-container > .jtable-bottom-panel select,
+    #viewGamerTagsDiv .jtable-main-container > .jtable-bottom-panel select {
 	max-width: 5em !important;
     }
 	

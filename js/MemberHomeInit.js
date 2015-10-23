@@ -11,6 +11,9 @@ var eventManagerJTableDiv = "#manageEventsContent";
 
 var currentEventViewerJTableDiv = "#currentEventsContent";
 var currentEventViewerLoadAction = 'GetCurrentEventsForJTable';
+var gamerTagViewerDlg = "gamerTagViewerDlg";
+var gamerTagViewerJTableDiv = "#viewGamerTagsDiv";
+
 var lastWindowWidth = -1;
 var lastWindowHeight = -1;
 
@@ -254,6 +257,14 @@ function OnViewportWidthChanged(newViewType)
     switch(newViewType) {
         case "xtraSmall":
         case "mobile":
+            if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
+                // Hide page size change area in gamerTagViewer table
+                $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').hide();
+
+                // Decrease width of gamer tag viewer dialog
+                $('#' + gamerTagViewerDlg).dialog('option', 'width', 400);
+            }
+            
             // If not already formatted for small viewports
             if(!($(curVisibleTable + ' table').hasClass('mobileViewFontSize'))) {				
                 $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
@@ -267,6 +278,14 @@ function OnViewportWidthChanged(newViewType)
             }
             break;
         case "desktop":
+            if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
+                // Show page size change area in gamerTagViewer table
+                $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').show();
+
+                // Increase width of gamer tag viewer dialog
+                $('#' + gamerTagViewerDlg).dialog('option', 'width', 600);
+            }
+            
             $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
             $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
             
@@ -426,7 +445,7 @@ function LoadEventManager()
 		$(this).attr('data-playersSignedUp', playerData);
 							
 		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), id, eventManagerJTableDiv);
+		OpenChildTableForJoinedPlayers($(this), eventManagerJTableDiv);
                 
                 // If an event is hidden, set forecolor to red
                 var isHidden = dataRecordArray[0].Hidden;
@@ -621,7 +640,7 @@ function LoadCurrentEventViewer()
 		$(this).attr('data-playersSignedUp', playerData);
 											
 		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), id, currentEventViewerJTableDiv);
+		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
                 
                 // If an event is joined by current user, set forecolor to green
                 var isJoined = dataRecordArray[0].Joined;
@@ -984,14 +1003,14 @@ function LeaveSelectedEvents()
     }
 }
 
-function OpenChildTableForJoinedPlayers(tableRow, eventId, jTableDiv)
+function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
 {        
     $(jTableDiv).jtable('openChildTable', tableRow,
         {
             title: "",
             childTableNoReloadOnOpen: true,
             actions: {
-                listAction: function(postData, jtParams) {
+                listAction: function() {
                     return GetChildDataForRow(tableRow);
                 }
             },
@@ -1002,11 +1021,28 @@ function OpenChildTableForJoinedPlayers(tableRow, eventId, jTableDiv)
                 },
                 PlayerName: {
                     title: 'Player Name',
-                    width: '100%',
+                    width: '55%',
                     sorting: true
+                },
+                GamerTags: {
+                    title: 'View Gamer Tags',
+                    width: '45%',
+                    sorting: false,
+                    display: function (data) {
+			var $tagViewerLink = $('<a href="#" class="actionLink" id="tagsLink' + data.record.ID + '">Show Tags</a>');
+
+                        $tagViewerLink.click(function () {
+                            OpenGamerTagViewer(gamerTagViewerDlg, gamerTagViewerJTableDiv.substring(1), "Gamer Tag Viewer", 
+                                               "Gamer Tags For: " + data.record.PlayerName, true, true, data.record.UserID);
+                            return false;
+                        });
+							
+			// Return link for display in jTable
+			return $tagViewerLink;
+                    }
                 }
             },
-            recordsLoaded: function(event, data) {
+            recordsLoaded: function() {
                 // Customize child table appearance
                 $(this).find('table.jtable > tbody > tr')
                     .each(function() {
@@ -1053,7 +1089,7 @@ function GetChildDataForRow(tableRow)
 	
     for(var i = 0; i < signedUpPlayerArray.length; i++) {
 	var playerDataArray = signedUpPlayerArray[i].split('|');
-	records.push({ "ID": playerDataArray[0], "PlayerName": playerDataArray[1]});
+	records.push({ "ID": playerDataArray[0], "PlayerName": playerDataArray[1], "UserID": playerDataArray[2]});
     }
 	
     return {

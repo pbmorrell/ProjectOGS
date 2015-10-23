@@ -292,7 +292,7 @@ function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPo
 }
 
 function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayContainerPosition, displayContainer, 
-                                    autoOpen, isModal, dlgWidth, dlgHeight)
+                                    autoOpen, isModal, dlgWidth, dlgHeight, destroyDlgOnClose)
 {
     var width = dlgWidth;
     var height = dlgHeight;
@@ -311,7 +311,12 @@ function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayCo
             height: height,
             modal: isModal,
             close: function(event, ui) {
-                $dialog.dialog('close');
+                if(destroyDlgOnClose) {
+                    $dialog.dialog('destroy').remove();
+                }
+                else {
+                    $dialog.dialog('close');
+                }
             }
         }
     );
@@ -537,7 +542,7 @@ function ExpandTableColumn(stackCol, colsToExpand, tableContainerDiv, hiddenClas
     var stackColIdx = $(tableContainerDiv + ' th:contains("' + stackCol + '")').index();
     
     // For each displayed row
-    $(tableContainerDiv).find('table tbody tr').each(function() {
+    $(tableContainerDiv).children('.jTable').find('tbody tr').each(function() {
         var stackedTextCol = $(this).find('td').eq(stackColIdx);
         var stackedText = $(stackedTextCol).text();
         

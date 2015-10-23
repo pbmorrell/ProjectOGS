@@ -4,15 +4,17 @@ var thisDialogTitle = "Gamer Tag Management";
 var thisGamerTagTableTitle = "Your Gamer Tags";
 var isReadOnlyMode = false;
 var destroyThisDialogOnClose = false;
+var userId = -1;
 var cachedPlatformList = undefined;
 
-function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, dialogTitle, tableTitle, isReadOnly, destroyDialogOnClose)
+function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, dialogTitle, tableTitle, isReadOnly, destroyDialogOnClose, openForUserID)
 {
     gamerTagManagerDlg = gamerTagManagerDlgId;
     gamerTagManagerJTableDiv = gamerTagManagerJTableDivId;
     thisDialogTitle = dialogTitle;
     thisGamerTagTableTitle = tableTitle;
     isReadOnlyMode = isReadOnly;
+    userId = openForUserID;
     destroyThisDialogOnClose = destroyDialogOnClose;
 	
     var dialogDescriptor = '<p><i class="fa fa-gamepad"></i> &nbsp; Add, update, or delete gamer tags tied to your user ID</p>';
@@ -22,7 +24,7 @@ function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, di
 	
     var dialogHTML = '<div id="' + gamerTagManagerDlg + '">' + 
 			'<div class="box style3 paddingOverride">' + dialogDescriptor +
-                            '<div id="manageGamerTagsDiv" class="jTableContainer">' +
+                            '<div id="' + gamerTagManagerJTableDiv + '" class="jTableContainer">' +
                             '</div><br />' + 
                             '<div id="gamerTagDialogToolbar" style="text-align: center;">' +
                                 '<button class="gamerTagManagerBtn icon fa-close" id="cancelBtn">Close</button>' +
@@ -34,7 +36,7 @@ function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, di
         $('#' + gamerTagManagerDlg).dialog('open');
     }
     else {
-        displayJQueryDialogFromDiv(dialogHTML, thisDialogTitle, "top", "top", window, false, true, 600, "auto");
+        displayJQueryDialogFromDiv(dialogHTML, thisDialogTitle, "top", "top", window, false, true, 600, "auto", destroyThisDialogOnClose);
         GamerTagManagerDialogOnReady($('#' + gamerTagManagerDlg).dialog());
     }
 }
@@ -42,16 +44,16 @@ function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, di
 function GamerTagManagerDialogOnReady($dialog)
 {
     var managerActions = {
-        listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser",
+        listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser&userID=" + userId,
         createAction: "AJAXHandler.php?action=AddGamerTagForUser",
         updateAction: "AJAXHandler.php?action=UpdateGamerTagsForUser",
         deleteAction: "AJAXHandler.php?action=DeleteGamerTagsForUser"
     };
 	
-    var readOnlyActions = { listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser" };
+    var readOnlyActions = { listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser&userID=" + userId };
 	
     // Initialize jTable on requested div
-    $(gamerTagManagerJTableDiv).jtable({
+    $('#' + gamerTagManagerJTableDiv).jtable({
         title: thisGamerTagTableTitle,
         paging: true,
         pageSize: 10,
@@ -109,19 +111,19 @@ function GamerTagManagerDialogOnReady($dialog)
         },
 	recordsLoaded: function(event, data) {
             // Enclose jTable container in fixed-height scrollable div
-            $(gamerTagManagerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedHeightScrollableContainerJumbo"></div>');
+            $('#' + gamerTagManagerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedHeightScrollableContainerJumbo"></div>');
 			
             if(isMobileView()) {
 		// Hide page size change area
-		$(gamerTagManagerJTableDiv + ' .jtable-page-size-change').hide();
+		$('#' + gamerTagManagerJTableDiv + ' .jtable-page-size-change').hide();
             }
 	}
     });
 
-    // Load event list
-    $(gamerTagManagerJTableDiv).jtable('load');
+    // Load tag list
+    $('#' + gamerTagManagerJTableDiv).jtable('load');
     
-    // Attach event handler to Cancel Event Creation/Update button
+    // Attach event handler to Close button
     $('#cancelBtn').click(function() {
 	if(destroyThisDialogOnClose)   $dialog.dialog('destroy').remove();
 	else                           $dialog.dialog('close');
