@@ -317,7 +317,7 @@ class GamingHandler
                         '<div class="fixedHeightScrollableContainer">'. 
                             $friendListSelect .
                         '</div><br /><br />'.
-                        '<div id="eventDialogToolbar' . $eventId . '">'.
+                        '<div id="eventDialogToolbar' . $eventId . '" class="dlgToolbarContainer">'.
                             '<button type="submit" class="memberHomeBtn" id="' . $formButtonName . '">' . $formButtonText . 
                                 '<br /><span class="icon fa-cogs" /></button>'.
                             '<button class="memberHomeBtn" id="cancelEventBtn' . $eventId . '">Cancel<br /><span class="icon fa-thumbs-o-down" /></button>'.
@@ -356,7 +356,7 @@ class GamingHandler
         $userGames = $this->LoadAllGameTitles($dataAccess, $logger);
         
         foreach($userGames as $userGame) {
-            $gameSelector .= ('<label class="overlayPanelLbl"><input type="checkbox" name="filterGameTitles[]" value="' . 
+            $gameSelector .= ('<label class="overlayPanelLabelMultiSelector"><input type="checkbox" name="filterGameTitles[]" value="' . 
                                 $userGame->Name . '" class="overlayPanelElement">' . $userGame->Name . '</label><br />');
         }
         
@@ -369,7 +369,7 @@ class GamingHandler
         $users = $this->LoadAllActiveUsers($dataAccess, $logger, $userID);
         
         foreach($users as $user) {
-            $userSelector .= ('<label class="overlayPanelLbl"><input type="checkbox" name="' . $groupId . '" value="' . 
+            $userSelector .= ('<label class="overlayPanelLabelMultiSelector"><input type="checkbox" name="' . $groupId . '" value="' . 
                                 $user->UserID . '" class="overlayPanelElement">' . $user->UserName . '</label><br />');
         }
         
@@ -1136,7 +1136,7 @@ class GamingHandler
                                    $row['Name'] . "<br />";
 
                         if($encloseInOverlayLabel) {
-                            $curLine = '<label class="overlayPanelLbl"><input type="checkbox" class="overlayPanelElement" name="' . 
+                            $curLine = '<label class="overlayPanelLabelMultiSelector"><input type="checkbox" class="overlayPanelElement" name="' . 
                                        $groupId . '" ' . $selected . ' value="' . $row['ID'] . '">' . $row['Name'] . '</label><br />';
                         }
                         $ddlPlatformsHTML = $ddlPlatformsHTML . $curLine;

@@ -211,7 +211,6 @@
         '<script src="js/jquery.dropotron.min.js"></script>'.
         '<script src="js/skel.min.js"></script>'.
         '<script src="js/skel-layers.min.js"></script>'.
-        '<script src="js/enquire.min.js"></script>'.    
         '<script src="js/init.js"></script>'.
         '<script src="js/main.js"></script>'.
         '<script src="js/' . $pageInitJSScriptName . '"></script>'.

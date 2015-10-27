@@ -24,8 +24,6 @@ function MemberHomeOnReady()
     LoadCurrentEventViewer();
     LoadEventManager();
     
-    var isMobile = isMobileView();
-    
     // Set up search filter panel
     $('#modalOverlay').slideReveal({
         position: "right",
@@ -36,7 +34,6 @@ function MemberHomeOnReady()
         position: "right",
         push: false
     });
-    
 
     $('#searchFilterLink').on('touchend', function(event) {
 	event.preventDefault();
@@ -57,59 +54,6 @@ function MemberHomeOnReady()
             CloseSearchPanel();
 	}
     });
-	
-    // Automatically size search panel fixed-height divs to proper height based on current browser viewport height
-    $(window).resize(function() {
-        isMobile = isMobileView();
-        var isMobileHeight = isMobileViewHeight();
-        var curWindowWidth = $(window).width();
-        var curWindowHeight = $(window).height();
-		
-        var filterDivHeightPct = 0.9;
-        if(isMobileHeight) {
-            if(isMobile)  filterDivHeightPct = 0.85;
-            else          filterDivHeightPct = 0.65;
-        }
-        
-        var toggleGroupWidth = curWindowWidth * 0.2;
-        var searchPanelWidth = Math.round(curWindowWidth * 0.4);
-        
-        if(isMobile) {
-            toggleGroupWidth = curWindowWidth * 0.75;
-            searchPanelWidth = Math.round(curWindowWidth * 0.8);
-        }
-        else if(curWindowWidth < 1000) {
-            toggleGroupWidth = curWindowWidth * 0.45;
-            searchPanelWidth = Math.round(curWindowWidth * 0.6);
-        }
-        
-        var filterDivHeight = filterDivHeightPct * curWindowHeight;
-        $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
-
-        var padding = isMobile ? "20%" : (isMobileHeight ? "10%" : "2%");
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', padding);
-        
-        $('.overlayPanelToggleGroup').css('width', toggleGroupWidth.toString() + "px");
-        
-        // If the resize event was triggered by scrolling or a minimal resize, don't need to hide search panel
-        if((Math.abs(curWindowWidth - lastWindowWidth) > 100) || (Math.abs(curWindowHeight - lastWindowHeight) > 100)) {
-            CloseSearchPanel();
-            
-            $('#modalOverlay').slideReveal({
-                changeWidth: true,
-                width: curWindowWidth + 20
-            });		
-            $('#searchPanel').slideReveal({
-                changeWidth: true,
-                width: searchPanelWidth
-            });
-        }
-        
-	lastWindowWidth = curWindowWidth;
-        lastWindowHeight = curWindowHeight;
-    });
-
-    $(window).trigger('resize');
 
     // Hide all filters initially, showing only filter name and toggle in un-expanded state
     $('.overlayPanelFilterGroup').not('#joinStatusFilterDiv').hide();
@@ -156,12 +100,6 @@ function MemberHomeOnReady()
     $('#gameFilterStartDate').datepicker('setDate', new Date());
     $('#gameFilterEndDate').datepicker('setDate', addDaysToDate(new Date(), 3));
     
-    // If in mobile view, disable text input
-    if(isMobile) {
-        $('#gameFilterStartDate').prop('readonly', true);
-        $('#gameFilterEndDate').prop('readonly', true);
-    }
-    
     // Initialize Game Filter Time datepickers
     var defaultTimeDate = new Date();
     var nextRoundIntervalValue = 15 - (defaultTimeDate.getMinutes() % 15);
@@ -171,8 +109,8 @@ function MemberHomeOnReady()
         disableTextInput: false,
         disableTouchKeyboard: false,
         minTime: defaultTimeDate,
-        selectOnBlur: !isMobile,
-        useSelect: isMobile,
+        selectOnBlur: true,
+        useSelect: false,
         className: 'overlayPanelElement',
         step: 15
     };
@@ -187,6 +125,60 @@ function MemberHomeOnReady()
     // Add overlayPanel class to time zone pickers in search panel
     $('#ddlTimeZonesStart').addClass('overlayPanelElement');
     $('#ddlTimeZonesEnd').addClass('overlayPanelElement');
+    
+    // Add event handlers to mobile control panel buttons
+    $('#btnMobileRefresh').click(function() {
+        var fullRefresh = false;
+        ReloadUserHostedEventsTable(fullRefresh);
+    });
+
+    $('#btnMobileActivate').click(function() {
+        ToggleTableEventActivation("1");
+    });
+
+    $('#btnMobileHide').click(function() {
+        ToggleTableEventActivation("0");
+    });
+
+    $('#btnMobileDelete').click(function() {
+        DeleteTableEvents();
+    });
+    
+    // Add click/touch handler to search panel swipe icon
+    $('#swipeHoverIcon').on('touchend', function(event) {
+        event.preventDefault();
+        if($('.overlayPanelControlElementGroup').children('button').first().is(':visible')) {
+            $('#swipeHoverIcon').attr('src', 'images/SwipeRight.png');
+        }
+        else {
+            $('#swipeHoverIcon').attr('src', 'images/SwipeLeft.png');
+        }
+        
+        $('.overlayPanelControlElementGroup').children('button').toggle('slide');
+    });
+    
+    $('#swipeHoverIcon').click(function(event) {
+        event.preventDefault();
+        if($('.overlayPanelControlElementGroup').children('button').first().is(':visible')) {
+            $('#swipeHoverIcon').attr('src', 'images/SwipeRight.png');
+        }
+        else {
+            $('#swipeHoverIcon').attr('src', 'images/SwipeLeft.png');
+        }
+        
+        $('.overlayPanelControlElementGroup').children('button').toggle('slide');
+    });
+	
+    // On startup, we want to simulate a viewport size transition, in order to format and size
+    // the current layout to best fit the current browser dimensions...we initialized everything
+    // as if it was in desktop view, so now we run a transition from 'desktop' to whatever the current view class is
+    var curWindowHeight = $(window).height();
+    lastWindowHeight = curWindowHeight;
+    var curWindowWidth = $(window).width();
+    lastWindowWidth = curWindowWidth;
+    var initTransition = true;
+    
+    OnViewportSizeChanged(curWindowWidth, curWindowHeight, 'desktop', GetCurWidthClass(), 'desktop', GetCurHeightClass(), initTransition);
     
     // Initialize event status checkbox states
     $('#evtStatusUnjoined').prop('checked', true);
@@ -211,12 +203,18 @@ function MemberHomeOnReady()
             if($(toggleLinkId).hasClass('overlayPanelToggleElementInactive')) {
 		$(toggleLinkId).removeClass('overlayPanelToggleElementInactive').addClass('overlayPanelToggleElementActive');
 		$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive').addClass('filterFieldActive');
-		$(lblId).text('Deactivate Filter');
+		
+                var displayText = "Deactivate Filter";
+                if(isMobileView()) displayText = "Deactivate";
+                $(lblId).text(displayText);
             }
             else {
 		$(toggleLinkId).removeClass('overlayPanelToggleElementActive').addClass('overlayPanelToggleElementInactive');
 		$(groupId).find('.overlayPanelElement').removeClass('filterFieldActive');
-		$(lblId).text('Activate Filter');
+                
+                var displayText = "Activate Filter";
+                if(isMobileView()) displayText = "Activate";
+                $(lblId).text(displayText);                
             }
 	});
     });
@@ -250,52 +248,131 @@ function CloseSearchPanel()
     return false;
 }
 
-function OnViewportWidthChanged(newViewType)
+function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition)
 {
-    var curVisibleTable = (activePanel === panelEnum.CurrentEventFeed) ? currentEventViewerJTableDiv : eventManagerJTableDiv;
-	
-    switch(newViewType) {
-        case "xtraSmall":
-        case "mobile":
-            if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
-                // Hide page size change area in gamerTagViewer table
-                $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').hide();
+    var isWidthTransition = false;
+    var searchPanelWidth = Math.round(curWindowWidth * 0.5);
+    
+    // Begin logic flow for viewport width changes that result in a class change
+    if(((lastWidthClass == 'desktop')  || initTransition) && ((curWidthClass == 'mobile') || (curWidthClass == 'xtraSmall'))) {
+        // If moving from desktop view to mobile view
+        if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
+            // Hide page size change area in gamerTagViewer table
+            $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').hide();
 
-                // Decrease width of gamer tag viewer dialog
-                $('#' + gamerTagViewerDlg).dialog('option', 'width', 400);
-            }
-            
-            // If not already formatted for small viewports
-            if(!($(curVisibleTable + ' table').hasClass('mobileViewFontSize'))) {				
-                $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
-                $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
-                
-                $('#gameFilterStartDate').prop('readonly', true);
-                $('#gameFilterEndDate').prop('readonly', true);
-                
-                if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(true);
-		else                                                 FormatEventManagerTableForCurrentView(true);
-            }
-            break;
-        case "desktop":
-            if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
-                // Show page size change area in gamerTagViewer table
-                $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').show();
+            // Decrease width of gamer tag viewer dialog
+            $('#' + gamerTagViewerDlg).dialog('option', 'width', (curWindowWidth < 400) ? (curWindowWidth - 25) : 400);
+        }
 
-                // Increase width of gamer tag viewer dialog
-                $('#' + gamerTagViewerDlg).dialog('option', 'width', 600);
-            }
-            
-            $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
-            $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
-            
-            $('#gameFilterStartDate').prop('readonly', false);
-            $('#gameFilterEndDate').prop('readonly', false);
-            
-            if(curVisibleTable === currentEventViewerJTableDiv)  FormatCurrentEventsTableForCurrentView(false);
-            else 						 FormatEventManagerTableForCurrentView(false);
-            break;
+        // Adjust width of search panel
+        if(curWidthClass == 'mobile')  searchPanelWidth = Math.round(curWindowWidth * 0.8);
+        else                           searchPanelWidth = Math.round(curWindowWidth * 0.95);
+
+        // Adjust padding for filter div to account for Skel's addition of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "10%");
+        
+        // Show search panel button div toggle icon
+        $('.overlayPanelControlElementGroup').children('button').hide();
+        $('.swipeHoverIconContainer hidden').show();
+
+        // Convert time pickers to plain select lists, for ease of use on mobile devices
+        $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
+        $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
+
+        // Force date selection alone on date pickers
+        $('#gameFilterStartDate').prop('readonly', true);
+        $('#gameFilterEndDate').prop('readonly', true);
+        
+        // Change text of toggle checkboxes to be shorter, for mobile view
+        $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate Filter" }).text('Activate');
+        $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
+        
+        // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
+        if(!initTransition) {
+            FormatCurrentEventsTableForCurrentView(true, curWidthClass);
+            FormatEventManagerTableForCurrentView(true, curWidthClass);
+        }
+        
+        isWidthTransition = true;
     }
+    
+    if(((lastWidthClass == 'mobile') || (lastWidthClass == 'xtraSmall') || initTransition) && (curWidthClass == 'desktop')) {
+        if(($('#' + gamerTagViewerDlg).length) && ($('#' + gamerTagViewerDlg + ' .jtable').length)) {
+            // Show page size change area in gamerTagViewer table
+            $(gamerTagViewerJTableDiv + ' .jtable-page-size-change').show();
+
+            // Increase width of gamer tag viewer dialog
+            $('#' + gamerTagViewerDlg).dialog('option', 'width', (curWindowWidth < 600) ? (curWindowWidth - 25) : 600);
+        }
+        
+        // Adjust padding for filter div to account for Skel's removal of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "2%");
+        
+        // Show search panel button div toggle icon
+        $('.overlayPanelControlElementGroup').children('button').show();
+        $('.swipeHoverIconContainer').hide();
+        
+        // Convert time pickers back to normal selector type
+        $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
+        $('#gameFilterEndTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
+
+        // Allow text entry into date picker fields
+        $('#gameFilterStartDate').prop('readonly', false);
+        $('#gameFilterEndDate').prop('readonly', false);
+        
+        // Change text of toggle checkboxes to full version, for desktop view
+        $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate" }).text('Activate Filter');
+        $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
+
+        // Restore hidden or combined columns
+        if(!initTransition) {
+            FormatCurrentEventsTableForCurrentView(false);
+            FormatEventManagerTableForCurrentView(false);
+        }
+        
+        isWidthTransition = true;
+    }
+    
+    // Do any required adjustments for viewport width changes that don't result in a class change
+    // If the resize event was triggered by scrolling or a minimal resize, don't need to hide search panel
+    if((Math.abs(curWindowWidth - lastWindowWidth) > 50) || initTransition) {
+        CloseSearchPanel();
+
+        $('#modalOverlay').slideReveal({
+            changeWidth: true,
+            width: curWindowWidth + 20
+        });
+        
+        if(isWidthTransition) {
+            $('#searchPanel').slideReveal({
+                changeWidth: true,
+                width: searchPanelWidth
+            });
+        }
+    }
+
+    lastWindowWidth = curWindowWidth;
+}
+
+function HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass)
+{
+    // Do required adjustments for viewport height changes that don't result in a class change
+    var filterDivHeightPct = 0.9;
+    var filterDivHeight = filterDivHeightPct * curWindowHeight;
+    $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
+    
+    // If the resize event was triggered by scrolling or a minimal resize, don't need to hide search panel
+    if(Math.abs(curWindowHeight - lastWindowHeight) > 100) {
+        CloseSearchPanel();
+    }
+    
+    lastWindowHeight = curWindowHeight;
+}
+
+function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, curWidthClass, lastHeightClass, curHeightClass, initTransition)
+{
+    HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition);
+    HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass);
 }
 
 function LoadEventManager()
@@ -307,6 +384,7 @@ function LoadEventManager()
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
         pageSizeChangeArea: true,
+        pageList: 'minimal',
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
         openChildAsAccordion: false,
@@ -443,7 +521,7 @@ function LoadEventManager()
 					
 		var playerData = dataRecordArray[0].PlayersSignedUpData;
 		$(this).attr('data-playersSignedUp', playerData);
-							
+									
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), eventManagerJTableDiv);
                 
@@ -454,9 +532,8 @@ function LoadEventManager()
                 }
             });
 			
-            if(isMobileView()) {
-                FormatEventManagerTableForCurrentView(true);
-            }
+            var curWidthClass = GetCurWidthClass();
+            if(curWidthClass != 'desktop')  FormatEventManagerTableForCurrentView(true, curWidthClass);
 	}
     });
 
@@ -482,6 +559,7 @@ function LoadCurrentEventViewer()
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
         pageSizeChangeArea: true,
+        pageList: 'minimal',
         sorting: true,
         defaultSorting: 'DisplayDate ASC',
         openChildAsAccordion: false,
@@ -628,35 +706,34 @@ function LoadCurrentEventViewer()
 				
 		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
             }
-			
+				
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
 		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
 		var id = $(this).attr('data-record-key');
 		var dataRecordArray = $.grep(data.records, function (e) {
                     return e.ID === id;
 		});
-									
+										
 		var playerData = dataRecordArray[0].PlayersSignedUpData;
 		$(this).attr('data-playersSignedUp', playerData);
-											
+													
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
-                
-                // If an event is joined by current user, set forecolor to green
-                var isJoined = dataRecordArray[0].Joined;
-                if(isJoined === 'LEAVE') {
+					
+		// If an event is joined by current user, set forecolor to green
+		var isJoined = dataRecordArray[0].Joined;
+		if(isJoined === 'LEAVE') {
                     $(this).css('color', 'green');
-                }
-                // If all required players are signed up for a given event,
-                // such that it is "full", set forecolor to red
-                else if(isJoined === 'FULL') {
+		}
+		// If all required players are signed up for a given event,
+		// such that it is "full", set forecolor to red
+		else if(isJoined === 'FULL') {
                     $(this).css('color', 'red');
-                }
+		}
             });
-            
-            if(isMobileView()) {
-                FormatCurrentEventsTableForCurrentView(true);
-            }
+				
+            var curWidthClass = GetCurWidthClass();
+            if(curWidthClass != 'desktop')  FormatCurrentEventsTableForCurrentView(true, curWidthClass);
 	}
     });
 
@@ -673,10 +750,16 @@ function LoadCurrentEventViewer()
     /* ******************************************************************************************************** */
 }
 
-function FormatEventManagerTableForCurrentView(isMobile)
+function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
 {
     var hiddenClass = "evtMgrHiddenInMobileView";
     if(isMobile) {
+	// Temporarily show hidden columns, to allow for column combination to work properly in all cases
+	$('.' + hiddenClass).removeClass(hiddenClass);
+		
+	// Temporarily remove fixed-width scrollable container, to allow for column combination to work properly in all cases
+	$(eventManagerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
+		
         // Collapse Game & Console columns into one vertical column,
         // and Scheduled Date & Scheduled Time columns into another vertical column
         var colsToCombine = ["Game", "Console"];
@@ -687,8 +770,24 @@ function FormatEventManagerTableForCurrentView(isMobile)
         colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
         CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, eventManagerJTableDiv, hiddenClass);
         
-        // Change table header and toolbar text to shorter, mobile-friendly words
-        $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
+        // Change table header/toolbar to be more mobile-friendly
+	if((curWidthClass == 'desktop') || (curWidthClass == 'mobile')) {
+            // Hide mobile control panel, and show toolbar items
+            $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
+            $('#mobileEvtMgrToolbar').addClass('hidden');
+	}
+		
+        if(curWidthClass == 'mobile') {
+            $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
+	}
+        else if(curWidthClass == 'xtraSmall') {
+            $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
+			
+            // Hide toolbar items, and show mobile control panel
+            $(eventManagerJTableDiv + ' .jtable-toolbar-item').hide();
+            $('#mobileEvtMgrToolbar').removeClass('hidden');
+	}
+        
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate Selected")').text('Activate');
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide Selected")').text('Hide');
@@ -704,9 +803,9 @@ function FormatEventManagerTableForCurrentView(isMobile)
         $(gameNotesColHdr).addClass(hiddenClass);
         $(hiddenColHdr).addClass(hiddenClass);
                 
-        $(eventManagerJTableDiv + ' table tbody tr').each(function() {
-            var gameNotesCol = $(this).find('td').eq(gameNotesColIdx);
-            var hiddenCol = $(this).find('td').eq(hiddenColIdx);
+	$(eventManagerJTableDiv).children('.jtable-main-container').children('.jtable').children('tbody').children('tr').each(function() {
+            var gameNotesCol = $(this).children('td').eq(gameNotesColIdx);
+            var hiddenCol = $(this).children('td').eq(hiddenColIdx);
             $(gameNotesCol).addClass(hiddenClass);
             $(hiddenCol).addClass(hiddenClass);
         });
@@ -714,11 +813,22 @@ function FormatEventManagerTableForCurrentView(isMobile)
         // Hide page size change area
         $(eventManagerJTableDiv + ' .jtable-page-size-change').hide();
         
+        // Hide go-to-page area
+        if(curWidthClass == 'xtraSmall') {
+            $(eventManagerJTableDiv + ' .jtable-goto-page').hide();
+        }
+        
 	// Reduce font size of table text to limit need for table overflow
 	$(eventManagerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
 		
 	// Enclose jTable containers in fixed-width scrollable divs
         $(eventManagerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedWidthScrollableContainer"></div>');
+        
+        // Adjust fixed-width scrollable container to maximum available width
+        if($(eventManagerJTableDiv + ' .jtable-title').is(':visible')) {
+            var titleBarWidth = $(eventManagerJTableDiv + ' .jtable-title').width();
+            $(eventManagerJTableDiv + ' .fixedWidthScrollableContainer').css('width', (titleBarWidth + 10) + 'px');
+        }
     }
     else {        
         // Expand Game & Console columns into two distinct columns again;
@@ -736,11 +846,18 @@ function FormatEventManagerTableForCurrentView(isMobile)
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide")').text('Hide Selected');
 	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete")').text('Delete Selected');
         
+        // Hide mobile control panel, and show toolbar items
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
+        $('#mobileEvtMgrToolbar').addClass('hidden');
+        
         // Show hidden columns
         $('.' + hiddenClass).removeClass(hiddenClass);
         
         // Display page size change area
         $(eventManagerJTableDiv + ' .jtable-page-size-change').show();
+        
+        // Display go-to-page area
+        $(eventManagerJTableDiv + ' .jtable-goto-page').show();
 		
 	// Make font size normal again
 	$(eventManagerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
@@ -750,11 +867,17 @@ function FormatEventManagerTableForCurrentView(isMobile)
     }
 }
 
-function FormatCurrentEventsTableForCurrentView(isMobile)
+function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
 {
     var hiddenClass = "curEvtsHiddenInMobileView";
 	
     if(isMobile) {
+	// Temporarily show hidden columns, to allow for column combination to work properly in all cases
+	$('.' + hiddenClass).removeClass(hiddenClass);
+		
+	// Temporarily remove fixed-width scrollable container, to allow for column combination to work properly in all cases
+	$(currentEventViewerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
+		
         // Collapse Game & Console columns into one vertical column,
         // and Scheduled Date & Scheduled Time columns into another vertical column
         var colsToCombine = ["Game", "Console"];
@@ -766,7 +889,9 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, hiddenClass);
         
         // Change table header and toolbar text to shorter, mobile-friendly words
-        $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse User Events');
+        if(curWidthClass == 'mobile')           $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse User Events');
+        else if(curWidthClass == 'xtraSmall')   $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Event List');
+        
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join Selected")').text('Join');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave Selected")').text('Leave');
@@ -784,9 +909,9 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         $(gameNotesColHdr).addClass(hiddenClass);
         $(joinedColHdr).addClass(hiddenClass);
                 
-        $(currentEventViewerJTableDiv + ' table tbody tr').each(function() {
-            var gameNotesCol = $(this).find('td').eq(gameNotesColIdx);
-            var joinedCol = $(this).find('td').eq(joinedColIdx);
+	$(currentEventViewerJTableDiv).children('.jtable-main-container').children('.jtable').children('tbody').children('tr').each(function() {
+            var gameNotesCol = $(this).children('td').eq(gameNotesColIdx);
+            var joinedCol = $(this).children('td').eq(joinedColIdx);
             $(gameNotesCol).addClass(hiddenClass);
             $(joinedCol).addClass(hiddenClass);
         });
@@ -794,11 +919,22 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         // Hide page size change area
         $(currentEventViewerJTableDiv + ' .jtable-page-size-change').hide();
         
+        // Hide go-to-page area
+        if(curWidthClass == 'xtraSmall') {
+            $(currentEventViewerJTableDiv + ' .jtable-goto-page').hide();
+        }
+        
 	// Reduce font size of table text to limit need for table overflow
 	$(currentEventViewerJTableDiv + ' table').removeClass('desktopViewFontSize').addClass('mobileViewFontSize');
 		
 	// Enclose jTable containers in fixed-width scrollable divs
         $(currentEventViewerJTableDiv + ' .jtable-main-container').children('.jtable').wrap('<div class="fixedWidthScrollableContainer"></div>');
+        
+        // Adjust fixed-width scrollable container to maximum available width
+        if($(currentEventViewerJTableDiv + ' .jtable-title').is(':visible')) {
+            var titleBarWidth = $(currentEventViewerJTableDiv + ' .jtable-title').width();
+            $(currentEventViewerJTableDiv + ' .fixedWidthScrollableContainer').css('width', (titleBarWidth + 10) + 'px');
+        }
     }
     else {
         // Expand Game & Console columns into two distinct columns again;
@@ -820,6 +956,9 @@ function FormatCurrentEventsTableForCurrentView(isMobile)
         
         // Display page size change area
         $(currentEventViewerJTableDiv + ' .jtable-page-size-change').show();
+        
+        // Display go-to-page area
+        $(currentEventViewerJTableDiv + ' .jtable-goto-page').show();
 		
 	// Make font size normal again
 	$(currentEventViewerJTableDiv + ' table').removeClass('mobileViewFontSize').addClass('desktopViewFontSize');
@@ -835,13 +974,13 @@ function ToggleSearchDivDisplay(curDiv, curToggleLink)
     
     if(isExpand) {
         $(curDiv).removeClass('overlayPanelGroupBorder').addClass('overlayPanelGroupBorder');
-		$(curDiv).removeClass('overlayPanelGroupExpanded').addClass('overlayPanelGroupExpanded');
+	$(curDiv).removeClass('overlayPanelGroupExpanded').addClass('overlayPanelGroupExpanded');
         $(curDiv).slideDown('slow');
         $(curToggleLink).removeClass('fa-plus-square').addClass('fa-minus-square');
     }
     else {
         $(curDiv).removeClass('overlayPanelGroupBorder');
-		$(curDiv).removeClass('overlayPanelGroupExpanded');
+	$(curDiv).removeClass('overlayPanelGroupExpanded');
         $(curDiv).slideUp('slow');
         $(curToggleLink).removeClass('fa-minus-square').addClass('fa-plus-square');
     }
@@ -1211,7 +1350,8 @@ function JoinEvents(selectedEventIds)
       type: "warning",
       showCancelButton: true,
       confirmButtonText: "You Bet!",
-      closeOnConfirm: false
+      closeOnConfirm: false,
+      showLoaderOnConfirm: true
    },
    function(isConfirm) {
       if(isConfirm) {
@@ -1220,24 +1360,23 @@ function JoinEvents(selectedEventIds)
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventViewerJoinEvents&" + $.param({'eventIds': selectedEventIds}),
-            success: function(){
+            success: function(response){
 		var fullRefresh = false;
-                ReloadCurrentEventsTable(fullRefresh);
-		sweetAlert(response);
-		return true;
+		ReloadCurrentEventsTable(fullRefresh);
+				
+		// Show success message
+		sweetAlert("Events Joined!", response, "success");
+            },
+            error: function() {
+		sweetAlert("Events not Joined", "Unable to join events", "info");
             }
-            });
-
-         // Show success message
-         sweetAlert("Events Joined!", "You're part of the team", "success");
+        });
       }
       else {
          // Show cancel message
-         sweetAlert("Events not Joined", "Unable to join events", "info");
+         sweetAlert("Events not Joined", "Canceled join events", "info");
       }
-   }
-);
-    
+   });
 }
 
 function LeaveEvents(selectedEventIds)
@@ -1305,22 +1444,60 @@ function ReloadCurrentEventsTable(fullRefresh)
 
 function DisplayCreateEventDialog()
 {
-    displayJQueryDialog("dlgCreateEvt", "Create Event", "top", "top", window, false, true, 
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 700;
+    
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
+    
+    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+        dlgHeight = 450;
+    }
+    
+    displayJQueryDialog("dlgCreateEvt", "Create Event", "top", displayContainerPosition, window, false, true, 
                         "AJAXHandler.php?action=EventEditorLoad", function() {
         var eventId = -1;
-        EventSchedulerDialogOnReady(eventId, $('#dlgCreateEvt').dialog());
-    });
+        EventSchedulerDialogOnReady(eventId, $('#dlgCreateEvt').dialog(), curWidthClass);
+    }, dlgWidth, dlgHeight);
 }
 
 function DisplayEditEventDialog(eventId)
 {
-    displayJQueryDialog("dlgEditEvent" + eventId, "Edit Event", "top", "top", window, false, true, 
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 700;
+    
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
+    
+    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+        dlgHeight = 450;
+    }
+    
+    displayJQueryDialog("dlgEditEvent" + eventId, "Edit Event", "top", displayContainerPosition, window, false, true, 
                         "AJAXHandler.php?action=EventEditorLoad&EventID=" + eventId, function() {
-        EventSchedulerDialogOnReady(eventId, $('#dlgEditEvent' + eventId).dialog());
-    });
+        EventSchedulerDialogOnReady(eventId, $('#dlgEditEvent' + eventId).dialog(), curWidthClass);
+    }, dlgWidth, dlgHeight);
 }
 
-function EventSchedulerDialogOnReady(eventId, $dialog)
+function EventSchedulerDialogOnReady(eventId, $dialog, curWidthClass)
 {
     var eventIdSuffix = "";
     var gameTime = "";
@@ -1417,15 +1594,6 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
     };
     
     $('#gameTime' + eventIdSuffix).timepicker(options);
-    
-    // Switch comments section to mobile width, if needed
-    if(isMobile) {
-        $('#message' + eventIdSuffix).addClass('textareaMobile');
-        $('#eventDialogToolbar' + eventIdSuffix).addClass('mobileDlgToolbarContainer');
-    }
-    else {
-        $('#eventDialogToolbar' + eventIdSuffix).addClass('dlgToolbarContainer');
-    }
 	
     // If user selects Private Event checkbox, enable friend list selection
     $('#privateEvent' + eventIdSuffix).click(function() {
@@ -1443,6 +1611,10 @@ function EventSchedulerDialogOnReady(eventId, $dialog)
             $("#selectAllFriends" + eventIdSuffix).prop('checked', false);
 	}
     });
+    
+    if(curWidthClass == 'xtraSmall') {
+        $("#selectAllFriends" + eventIdSuffix).removeClass('selectAllCheckbox').addClass('xtraSmallSelectAllCheckbox');
+    }
     
     $("#selectAllFriends" + eventIdSuffix).click(function() {
         var checkedVal = this.checked;
@@ -1467,6 +1639,15 @@ function ToggleControlPanelDisplay(panelToToggle)
 	// Fade in desired panel
 	activePanel = panelToToggle;
 	$(panelToToggle).fadeIn("slow", function() {});
+
+        if(activePanel == panelEnum.CurrentEventFeed) {
+            var titleBarWidth = $(currentEventViewerJTableDiv + ' .jtable-title').width();
+            $(currentEventViewerJTableDiv + ' .fixedWidthScrollableContainer').css('width', (titleBarWidth + 10) + 'px');
+        }
+        else {
+            var titleBarWidth = $(eventManagerJTableDiv + ' .jtable-title').width();
+            $(eventManagerJTableDiv + ' .fixedWidthScrollableContainer').css('width', (titleBarWidth + 10) + 'px');            
+        }
     }
 	
     // Close search panel, if open

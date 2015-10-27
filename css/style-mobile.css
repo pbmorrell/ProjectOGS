@@ -24,6 +24,22 @@
     {
 	font-size: 1em;
     }
+    
+    .ui-dialog input[type=text],select,textarea {
+        width: 95% !important;
+    }
+    
+    .ui-dialog .custom-combobox {
+        width: 95% !important;
+    }
+    
+    .ui-dialog .custom-combobox input {
+        width: 85% !important;
+    }
+    
+    .ui-dialog .selectAllCheckbox {
+        margin-left: 2em;
+    }
         
     .signupInp input{
 	width: 100%;
@@ -36,9 +52,12 @@
     .desktopButtonDisplay {
         display:none;
     }
-
-    .overlayPanelToggleGroup {
-        margin-top: 2%;
+    
+    .overlayPanelToggleLinkWrap {
+        display: table-cell;
+        padding: 0.5em;
+        width: 60%;
+        text-align: left;
     }
     
     .overlayPanelFilterGroup {
@@ -72,12 +91,21 @@
     .overlayPanelControlElement {
         width: 80% !important;
         height: 55px;
-        margin-left: 15%;
+        margin-left: 35px;
         margin-top: 5px;
     }
     
     .overlayPanelFixedHeightScrollableContainer  {
         width: 95%;
+        overflow-y: auto;
+    }
+    
+    .fixedHeightScrollableContainer  {
+        border:2px solid #ccc;
+        box-sizing: border-box;
+        padding: 0.5em;
+        width: 95%;
+        height: 100px;
         overflow-y: auto;
     }
     
@@ -115,6 +143,25 @@
         margin-top: 5%;
         font-size: 1.8em;
         text-align: center;
+    }
+    
+    .dlgToolbarContainer {
+        width: 95%;
+        height: auto;
+        border:2px solid red;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+    
+    .dlgToolbarContainer > button {
+        width: 45%;
+        height: 90px;
+        float: left;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: 2%;
+        margin-right: 2%;
+        padding: 1.5em 1em 1em 0.75em !important;
     }
         
     section,

@@ -1,24 +1,25 @@
+// Globals
+var lastHeightClass = '';
+var lastWidthClass = '';
+
 // Shared functions
 function GlobalStartupActions()
 {
-    // If current page defines a viewport width handler, register for
-    // viewport width transitions now
-    if(typeof OnViewportWidthChanged == 'function') {
-        // Attach handler for events fired by viewport size transition
-        enquire.register("(max-width: 400px)", function() {
-                // Fire viewportWidthChanged handler, if defined in current page
-                OnViewportWidthChanged("xtraSmall");
-            });
-
-        enquire.register("(min-width: 401px) and (max-width: 650px)", function() {
-                // Fire viewportWidthChanged handler
-                OnViewportWidthChanged("mobile");
-            });
-
-        enquire.register("(min-width: 651px) and (max-width: 2000px)", function() {
-                // Fire viewportWidthChanged handler
-                OnViewportWidthChanged("desktop");
-            });
+    // If current page defines a viewport size change handler, call it
+    // when window resize event occurs
+    if(typeof OnViewportSizeChanged == 'function') {
+        $(window).resize(function() {
+            var curWindowWidth = $(window).width();
+            var curWindowHeight = $(window).height();
+            var curHeightClass = GetCurHeightClass();
+            var curWidthClass = GetCurWidthClass();
+            
+            OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, curWidthClass, 
+                                  lastHeightClass, curHeightClass);
+            
+            lastHeightClass = curHeightClass;
+            lastWidthClass = curWidthClass;
+        });
     }
     
     // Display in desktop mode any ads whose position/size is dependent on
@@ -61,6 +62,32 @@ function GlobalStartupActions()
             window.location.href = "Index.php?action=Signup";
         });
     }
+}
+
+function GetCurWidthClass()
+{
+    var curWidthClass = 'desktop';
+    if(window.matchMedia("(max-width: 400px)").matches) {
+        curWidthClass = 'xtraSmall';
+    }
+    else if(window.matchMedia("(min-width: 401px) and (max-width: 675px)").matches) {
+        curWidthClass = 'mobile';
+    }
+    
+    return curWidthClass;
+}
+
+function GetCurHeightClass()
+{
+    var curHeightClass = 'desktop';
+    if(window.matchMedia("(max-height: 400px)").matches) {
+        curHeightClass = 'xtraSmall';
+    }
+    else if(window.matchMedia("(min-height: 401px) and (max-height: 675px)").matches) {
+        curHeightClass = 'mobile';
+    }
+    
+    return curHeightClass;
 }
 
 function GetURLParamVal(paramName)
@@ -259,16 +286,10 @@ function displayHiddenAdsByBrowsingDevice()
 }
 
 function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPosition, displayContainer, 
-                             autoOpen, isModal, dialogLoadURL, dialogLoadOnLoaded)
+                             autoOpen, isModal, dialogLoadURL, dialogLoadOnLoaded, dlgWidth, dlgHeight)
 {
-    var width = 600;
-    var height = 700;
-    
-    if(isMobileView()) {
-        width = 400;
-        height = 500;
-        displayContainerPosition = displayContainerPosition + "+10%";
-    }
+    var width = dlgWidth || 600;
+    var height = dlgHeight || 700;
     
     var $dialog = $('<div id="' + dialogId + '"></div>').load(dialogLoadURL, dialogLoadOnLoaded).dialog({
             autoOpen: autoOpen,
@@ -276,6 +297,7 @@ function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPo
             width: width,
             height: height,
             modal: isModal,
+            dialogClass: 'customDialogStyle',
             close: function(event, ui) {
                 $dialog.dialog('destroy').remove();
             }
@@ -291,35 +313,41 @@ function displayJQueryDialog(dialogId, title, dialogPosition, displayContainerPo
     $dialog.dialog('open');
 }
 
-function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayContainerPosition, displayContainer, 
-                                    autoOpen, isModal, dlgWidth, dlgHeight, destroyDlgOnClose)
+function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayContainer, 
+                                    autoOpen, isModal, dlgHeight, destroyDlgOnClose, dialogLoadOnLoaded)
 {
-    var width = dlgWidth;
-    var height = dlgHeight;
-    
-    if(isMobileView()) {
-        width = 0.66 * dlgWidth;
-        
-        if(height != 'auto')  height = 0.8 * dlgHeight;
-        displayContainerPosition = displayContainerPosition + "+10%";
+    var curWidthClass = GetCurWidthClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
     }
     
+    var height = dlgHeight || 700;
+    
     var $dialog = $(dialogHTML).dialog({
-            autoOpen: autoOpen,
-            title: title,
-            width: width,
-            height: height,
-            modal: isModal,
-            close: function(event, ui) {
-                if(destroyDlgOnClose) {
-                    $dialog.dialog('destroy').remove();
-                }
-                else {
-                    $dialog.dialog('close');
-                }
+        autoOpen: autoOpen,
+        title: title,
+        width: dlgWidth,
+        height: height,
+        modal: isModal,
+        dialogClass: 'customDialogStyle',
+	open: dialogLoadOnLoaded || (function() {}),
+        close: function(event, ui) {
+            if(destroyDlgOnClose) {
+                $dialog.dialog('destroy').remove();
+            }
+            else {
+                $dialog.dialog('close');
             }
         }
-    );
+    });
     
     $dialog.dialog('option', 'position', {
         my: dialogPosition,
@@ -485,11 +513,12 @@ function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tab
         return;
     }
     
-    var destColIdx = $(tableContainerDiv + ' th:contains("' + colsToCombine[0] + '")').index();
+    var curJTable = $(tableContainerDiv).children('.jtable-main-container').children('.jtable');
+    var destColIdx = $(curJTable).find('th:contains("' + colsToCombine[0] + '")').eq(0).index();
     
     // For each displayed row
-    $(tableContainerDiv).children('.jTable').find('tbody tr').each(function() {
-        var stackedTextCol = $(this).find('td').eq(destColIdx);
+    $(curJTable).children('tbody').children('tr').each(function() {
+        var stackedTextCol = $(this).children('td').eq(destColIdx);
         var stackedText = $(stackedTextCol).text();
         
         // Apply "white-space:pre" style to stack column, to allow separator line between
@@ -498,7 +527,7 @@ function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tab
         
         for(var i = 1; i < colsToCombine.length; i++) {
             // Get current index of this column
-            var colIdx = $(tableContainerDiv + ' th:contains("' + colsToCombine[i] + '")').index();
+            var colIdx = $(curJTable).find('th:contains("' + colsToCombine[i] + '")').eq(0).index();
 
             // Get text of this column
             var newLinesToAdd = "\n";
@@ -506,7 +535,7 @@ function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tab
                 newLinesToAdd += "\n";
             }
             
-            var col = $(this).find('td').eq(colIdx);
+            var col = $(this).children('td').eq(colIdx);
             var colText = newLinesToAdd + $(col).text();
 
             // Add to stack
@@ -517,7 +546,7 @@ function CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, tab
             
             // Hide this column header
             if(i === 1) {
-                var colHdr = $(tableContainerDiv + ' thead tr th:contains("' + colsToCombine[i] + '")');
+                var colHdr = $(curJTable).find('th:contains("' + colsToCombine[i] + '")').eq(0);
                 $(colHdr).addClass(hiddenClassName);
             }
         }
@@ -539,11 +568,12 @@ function ExpandTableColumn(stackCol, colsToExpand, tableContainerDiv, hiddenClas
         return;
     }
     
-    var stackColIdx = $(tableContainerDiv + ' th:contains("' + stackCol + '")').index();
+    var curJTable = $(tableContainerDiv).children('.jtable-main-container').children('.fixedWidthScrollableContainer').children('.jtable');
+    var stackColIdx = $(curJTable).find('th:contains("' + stackCol + '")').eq(0).index();
     
     // For each displayed row
-    $(tableContainerDiv).children('.jTable').find('tbody tr').each(function() {
-        var stackedTextCol = $(this).find('td').eq(stackColIdx);
+    $(curJTable).children('tbody').children('tr').each(function() {
+        var stackedTextCol = $(this).children('td').eq(stackColIdx);
         var stackedText = $(stackedTextCol).text();
         
         // Remove stacked text, leaving only original text
@@ -556,9 +586,48 @@ function ExpandTableColumn(stackCol, colsToExpand, tableContainerDiv, hiddenClas
         
         // Make previously hidden columns visible again
         for(var i = 0; i < colsToExpand.length; i++) {
-            var colIdx = $(tableContainerDiv + ' th:contains("' + colsToExpand[i] + '")').index();
-            var col = $(this).find('td').eq(colIdx);
+            var colIdx = $(curJTable).find('th:contains("' + colsToExpand[i] + '")').eq(0).index();
+            var col = $(this).children('td').eq(colIdx);
             $(col).removeClass(hiddenClassName);
         }
+    });
+}
+
+function SaveCurrentJTableContentsToClipboard(jTableDiv, title, tableTitle)
+{
+    var newline = '&#13;&#10;';
+    var outputText = tableTitle;
+    var gamerTagNameColIdx = $(jTableDiv + ' th:contains("Tag Name")').index();
+    var platformNameColIdx = $(jTableDiv + ' th:contains("Platform")').index();
+	
+    // For each displayed row
+    $(jTableDiv + ' .fixedHeightScrollableContainerJumbo').children('.jtable').find('tbody tr').each(function() {
+	var gamerTagName = $(this).find('td').eq(gamerTagNameColIdx).text();
+	var platformName = $(this).find('td').eq(platformNameColIdx).text();
+		
+	var outputLine =  newline + newline + 'Tag Name:  ' + gamerTagName + newline + 'Platform Name: ' + platformName;
+	outputText += outputLine;
+    });
+	
+    var dialogHTML = '<div><textarea class="autoSelectTextArea">' + outputText + '</textarea></div>';
+    displayJQueryDialogFromDiv(dialogHTML, title, 'top', window, false, false, 'auto', true, SelectAllTextInTextArea);
+}
+
+function SelectAllTextInTextArea()
+{
+    $(this).children('textarea').each(function() {
+        var $this = $(this);
+	$this.focus(function() {
+            $this.mouseup(function(e){
+                e.preventDefault();
+            });
+            
+            $this.select();
+            setTimeout(function() {
+                $this.select();
+            }, 500);
+        });
+        
+	$this.focus();
     });
 }

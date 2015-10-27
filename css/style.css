@@ -538,6 +538,10 @@
         margin-left: 5em;
     }
 
+    .xtraSmallSelectAllCheckbox {
+        margin-left: 0.5em !important;
+    }
+    
     .globalGameOption {
         background-color: #F0F0F0;
     }
@@ -633,12 +637,55 @@
     }
 
     .overlayPanelToggleGroup {
-        margin-top: 1%;
+        display: table;
+        width: 100%;
     }
     
-    .overlayPanelToggleGroup:after {
-        content: "\a0\a";
-        white-space: pre !important;
+    .overlayPanelToggleLinkWrap {
+        display: table-cell;
+        padding: 0.5em;
+        width: 25%;
+        text-align: left;
+    }
+
+    .overlayPanelToggleChkboxWrap {
+        display: table-cell;
+        padding: 0.5em;
+        text-align: left;
+    }
+    
+    .overlayPanelToggleElementActive {
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
+        margin-left: 3%;
+        font-size: 1.5em;
+        font-weight:bold;
+        text-decoration: none;
+        color: blue;
+        float: left;
+    }
+	
+    .overlayPanelToggleElementInactive {
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
+        margin-left: 3%;
+        font-size: 1.5em;
+        text-decoration: none;
+        color: black;
+        float: left;
+    }
+    
+    .overlayPanelToggleActiveChk {
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
+	margin-right: 5px;
+    }
+    
+    .overlayPanelToggleActiveLbl {
+        opacity: 0.9;
+        filter: alpha(opacity=90); /* IE6+ */
+	color: white;
+	font-size: 1em;
     }
     
     .overlayPanelFilterGroup {
@@ -709,6 +756,13 @@
         color: white;
     }
     
+    .overlayPanelLabelMultiSelector {
+        opacity: 0.9; /* CSS3 */
+        filter: alpha(opacity=90); /* IE6+ */
+	color: white;
+	font-size: 1em;
+    }
+    
     .overlayPanelControlElement {
         width: 250px !important;
         height: 55px;
@@ -725,48 +779,13 @@
         width: 95%;
     }
     
-    .overlayPanelToggleElementActive {
-        opacity: 0.9; /* CSS3 */
-        filter: alpha(opacity=90); /* IE6+ */
-        margin-left: 3%;
-        font-size: 1.5em;
-        font-weight:bold;
-        text-decoration: none;
-        color: blue;
-        float: left;
-    }
-	
-    .overlayPanelToggleElementInactive {
-        opacity: 0.9; /* CSS3 */
-        filter: alpha(opacity=90); /* IE6+ */
-        margin-left: 3%;
-        font-size: 1.5em;
-        text-decoration: none;
-        color: black;
-        float: left;
-    }
-	
-    .overlayPanelToggleActiveChk {
-        opacity: 0.9; /* CSS3 */
-        filter: alpha(opacity=90); /* IE6+ */
-		margin-left: 2%;
-		margin-right: 5px;
-        float: right;
-    }
-	
-    .overlayPanelLbl {
-        opacity: 0.9; /* CSS3 */
-        filter: alpha(opacity=90); /* IE6+ */
-		color: white;
-		font-size: 1em;
-    }
-    
-    .overlayPanelToggleActiveLbl {
-        opacity: 0.9;
-        filter: alpha(opacity=90); /* IE6+ */
-		color: white;
-		font-size: 1em;
-        float: right;
+    .swipeHoverIconContainer {
+        position: absolute;
+        bottom: 0px;
+        left: -5px;
+        opacity: 0.5; /* CSS3 */
+        filter: alpha(opacity=50); /* IE6+ */
+        z-index: 100002;
     }
     
     .searchPanelCurEvtsFilter {}
@@ -811,12 +830,11 @@
     .fixedWidthScrollableContainer {
         border:none;
         box-sizing: border-box;
-        width: 375px !important;
         overflow-x: auto;
     }
     
     .multiLineTableColumn {
-        white-space: pre;
+        white-space: pre-wrap;
     }
 	
     .mobileViewFontSize {
@@ -1261,13 +1279,18 @@
         line-height: 1.75em;
         width: 28em;
     }
-    .textareaMobile{
-        width: 18em !important;
-    }
     
     #signupForm textarea {
         height: 10em;
         resize: none;
+    }
+    
+    .customDialogStyle .ui-dialog-titlebar > span {
+        white-space: normal !important;
+    }
+    
+    .autoSelectTextArea {
+        min-height: 300px;
     }
 
     select{
@@ -1394,18 +1417,19 @@
         margin-right: 2%;
         padding: 1em 1em 1em 0.75em !important;
     }
-    
-    .mobileDlgToolbarContainer {
-        width: 300px;
+	
+    .mobileButtonToolbarContainer {
+        width: 95%;
         height: auto;
         border:2px solid red;
         box-sizing: border-box;
         overflow-y: auto;
+	margin-bottom: 10px;
     }
     
-    .mobileDlgToolbarContainer > button {
+    .mobileButtonToolbarContainer > button {
         width: 45%;
-        height: 90px;
+        height: 65px;
         float: left;
         margin-top: 0.5em;
         margin-bottom: 0.5em;

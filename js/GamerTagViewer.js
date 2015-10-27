@@ -17,9 +17,9 @@ function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, di
     userId = openForUserID;
     destroyThisDialogOnClose = destroyDialogOnClose;
 	
-    var dialogDescriptor = '<p><i class="fa fa-gamepad"></i> &nbsp; Add, update, or delete gamer tags tied to your user ID</p>';
+    var dialogDescriptor = '<p style="font-weight: bold;"><i class="fa fa-gamepad"></i> &nbsp; Add, update, or delete gamer tags tied to your user ID</p>';
     if(isReadOnlyMode) {
-	dialogDescriptor = '<br />';
+        dialogDescriptor = '<p style="font-weight: bold;">' + tableTitle + '</p>';
     }
 	
     var dialogHTML = '<div id="' + gamerTagManagerDlg + '">' + 
@@ -35,13 +35,13 @@ function OpenGamerTagViewer(gamerTagManagerDlgId, gamerTagManagerJTableDivId, di
     if(($('#' + gamerTagManagerDlg).length) && ($('#' + gamerTagManagerDlg + ' .jtable').length)) {
         $('#' + gamerTagManagerDlg).dialog('open');
     }
-    else {
-        displayJQueryDialogFromDiv(dialogHTML, thisDialogTitle, "top", "top", window, false, true, 600, "auto", destroyThisDialogOnClose);
-        GamerTagManagerDialogOnReady($('#' + gamerTagManagerDlg).dialog());
+    else {        
+        displayJQueryDialogFromDiv(dialogHTML, thisDialogTitle, "top", window, false, true, "auto", destroyThisDialogOnClose);
+        GamerTagManagerDialogOnReady($('#' + gamerTagManagerDlg).dialog(), GetCurWidthClass() == 'xtraSmall');
     }
 }
 
-function GamerTagManagerDialogOnReady($dialog)
+function GamerTagManagerDialogOnReady($dialog, showMinimalPagingControls)
 {
     var managerActions = {
         listAction: "AJAXHandler.php?action=GetCurrentGamerTagsForUser&userID=" + userId,
@@ -54,16 +54,30 @@ function GamerTagManagerDialogOnReady($dialog)
 	
     // Initialize jTable on requested div
     $('#' + gamerTagManagerJTableDiv).jtable({
-        title: thisGamerTagTableTitle,
+        title: isReadOnlyMode ? 'Tag List' : thisGamerTagTableTitle,
         paging: true,
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
         pageSizeChangeArea: true,
 	gotoPageArea: 'none',
+        pageList: showMinimalPagingControls ? 'minimal' : 'normal',
         sorting: true,
         defaultSorting: 'GamerTagName ASC',
         openChildAsAccordion: false,
         actions: isReadOnlyMode ? readOnlyActions : managerActions,
+        toolbar: {
+            items: [
+                {
+                    icon: 'images/saveToClipboard.png',
+                    text: 'Copy to Clipboard',
+                    click: function() {
+                        return SaveCurrentJTableContentsToClipboard('#' + gamerTagManagerJTableDiv, 
+                                                                    'Press Ctrl + C to copy to clipboard',
+                                                                    thisGamerTagTableTitle);
+                    }
+                }
+            ]
+        },
         fields: {
             ID: {
                 key: true,
@@ -83,7 +97,7 @@ function GamerTagManagerDialogOnReady($dialog)
                     // if we're listing records after an update
                     return ($.isNumeric(data.record.PlatformName)) ? FindPlatformNameByID(data.record.PlatformName) : data.record.PlatformName;
 		},
-                input: function (data) {
+		input: function (data) {
                     // Get list of platforms
                     var selectorHTML = '<select id="ddlPlatforms" name="PlatformName"><option value="-1">DB error: could not load consoles</option></select>';
                     if(!cachedPlatformList) {

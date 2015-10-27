@@ -52,11 +52,16 @@
                                                     <div id="searchPanel" class="overlayPanel overlayPanelCurEvts">
                                                         <form name="searchForm" method="POST" action="">
                                                             <div class="overlayPanelFixedHeightScrollableContainer">
-                                                                <div class="overlayPanelToggleGroup"><a href="#" id="dateRangeFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                <div class="overlayPanelToggleGroup">
+                                                                    <div class="overlayPanelToggleLinkWrap">
+                                                                        <a href="#" id="dateRangeFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
                                                                         onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
-                                                                    <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" 
-								       groupId="dateRangeFilterDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
-                                                                    <label id="dateRangeFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
+                                                                    <div class="overlayPanelToggleChkboxWrap">
+                                                                        <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" 
+                                                                           groupId="dateRangeFilterDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
+                                                                        <label id="dateRangeFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
                                                                 </div>
                                                                 <div id="dateRangeFilterDiv" class="overlayPanelFilterGroup">
                                                                     <div id="dateRangeFilterStart" class="overlayPanelFilterSubGroup">
@@ -97,11 +102,15 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
-                                                                    <a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-                                                                       onclick="return ToggleSearchDivDisplay('#gameTitleFilterDiv', this);">&nbsp;&nbsp;Game Title</a>
-                                                                    <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" 
-									   groupId="gameTitleFilterDiv" lblId="gameTitleFilterActiveToggleLabel" type="checkbox">
-                                                                    <label id="gameTitleFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    <div class="overlayPanelToggleLinkWrap">
+                                                                        <a href="#" id="gameTitleFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                           onclick="return ToggleSearchDivDisplay('#gameTitleFilterDiv', this);">&nbsp;&nbsp;Game Title</a>
+                                                                    </div>
+                                                                    <div class="overlayPanelToggleChkboxWrap">
+                                                                        <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="gameTitleFilterLink" 
+                                                                               groupId="gameTitleFilterDiv" lblId="gameTitleFilterActiveToggleLabel" type="checkbox">
+                                                                        <label id="gameTitleFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
                                                                 </div>
                                                                 <div id="gameTitleFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
@@ -121,11 +130,15 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter">
-                                                                    <a href="#" id="eventCreatorFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-                                                                       onclick="return ToggleSearchDivDisplay('#eventCreatorFilterDiv', this);">&nbsp;&nbsp;Event Creator</a>
-                                                                    <input id="eventCreatorFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="eventCreatorFilterLink" 
-									   groupId="eventCreatorFilterDiv" lblId="eventCreatorFilterActiveToggleLabel" type="checkbox">
-                                                                    <label id="eventCreatorFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    <div class="overlayPanelToggleLinkWrap">
+                                                                        <a href="#" id="eventCreatorFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                           onclick="return ToggleSearchDivDisplay('#eventCreatorFilterDiv', this);">&nbsp;&nbsp;Event Creator</a>
+                                                                    </div>
+                                                                    <div class="overlayPanelToggleChkboxWrap">
+                                                                        <input id="eventCreatorFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="eventCreatorFilterLink" 
+                                                                               groupId="eventCreatorFilterDiv" lblId="eventCreatorFilterActiveToggleLabel" type="checkbox">
+                                                                        <label id="eventCreatorFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
                                                                 </div>
                                                                 <div id="eventCreatorFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter">
                                                                     <div id="eventCreatorFilterStart" class="overlayPanelFilterSubGroup">
@@ -145,11 +158,15 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="overlayPanelToggleGroup searchPanelEvtMgrFilter searchPanelCurEvtsFilter">
-                                                                    <a href="#" id="joinedUserFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-                                                                       onclick="return ToggleSearchDivDisplay('#joinedUserFilterDiv', this);">&nbsp;&nbsp;Joined Users</a>
-                                                                    <input id="joinedUserFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="joinedUserFilterLink" 
-									   groupId="joinedUserFilterDiv" lblId="joinedUserFilterActiveToggleLabel" type="checkbox">
-                                                                    <label id="joinedUserFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    <div class="overlayPanelToggleLinkWrap">
+                                                                        <a href="#" id="joinedUserFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                           onclick="return ToggleSearchDivDisplay('#joinedUserFilterDiv', this);">&nbsp;&nbsp;Joined Users</a>
+                                                                    </div>
+                                                                    <div class="overlayPanelToggleChkboxWrap">
+                                                                        <input id="joinedUserFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="joinedUserFilterLink" 
+                                                                               groupId="joinedUserFilterDiv" lblId="joinedUserFilterActiveToggleLabel" type="checkbox">
+                                                                        <label id="joinedUserFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
                                                                 </div>
                                                                 <div id="joinedUserFilterDiv" class="overlayPanelFilterGroup searchPanelEvtMgrFilter searchPanelCurEvtsFilter">
                                                                     <div id="joinedUserFilterStart" class="overlayPanelFilterSubGroup">
@@ -169,11 +186,15 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
-                                                                    <a href="#" id="platformFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-                                                                       onclick="return ToggleSearchDivDisplay('#platformFilterDiv', this);">&nbsp;&nbsp;Console Type</a>
-                                                                    <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
-									   groupId="platformFilterDiv" lblId="platformFilterActiveToggleLabel" type="checkbox">
-                                                                    <label id="platformFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    <div class="overlayPanelToggleLinkWrap">
+                                                                        <a href="#" id="platformFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                           onclick="return ToggleSearchDivDisplay('#platformFilterDiv', this);">&nbsp;&nbsp;Console Type</a>
+                                                                    </div>
+                                                                    <div class="overlayPanelToggleChkboxWrap">
+                                                                        <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
+                                                                               groupId="platformFilterDiv" lblId="platformFilterActiveToggleLabel" type="checkbox">
+                                                                        <label id="platformFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+                                                                    </div>
                                                                 </div>
                                                                 <div id="platformFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
                                                                     <div id="platformFilterStart" class="overlayPanelFilterSubGroup">
@@ -223,6 +244,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <div class="swipeHoverIconContainer"><img id="swipeHoverIcon" src="images/SwipeRight.png" /></div>
                                                             <div class="overlayPanelControlElementGroup">
                                                                 <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
                                                                 <button class="controlBtn button overlayPanelControlElement" id="closePanelBtn">Close</button>
@@ -235,20 +257,30 @@
 					</section>				
                                     </div>
 				</div>
-				<div id="manageEventsDiv" class="9u jTableContainer">
-                                    <section class="box style1">
-                                    <h2>Manage Your Events</h2>
-                                    <div id="manageEventsContent">
-                                    </div>
-                                    </section>
-				</div>
-				<div id="currentEventsDiv" class="9u jTableContainer">					
+				<div id="currentEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
                                     <h2>Current Events</h2>
                                     <span id="totalGamesToJoin" class="byline"></span><br/><br/>
                                     <div id="currentEventsContent">
                                     </div>
                                     </section><br/>
+				</div>
+				<div id="manageEventsDiv" class="9u jTableContainer">
+                                    <section class="box style1">
+                                    <h2>Manage Your Events</h2>
+					<div id="mobileEvtMgrToolbar" class="mobileButtonToolbarContainer">
+                                            <button type="button" class="memberHomeBtn" id="btnMobileRefresh">Refresh
+						<br /><img src="images/refresh.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileActivate">Activate
+						<br /><img src="images/activate.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileHide">Hide
+						<br /><img src="images/deactivate.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileDelete">Delete
+						<br /><img src="images/delete.png" /></button>
+					</div>
+                                    <div id="manageEventsContent">
+                                    </div>
+                                    </section>
 				</div>
                             </div>
 			</div>

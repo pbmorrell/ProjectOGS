@@ -32,7 +32,7 @@
                                                             <form id="mobileLoginForm" name="mobileLoginForm" method="POST" action="">
                                                                 <input id="loginUsername" name="loginUsername" type="text" maxlength="50" placeholder=" Username"><br/>
                                                                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password"><br/><br/>
-                                                                <button type="submit" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</button>&nbsp;
+                                                                <a href="#" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</a>&nbsp;
                                                             </form>
                                                         </div>
                                                         <br/>
