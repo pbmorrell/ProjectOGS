@@ -742,6 +742,14 @@
         margin-right: 2%;
     }
     
+    .overlayPanelElementContainerCheckboxListSiblingWide {
+        width: 95% !important;
+        height: 8%;
+        float: left;
+        margin-left: 2%;
+        margin-right: 2%;
+    }    
+    
     .overlayPanelElement {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
@@ -781,8 +789,8 @@
     
     .swipeHoverIconContainer {
         position: absolute;
-        bottom: 0px;
-        left: -5px;
+        bottom: 5%;
+        left: -10px;
         opacity: 0.5; /* CSS3 */
         filter: alpha(opacity=50); /* IE6+ */
         z-index: 100002;

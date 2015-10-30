@@ -286,6 +286,10 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         // Change text of toggle checkboxes to be shorter, for mobile view
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate Filter" }).text('Activate');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
+		
+		// Hide event manager mobile control panel if mobile view, or show it if in xtraSmall view
+		if(curWidthClass == 'mobile') 			$('.mobileButtonToolbarContainer').hide();
+		else if(curWidthClass == 'xtraSmall')   $('.mobileButtonToolbarContainer').show();
         
         // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
         if(!initTransition) {
@@ -323,6 +327,9 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         // Change text of toggle checkboxes to full version, for desktop view
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate" }).text('Activate Filter');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
+		
+		// Hide event manager mobile control panel
+		$('.mobileButtonToolbarContainer').hide();
 
         // Restore hidden or combined columns
         if(!initTransition) {
@@ -641,29 +648,29 @@ function LoadCurrentEventViewer()
                 sorting: true,
                 display: function (data) {
                     // Create JOIN or LEAVE link
-                    if(data.record.Joined !== 'FULL') {
-			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
+                    if((data.record.Joined == 'JOIN') || (data.record.Joined == 'LEAVE')) {
+						var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
 					
-			if(data.record.Joined === 'JOIN') {
+						if(data.record.Joined === 'JOIN') {
                             $expandLink.click(function () {
-				var eventIds = [data.record.ID];
-				JoinEvents(eventIds);
-				return false;
+								var eventIds = [data.record.ID];
+								JoinEvents(eventIds);
+								return false;
                             });
-			}
-			else {
+						}
+						else {
                             $expandLink.click(function () {
-				var eventIds = [data.record.ID];
-				LeaveEvents(eventIds);
-				return false;
+								var eventIds = [data.record.ID];
+								LeaveEvents(eventIds);
+								return false;
                             });
-			}
+						}
 							
-			// Return image for display in jTable
-			return $expandLink;
+						// Return image for display in jTable
+						return $expandLink;
                     }
                     else {
-			return $('<label>FULL</label>');
+						return $('<label>' + data.record.Joined + '</label>');
                     }
                 }
             },
@@ -695,46 +702,50 @@ function LoadCurrentEventViewer()
                 sorting: false
             }
         },
-	recordsLoaded: function(event, data) {
+		recordsLoaded: function(event, data) {
             // Set total count of games that need joining
             if((data.records !== null) && (data.records.length > 0)) {
-		var totalGameCount = data.records[0].TotalGamesToJoinCount;
-		var needText = "need";
-		if(totalGameCount == 1) {
+				var totalGameCount = data.records[0].TotalGamesToJoinCount;
+				var needText = "need";
+				if(totalGameCount == 1) {
                     needText = "needs";
-		}
+				}
 				
-		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
+				$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
             }
 				
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
-		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
-		var id = $(this).attr('data-record-key');
-		var dataRecordArray = $.grep(data.records, function (e) {
+				// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
+				var id = $(this).attr('data-record-key');
+				var dataRecordArray = $.grep(data.records, function (e) {
                     return e.ID === id;
-		});
+				});
 										
-		var playerData = dataRecordArray[0].PlayersSignedUpData;
-		$(this).attr('data-playersSignedUp', playerData);
-													
-		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
-					
-		// If an event is joined by current user, set forecolor to green
-		var isJoined = dataRecordArray[0].Joined;
-		if(isJoined === 'LEAVE') {
+				var playerData = dataRecordArray[0].PlayersSignedUpData;
+				$(this).attr('data-playersSignedUp', playerData);
+															
+				// Pre-load each child table, but do not show yet
+				OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
+							
+				// If an event is joined by current user, set forecolor to green
+				var isJoined = dataRecordArray[0].Joined;
+				if(isJoined === 'LEAVE') {
                     $(this).css('color', 'green');
-		}
-		// If all required players are signed up for a given event,
-		// such that it is "full", set forecolor to red
-		else if(isJoined === 'FULL') {
+				}
+				// If all required players are signed up for a given event,
+				// such that it is "full", set forecolor to red
+				else if((isJoined === 'FULL') && (!IsPastEvent(dataRecordArray[0].EventScheduledForDate))) {
                     $(this).css('color', 'red');
-		}
+				}
+				// If event occurred in the past, set forecolor to gray
+				else if(isJoined !== 'JOIN') {
+                    $(this).css('color', 'gray');
+				}				
             });
 				
             var curWidthClass = GetCurWidthClass();
             if(curWidthClass != 'desktop')  FormatCurrentEventsTableForCurrentView(true, curWidthClass);
-	}
+		}
     });
 
     // Load event list
@@ -772,9 +783,8 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         
         // Change table header/toolbar to be more mobile-friendly
 	if((curWidthClass == 'desktop') || (curWidthClass == 'mobile')) {
-            // Hide mobile control panel, and show toolbar items
+            // Show toolbar items
             $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
-            $('#mobileEvtMgrToolbar').addClass('hidden');
 	}
 		
         if(curWidthClass == 'mobile') {
@@ -783,9 +793,8 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         else if(curWidthClass == 'xtraSmall') {
             $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
 			
-            // Hide toolbar items, and show mobile control panel
+            // Hide toolbar items
             $(eventManagerJTableDiv + ' .jtable-toolbar-item').hide();
-            $('#mobileEvtMgrToolbar').removeClass('hidden');
 	}
         
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
@@ -846,9 +855,8 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide")').text('Hide Selected');
 	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete")').text('Delete Selected');
         
-        // Hide mobile control panel, and show toolbar items
+        // Show toolbar items
         $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
-        $('#mobileEvtMgrToolbar').addClass('hidden');
         
         // Show hidden columns
         $('.' + hiddenClass).removeClass(hiddenClass);
@@ -998,6 +1006,19 @@ function EventManagerOnReady()
 
 }
 
+function IsPastEvent(eventScheduledForDate)
+{
+	var curMoment = moment().utc();
+	
+	// Event date already in UTC, and is in 24-hr format
+	var gameTimeMoment = moment(eventScheduledForDate + " +0000", "YYYY-MM-DD HH:mm:ss Z");
+	if (gameTimeMoment.isBefore(curMoment)) {
+		return true;
+	}
+	
+	return false;
+}
+
 function DeselectAllJTableRows(jTableContainer)
 {
     // Deselect rows (remove highlight)
@@ -1085,6 +1106,7 @@ function JoinSelectedEvents()
     }
 
     var selectedEventIds = [];
+	var oldEvents = [];
     var eventsToDeselect = [];
     $selectedRows.each(function() {
         var id = $(this).data('record').ID;
@@ -1100,7 +1122,7 @@ function JoinSelectedEvents()
     });
 
     if(selectedEventIds.length === 0) {
-        sweetAlert("You are already a member of all selected events");
+        sweetAlert("No selected events may be joined: you can only join future events which are not full, and which you haven't already joined");
         DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
     }
     else if(!JoinEvents(selectedEventIds)) {
@@ -1133,7 +1155,7 @@ function LeaveSelectedEvents()
     });
 
     if(selectedEventIds.length === 0) {
-        sweetAlert("You haven't joined any of the selected events yet");
+        sweetAlert("No selected events may be left: you can only leave events scheduled for the future, and which you have already joined");
         DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
     }
     else if(!LeaveEvents(selectedEventIds)) {

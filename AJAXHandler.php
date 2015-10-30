@@ -326,15 +326,15 @@
                 }
                 break;
             case "EventEditorLoad":
-		$eventId = '';
-		if(isset($_GET['EventID'])) {
+				$eventId = '';
+				if(isset($_GET['EventID'])) {
                     $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
-		}
+				}
 
-		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $eventId);
-		break;
+				echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $objUser->IsPremiumMember, $eventId);
+				break;
             case "EventManagerLoad":
-		echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
+				echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
                 break;
             case "EventEditorCreateEvent":
                 $pvtEventFriends = (isset($_POST['pvtEventFriends'])) ? ($_POST['pvtEventFriends']) : [];

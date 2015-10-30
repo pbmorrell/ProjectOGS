@@ -187,7 +187,7 @@ class GamingHandler
         return $activeUsers;
     }
 	
-    public function EventEditorLoad($dataAccess, $logger, $userID, $eventId)
+    public function EventEditorLoad($dataAccess, $logger, $userID, $isPremiumMember, $eventId)
     {
         // If this is called for existing event, append eventID to each control ID for uniqueness
         $formName = "eventCreateForm";
@@ -276,7 +276,7 @@ class GamingHandler
 		if(($eventInfo != null) && (!$eventInfo->IsPublicGame)) {
                     $userFriendDisabled = '';
 		}
-				
+		
 		$friendListSelect .= '<input type="checkbox" name="pvtEventFriends' . $eventId . '[]" value="' . $userFriend->UserID . '" ' . $userFriendSelected . 
                                      ' ' . $userFriendDisabled . ' /> ' . $userDisplayName . '</br>';
             }
@@ -308,15 +308,21 @@ class GamingHandler
                             '<textarea name="message' . $eventId . '" id="message' . $eventId .
                             '" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required>'.
                             (($eventInfo != null) ? ($eventInfo->Notes) : '') . '</textarea>'.
-                        '</p>'.
-			'<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event</p>'.
-                        '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
+                        '</p>'. 
+			($isPremiumMember ?
+			(
+                            '<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event</p>'.
+                            '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
                             $privateEventOptionChecked . ' ' . $privateEventOptionDisabled . 
-                        '>Private Event</input>&nbsp;<input class="selectAllCheckbox" type="checkbox" id="selectAllFriends' . $eventId . '" value="all" ' . 
+                            '>Private Event</input>&nbsp;<input class="selectAllCheckbox" type="checkbox" id="selectAllFriends' . $eventId . '" value="all" ' . 
                             ((($eventId === 0) || (!$privateEventOptionChecked)) ? 'disabled ' : '') . '>Select all</input>'.
-                        '<div class="fixedHeightScrollableContainer">'. 
-                            $friendListSelect .
-                        '</div><br /><br />'.
+                            '<div class="fixedHeightScrollableContainer">'. 
+				$friendListSelect .
+                            '</div><br /><br />'
+			) 
+			: 
+                            '<br />'
+			).
                         '<div id="eventDialogToolbar' . $eventId . '" class="dlgToolbarContainer">'.
                             '<button type="submit" class="memberHomeBtn" id="' . $formButtonName . '">' . $formButtonText . 
                                 '<br /><span class="icon fa-cogs" /></button>'.
@@ -429,9 +435,10 @@ class GamingHandler
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-		"PlayersSignedUpData" => $playersSignedUpData,
+				"PlayersSignedUpData" => $playersSignedUpData,
                 "Edit" => '',
-		"Hidden" => !$game->Visible ? 'Yes' : 'No'
+				"Hidden" => !$game->Visible ? 'Yes' : 'No',
+				"EventScheduledForDate" => $game->ScheduledDateUTC
             );
 
             array_push($rows, $row);
@@ -493,16 +500,17 @@ class GamingHandler
 
             $row = array (
                 "ID" => $game->EventID,
-		"TotalGamesToJoinCount" => $totalGameCntNotJoined,
-		"UserName" => $game->EventCreatorUserName,
+				"TotalGamesToJoinCount" => $totalGameCntNotJoined,
+				"UserName" => $game->EventCreatorUserName,
                 "GameTitle" => $game->Name,
                 "Platform" => $game->SelectedPlatformText,
                 "DisplayDate" => $game->ScheduledDate,
                 "DisplayTime" => $game->ScheduledTime . ' ' . $game->ScheduledTimeZoneText,
                 "Notes" => $game->Notes,
                 "PlayersSignedUp" => sprintf("%d (of %d)", count($playersSignedUp), $game->RequiredPlayersCount),
-		"PlayersSignedUpData" => $playersSignedUpData,
-		"Joined" => $game->JoinStatus
+				"PlayersSignedUpData" => $playersSignedUpData,
+				"Joined" => $game->JoinStatus,
+				"EventScheduledForDate" => $game->ScheduledDateUTC
             );
 
             array_push($rows, $row);
@@ -1265,8 +1273,9 @@ class GamingHandler
                 $queryOrderByClause = "u.`UserName` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "Joined":
-                $queryOrderByClause = "(CASE WHEN em2.`ID` IS NOT NULL THEN 'LEAVE' ELSE " .
-                                      "(CASE WHEN membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount` THEN 'FULL' ELSE 'JOIN' END) END) " . 
+                $queryOrderByClause = "(CASE WHEN em2.`ID` IS NOT NULL THEN (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) THEN 'JOINED' ELSE 'LEAVE' END) ELSE " .
+                                      "(CASE WHEN membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount` THEN 'FULL' ELSE (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) " .
+									  "THEN 'UNJOINED' ELSE 'JOIN' END) END) END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
         }
@@ -1476,7 +1485,7 @@ class GamingHandler
                                                                 false, $row['TimezoneID'], $row['PlatformID'], $row['GameTitle'], $row['EventScheduledForDate'], $row['Platform'], 
                                                                 $row['TimeZone'], $row['ID'], $row['IsActive'] == '1' ? true : false, $row['EventCreatorUserName']);
                         $userGame->EventMembers = $evtMembers;
-                        $this->SetEventJoinStatus($userGame, $evtMembers, $row['RequiredMemberCount'], $row['thisUserIsJoined']);
+                        $this->SetEventJoinStatus($userGame, $evtMembers, $row['RequiredMemberCount'], $row['thisUserIsJoined'], $row['EventScheduledForDate']);
                         array_push($userGames, $userGame);
                     }
 		}
@@ -1491,12 +1500,17 @@ class GamingHandler
         return $userGames;
     }
 	
-    private function SetEventJoinStatus($userGame, $evtMembers, $requiredMemberCount, $thisUserIsJoined)
+    private function SetEventJoinStatus($userGame, $evtMembers, $requiredMemberCount, $thisUserIsJoined, $eventScheduledDate)
     {
-        // Calculate join status of this game: full (all required members signed up), join (open for current user to join), leave (current user is joined already)
-        $joinStatus = "JOIN";
+        // Calculate join status of this game: full (all required members signed up), join (open for current user to join), leave (current user is joined already),
+		// or past (event was scheduled for a past time, so join status cannot be changed)
+		$eventDate = date_create_from_format("Y-m-d H:i:s", $eventScheduledDate, new DateTimeZone("UTC"));
+		$curUTCDate = new DateTime(null, new DateTimeZone("UTC"));
+		$isPastEvent = ($curUTCDate > $eventDate);
+		
+        $joinStatus = $isPastEvent ? "UNJOINED" : "JOIN";
         if($thisUserIsJoined == 1) {
-            $joinStatus = "LEAVE";
+            $joinStatus = $isPastEvent ? "JOINED" : "LEAVE";
         }
         else if(count($evtMembers) >= $requiredMemberCount) {
             $joinStatus = "FULL";

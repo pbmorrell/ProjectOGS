@@ -616,18 +616,8 @@ function SaveCurrentJTableContentsToClipboard(jTableDiv, title, tableTitle)
 function SelectAllTextInTextArea()
 {
     $(this).children('textarea').each(function() {
-        var $this = $(this);
-	$this.focus(function() {
-            $this.mouseup(function(e){
-                e.preventDefault();
-            });
-            
-            $this.select();
-            setTimeout(function() {
-                $this.select();
-            }, 500);
-        });
-        
-	$this.focus();
+        var $this = $(this).get(0);
+        $this.focus();
+        $this.setSelectionRange(0, 9999);
     });
 }
