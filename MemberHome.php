@@ -62,11 +62,11 @@ by => Stephen Giles and Paul Morrell
                                                                     <div class="overlayPanelToggleGroup">
 									<div class="overlayPanelToggleLinkWrap">
                                                                             <a href="#" id="dateRangeFilterLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
-										onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
+                                                                               onclick="return ToggleSearchDivDisplay('#dateRangeFilterDiv', this);">&nbsp;&nbsp;Date Range</a>
 									</div>
 									<div class="overlayPanelToggleChkboxWrap">
                                                                             <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterLink" 
-										   groupId="dateRangeFilterDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
+										groupId="dateRangeFilterDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
                                                                             <label id="dateRangeFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
 									</div>
                                                                     </div>
@@ -105,6 +105,49 @@ by => Stephen Giles and Paul Morrell
 										<?php 
                                                                                     echo $gamingHandler->GetTimezoneList($dataAccess, -1, 'End'); 
 										?>
+                                                                            </div>
+									</div>
+                                                                    </div>
+								<?php else: ?>
+                                                                    <div class="overlayPanelToggleGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+									<div class="overlayPanelToggleLinkWrap">
+                                                                            <a href="#" id="dateRangeFilterSelectorLink" class="fa fa-plus-square overlayPanelToggleElementInactive" 
+                                                                                onclick="return ToggleSearchDivDisplay('#dateRangeFilterSelectorDiv', this);">&nbsp;&nbsp;Date Range</a>
+									</div>
+									<div class="overlayPanelToggleChkboxWrap">
+                                                                            <input id="dateRangeFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="dateRangeFilterSelectorLink" 
+										groupId="dateRangeFilterSelectorDiv" lblId="dateRangeFilterActiveToggleLabel" type="checkbox">
+                                                                            <label id="dateRangeFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
+									</div>
+                                                                    </div>
+                                                                    <div id="dateRangeFilterSelectorDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
+									<div id="dateRangeFilterSubGroup" class="overlayPanelFilterSubGroup">
+                                                                            <div class="overlayPanelElementContainerWide">
+										<label class="overlayPanelLabel">See Games Starting From:</label><br />
+										<select id="gameFilterDateRangeStart" name="gameFilterDateRangeStart" class="overlayPanelElement">
+                                                                                    <option value="0">Now</option>
+                                                                                    <option value="1">1 Day Ago</option>
+                                                                                    <option value="2">2 Days Ago</option>
+                                                                                    <option value="3">3 Days Ago</option>
+                                                                                    <option value="7">1 Week Ago</option>
+                                                                                    <option value="14">2 Weeks Ago</option>
+                                                                                    <option value="30">1 Month Ago</option>
+										</select>
+                                                                            </div>
+                                                                            <div class="overlayPanelElementContainerWide">
+										<label class="overlayPanelLabel">See Games Up Through:</label><br />
+										<select id="gameFilterDateRangeEnd" name="gameFilterDateRangeEnd" class="overlayPanelElement">
+                                                                                    <option value="365">1 Year From Now</option>
+                                                                                    <option value="0">Today</option>
+                                                                                    <option value="1">Tomorrow</option>
+                                                                                    <option value="3">3 Days From Now</option>
+                                                                                    <option value="7">1 Week From Now</option>
+                                                                                    <option value="14">2 Weeks From Now</option>
+                                                                                    <option value="30">1 Month From Now</option>
+                                                                                    <option value="61">2 Months From Now</option>
+                                                                                    <option value="91">3 Months From Now</option>
+                                                                                    <option value="182">6 Months From Now</option>
+										</select>
                                                                             </div>
 									</div>
                                                                     </div>
@@ -260,7 +303,7 @@ by => Stephen Giles and Paul Morrell
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="swipeHoverIconContainer"><img id="swipeHoverIcon" src="images/SwipeRight.png" /></div>
+                                                            <div class="swipeHoverIconContainer"><img id="swipeHoverIcon" src="images/SwipeLeft.png" /></div>
                                                             <div class="overlayPanelControlElementGroup">
                                                                 <button class="controlBtn button icon fa-cogs overlayPanelControlElement" id="searchBtn">Search</button>
                                                                 <button class="controlBtn button overlayPanelControlElement" id="closePanelBtn">Close</button>

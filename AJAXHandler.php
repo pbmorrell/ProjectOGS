@@ -326,15 +326,15 @@
                 }
                 break;
             case "EventEditorLoad":
-				$eventId = '';
-				if(isset($_GET['EventID'])) {
+		$eventId = '';
+		if(isset($_GET['EventID'])) {
                     $eventId = filter_var(trim($_GET['EventID']), FILTER_SANITIZE_STRING);
-				}
+		}
 
-				echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser->UserID, $objUser->IsPremiumMember, $eventId);
-				break;
+		echo $gamingHandler->EventEditorLoad($dataAccess, $logger, $objUser, $eventId);
+		break;
             case "EventManagerLoad":
-				echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
+		echo $gamingHandler->EventManagerLoad($dataAccess, $logger, $objUser->UserID);
                 break;
             case "EventEditorCreateEvent":
                 $pvtEventFriends = (isset($_POST['pvtEventFriends'])) ? ($_POST['pvtEventFriends']) : [];
@@ -384,6 +384,20 @@
 
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+		$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
+		$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
+				
+		if(strlen($startDateRangeInDays) > 0) {
+                    $curUTCStartDate = new DateTime(null, new DateTimeZone("UTC"));
+                    $curUTCEndDate = new DateTime(null, new DateTimeZone("UTC"));
+					
+                    // Add value of selected start and end dates, each of which will be the difference from today in days, to current date
+                    $startDateTime = ($startDateRangeInDays == "0") ? ($curUTCStartDate->format(DateTime::ATOM)) : 
+                                                                      ($curUTCStartDate->sub(new DateInterval(sprintf("P%sD", $startDateRangeInDays)))->format(DateTime::ATOM));
+                    $endDateTime = ($endDateRangeInDays == "0") ? ($curUTCEndDate->format(DateTime::ATOM)) : 
+								  ($curUTCEndDate->add(new DateInterval(sprintf("P%sD", $endDateRangeInDays)))->format(DateTime::ATOM));
+		}
+				
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
                 $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? trim(filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING)) : "";
                 if(strlen($customGameTitle) > 0) {
@@ -415,6 +429,20 @@
 		$showHiddenEvents = false;
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
+		$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
+		$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
+				
+		if(strlen($startDateRangeInDays) > 0) {
+                    $curUTCStartDate = new DateTime(null, new DateTimeZone("UTC"));
+                    $curUTCEndDate = new DateTime(null, new DateTimeZone("UTC"));
+					
+                    // Add value of selected start and end dates, each of which will be the difference from today in days, to current date
+                    $startDateTime = ($startDateRangeInDays == "0") ? ($curUTCStartDate->format(DateTime::ATOM)) : 
+								      ($curUTCStartDate->sub(new DateInterval(sprintf("P%sD", $startDateRangeInDays)))->format(DateTime::ATOM));
+                    $endDateTime = ($endDateRangeInDays == "0") ? ($curUTCEndDate->format(DateTime::ATOM)) : 
+								  ($curUTCEndDate->add(new DateInterval(sprintf("P%sD", $endDateRangeInDays)))->format(DateTime::ATOM));
+		}
+				
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
                 $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? trim(filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING)) : "";
                 if(strlen($customGameTitle) > 0) {

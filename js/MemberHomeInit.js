@@ -272,8 +272,7 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "10%");
         
         // Show search panel button div toggle icon
-        $('.overlayPanelControlElementGroup').children('button').hide();
-        $('.swipeHoverIconContainer hidden').show();
+        $('.swipeHoverIconContainer').show();
 
         // Convert time pickers to plain select lists, for ease of use on mobile devices
         $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
@@ -287,9 +286,9 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate Filter" }).text('Activate');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
 		
-		// Hide event manager mobile control panel if mobile view, or show it if in xtraSmall view
-		if(curWidthClass == 'mobile') 			$('.mobileButtonToolbarContainer').hide();
-		else if(curWidthClass == 'xtraSmall')   $('.mobileButtonToolbarContainer').show();
+	// Hide event manager mobile control panel if mobile view, or show it if in xtraSmall view
+	if(curWidthClass == 'mobile') 		$('.mobileButtonToolbarContainer').hide();
+	else if(curWidthClass == 'xtraSmall')   $('.mobileButtonToolbarContainer').show();
         
         // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
         if(!initTransition) {
@@ -328,8 +327,8 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate" }).text('Activate Filter');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
 		
-		// Hide event manager mobile control panel
-		$('.mobileButtonToolbarContainer').hide();
+	// Hide event manager mobile control panel
+	$('.mobileButtonToolbarContainer').hide();
 
         // Restore hidden or combined columns
         if(!initTransition) {

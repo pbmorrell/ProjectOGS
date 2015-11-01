@@ -187,7 +187,7 @@ class GamingHandler
         return $activeUsers;
     }
 	
-    public function EventEditorLoad($dataAccess, $logger, $userID, $isPremiumMember, $eventId)
+    public function EventEditorLoad($dataAccess, $logger, $user, $eventId)
     {
         // If this is called for existing event, append eventID to each control ID for uniqueness
         $formName = "eventCreateForm";
@@ -197,6 +197,8 @@ class GamingHandler
         $gameDateValue = "";
         $gameTimeValue = "";
         $eventInfo = null;
+        $userDefaultTimeZoneId = -1;
+        $userDefaultPlatformId = -1;
         
         if(strlen($eventId) > 0) {
             $formName = "eventEditForm"  . $eventId;
@@ -209,8 +211,11 @@ class GamingHandler
             $showOpenEvents = true;
             $showUnjoinedFullEvents = true;
             $noStartDateRestriction = true;
-            $searchParms = new SearchParameters($showHiddenEvents, "", "", [], [], [], [], $showJoinedEvents, $showOpenEvents, $showUnjoinedFullEvents, $noStartDateRestriction);
-            $eventArray = $this->GetScheduledGames($dataAccess, $logger, $userID, "DisplayDate ASC", false, "0", "10", $eventId, false, $searchParms);
+            $searchParms = new SearchParameters($showHiddenEvents, "", "", [], [], [], [], $showJoinedEvents, $showOpenEvents, 
+                                                $showUnjoinedFullEvents, $noStartDateRestriction);
+            $userAllowedFriendsByEvent = $this->LoadUserFriends($dataAccess, $logger, $user->UserID, [$eventId]);
+            $eventArray = $this->GetScheduledGames($dataAccess, $logger, $user->UserID, "DisplayDate ASC", false, "0", "10", $eventId, 
+                                                   false, $searchParms, [], [], $userAllowedFriendsByEvent);
             if(count($eventArray) > 0) {
                 $eventInfo = $eventArray[0];
                 $gameDateValue = 'value="' . $eventInfo->ScheduledDate . '" ';
@@ -231,6 +236,10 @@ class GamingHandler
                 $logger->LogError("Event " . $eventId . " could not be loaded for editing");
                 return "ERROR: Event not found";
             }
+        }
+        else {
+            $userDefaultTimeZoneId = $user->TimezoneID;
+            $userDefaultPlatformId = (count($user->GamePlatforms) > 1) ? -1 : (reset($user->GamePlatforms));
         }
         
 	// Build game-players-needed selector
@@ -254,7 +263,7 @@ class GamingHandler
 	// Build friends list selector
 	$privateEventOptionDisabled = " disabled";
         $privateEventOptionChecked = "";
-	$userFriendList = $this->LoadUserFriends($dataAccess, $logger, $userID);
+	$userFriendList = $this->LoadUserFriends($dataAccess, $logger, $user->UserID);
 	$friendListSelect = 'Your friends list is empty';
 		
 	if(count($userFriendList) > 0){
@@ -289,7 +298,7 @@ class GamingHandler
                     '<div class="inputLine">'.
 			'<p><i class="fa fa-gamepad"></i> &nbsp; What game do you wish to schedule?<br/>'.
 			'<div id="gameSelectorDiv' . $eventId . '">'.
-                            $this->ConstructGameTitleSelectorHTML($dataAccess, $logger, $userID, $eventId, (($eventInfo != null) ? $eventInfo->Name : '')) .
+                            $this->ConstructGameTitleSelectorHTML($dataAccess, $logger, $user->UserID, $eventId, (($eventInfo != null) ? $eventInfo->Name : '')) .
 			'</div><br />'.
 			'<p><i class="fa fa-calendar-o"></i> &nbsp; Tell us a date<br/>'.
                             '<input id="gameDate' . $eventId . '" name="gameDate' . $eventId . '" ' . $gameDateValue .
@@ -297,19 +306,19 @@ class GamingHandler
 			'<p><i class="fa fa-clock-o"></i> &nbsp; Time you want to play<br/>'.
                             '<input id="gameTime' . $eventId . '" name="gameTime' . $eventId . '" ' . $gameTimeValue .
                             'type="text" maxlength="9" placeholder=" Time"><br />' .
-                            $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : -1), $eventId) .
+                            $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : $userDefaultTimeZoneId), $eventId) .
                         '</p>'.
 			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>'. 
                             $gamePlayersNeededSelect .
                         '<p><i class="fa fa-gamepad"></i> &nbsp; Choose a platform for this game<br/>'. 
-                            $this->GetPlatformDropdownList($dataAccess, (($eventInfo != null) ? $eventInfo->SelectedPlatformID : -1), $eventId) .
+                            $this->GetPlatformDropdownList($dataAccess, (($eventInfo != null) ? $eventInfo->SelectedPlatformID : $userDefaultPlatformId), $eventId) .
                         '</p>'.
 			'<p><i class="fa fa-comments-o"></i> &nbsp; Notes about your event<br/>'.
                             '<textarea name="message' . $eventId . '" id="message' . $eventId .
                             '" placeholder=" exp: Looking for some new team mates to play through Rocket Leagues 3v3 mode. Must have a mic!" rows="6" required>'.
                             (($eventInfo != null) ? ($eventInfo->Notes) : '') . '</textarea>'.
                         '</p>'. 
-			($isPremiumMember ?
+			($user->IsPremiumMember ?
 			(
                             '<p><i class="fa fa-lock"></i> &nbsp; Only allow friends to join this event</p>'.
                             '<input type="checkbox" id="privateEvent' . $eventId . '" name="privateEvent' . $eventId . '" value="private" ' . 
@@ -1445,7 +1454,7 @@ class GamingHandler
         
         $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
                              "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
-                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsPublic`, e.`IsActive`, " .
+                             "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsActive`, " .
                              "u.`UserName` AS EventCreatorUserName, ".
                              "(CASE WHEN em2.`ID` IS NULL THEN 0 ELSE 1 END) AS thisUserIsJoined " .
                              "FROM `Gaming.Events` AS e ".
