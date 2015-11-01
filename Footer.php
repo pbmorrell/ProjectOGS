@@ -24,8 +24,8 @@
                             <section>
                                 <h2>Quick Links</h2>
                                 <ul class="style3">
-                                    <li class="icon fa-newspaper-o">
-                                        <a href="" style="text-decoration:none;"> &nbsp Recent News</a>
+                                    <li class="icon fa-question-circle">
+                                        <a href="" style="text-decoration:none;"> &nbsp FAQ</a>
                                     </li>
                                     <li class="icon fa-cubes">
                                         <a href="About.php" style="text-decoration:none;"> &nbsp About Us</a>

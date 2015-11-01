@@ -1008,7 +1008,6 @@
         color: #fff;
         color: rgba(255,255,255,0.75);
         background: #1E90FF;
-	padding-top: 1em;
     }
 
     .box.style2
@@ -1025,7 +1024,6 @@
         color: #fff;
         color: rgba(255,255,255,0.75);
         background: #2c2f34;
-	padding-top: 1em;
     }
     
     .box.style3 .controlBtn

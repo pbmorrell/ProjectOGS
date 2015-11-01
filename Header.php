@@ -103,7 +103,7 @@
                                                                    ((strlen($objUser->UserName) > 0) ? $objUser->UserName : $objUser->EmailAddress);
 
             // Construct user navigation menu
-            $basicMemberNavOptions =    array('<li><a href="#">Become a Premium Member!</a></li>');
+            $basicMemberNavOptions =    array('<li><a href="BecomeMember.php">Become a Member</a></li>');
 
             $premiumMemberNavOptions =  array('<li><a href="#">Find Friends</a></li>');
 
