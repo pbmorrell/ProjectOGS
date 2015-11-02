@@ -6,8 +6,8 @@
     // header.php retrieves user information from session, storing in $objUser variable
     include "Header.php";
     
-    $welcomeHeaderText = "Project OGS | " . $welcomeUserName;
-    $editProfileMsg = "<p>Update your profile...</p>";
+    $welcomeHeaderText = "Player Unite | " . $welcomeUserName;
+    $editProfileMsg = "<h2>Edit Profile</h2>";
 
     $userNameReadOnly = "readonly ";
 
@@ -140,17 +140,37 @@
                                             <form id="signupForm" name="signupForm" method="POST" action="">
                                                 <div class="row double">
                                                     <section class="3u">
-                                                        <p><i class="fa fa-terminal"></i>&nbsp;&nbsp;Pick a username</p>
+                                                        <p><i class="fa fa-tags"></i>&nbsp;&nbsp;Enter a username</p>
                                                         <?php                                                           
                                                             echo $userNameInputHTML;
                                                         ?>
 							<br/>
                                                             <div id="userNameTakenIndicator">&nbsp;</div>
 							<br/>
-                                                        <p><i class="fa fa-at"></i>&nbsp;&nbsp;Edit Your Email Address:</p>
+                                                        <p><i class="fa fa-user"></i>&nbsp;&nbsp;What is your given name?</p>
+                                                        <?php                                                           
+                                                            echo $firstNameInputHTML . $lastNameInputHTML;
+                                                        ?>
+							<br/><br/><br/>
+                                                        <p><i class="fa fa-at"></i>&nbsp;&nbsp;Update Your Email Address:</p>
                                                         <?php
                                                             echo $emailAddressInputHTML;
                                                         ?>
+                                                        <br/><br/><br/>
+                                                        <p><i class="fa fa-male"></i>&nbsp;<i class="fa fa-female"></i>&nbsp;What is your gender?</p>
+                                                        <?php
+                                                            echo $genderInputHTML;
+							?>
+                                                        <button type="submit" id="hiddenBtn" style="display:none">Update Profile</button>
+                                                    </section>
+                                                    <section class="4u">
+                                                        <p><i class="fa fa-birthday-cake"></i>&nbsp;&nbsp;When were you born?</p>
+                                                        <?php
+                                                            echo $dobHTML;
+							?>
+							<br/><br/><br/>
+                                                        <p><i class="fa fa-clock-o"></i>&nbsp;&nbsp;What is your time zone?</p>
+                                                        <?php echo $timeZoneHTML; ?>
                                                         <br/><br/><br/>
                                                         <p><i class="fa fa-key"></i>&nbsp;&nbsp;Change Your Password:</p>
                                                         <input id="pwd" name="pwd" type="password" maxlength="50" placeholder=" Password" /><br/>
@@ -168,26 +188,6 @@
                                                                                                    ' Confirm Password', true);">Show Password</a>
                                                         </span>&nbsp;<br/>
                                                         <span id="passwordMatch" class="passwordWeak"></span>
-                                                        <button type="submit" id="hiddenBtn" style="display:none">Update Profile</button>
-                                                    </section>
-                                                    <section class="4u">
-                                                        <p><i class="fa fa-user"></i>&nbsp;&nbsp;What is your name?</p>
-                                                        <?php                                                           
-                                                            echo $firstNameInputHTML . $lastNameInputHTML;
-                                                        ?>
-							<br/><br/><br/>
-                                                        <p><i class="fa fa-male"></i>&nbsp;<i class="fa fa-female"></i>&nbsp;What is your gender?</p>
-                                                        <?php
-                                                            echo $genderInputHTML;
-							?>
-							<br/><br/>
-                                                        <p><i class="fa fa-birthday-cake"></i>&nbsp;&nbsp;When were you born?</p>
-                                                        <?php
-                                                            echo $dobHTML;
-							?>
-							<br/><br/>
-                                                        <p><i class="fa fa-clock-o"></i>&nbsp;&nbsp;What is your time zone?</p>
-                                                        <?php echo $timeZoneHTML; ?>
                                                     </section>
                                                     <section class="4u">
                                                         <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on?<br /><label>(check all that apply)</label></p>

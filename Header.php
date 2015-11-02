@@ -105,7 +105,7 @@
             // Construct user navigation menu
             $basicMemberNavOptions =    array('<li><a href="BecomeMember.php">Become a Member</a></li>');
 
-            $premiumMemberNavOptions =  array('<li><a href="#">Find Friends</a></li>');
+            $premiumMemberNavOptions =  array('<li><a href="FindFriends.php">Find Friends</a></li>');
 
             $homeNavOption =            array('<li><a href="MemberHome.php">Home</a></li>');
 
@@ -140,7 +140,7 @@
             }
 
             if(!$justCreatedSession) {
-                $curNavOptions = array_merge($curNavOptions, $homeNavOption);
+                $curNavOptions = array_merge($homeNavOption, $curNavOptions);
             }
 
             $curNavOptions = array_merge($curNavOptions, $commonNavOptions);
@@ -166,10 +166,9 @@
                                             '<li>'.
                                                 '<a href="" class="arrow">Site Links</a>'.
                                                 '<ul>'.
-                                                    '<li><a href="#">Recent News</a></li>'.
-                                                    '<li><a href="#">Developer Blog</a></li>'.
+                                                    '<li><a href="Faq.php">FAQ</a></li>'.
+                                                    '<li><a href="DeveloperBlog.php">Developer Blog</a></li>'.
                                                     '<li><a href="About.php">About Us</a></li>'.
-                                                    '<li><a href="#">Contact Us</a></li>'.
                                                 '</ul>'.
                                             '</li>'.
                                         '</ul>'.
