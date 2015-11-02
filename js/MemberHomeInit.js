@@ -54,6 +54,12 @@ function MemberHomeOnReady()
             CloseSearchPanel();
 	}
     });
+    
+    // Add handler for unsubscribe click
+    $('#unsubscribeLink').click(function() {
+        DisplayUnsubscribeDialog();
+        return false;
+    });
 
     // Hide all filters initially, showing only filter name and toggle in un-expanded state
     $('.overlayPanelFilterGroup').not('#joinStatusFilterDiv').hide();
@@ -1918,4 +1924,20 @@ function CreateEvent($dialog)
     }
     
     return false;
+}
+
+function DisplayUnsubscribeDialog()
+{
+    var dialogHTML = '<div id="dlgCancelMembership">' +
+                        '<div>To cancel your membership, click the "Unsubscribe" button below.</div><br /><br />' +
+                        '<a id="btnCancelMembership" href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW">' +
+                           '<img src="https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif" border="0">' +
+                        '</a>' +
+                     '</div>';
+    displayJQueryDialogFromDiv(dialogHTML, "Cancel Your Membership", 'top', window, false, true, 'auto', true, CancelMembershipDialogOnReady);
+}
+
+function CancelMembershipDialogOnReady()
+{
+    
 }

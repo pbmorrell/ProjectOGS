@@ -476,7 +476,8 @@ INSERT INTO `Security.PageRoles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
 (3, 9, 3),
 (4, 10, 4),
 (5, 11, 4),
-(6, 12, 4);
+(6, 12, 4),
+(7, 13, 3);
 
 -- --------------------------------------------------------
 
@@ -499,7 +500,8 @@ INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
 (9, 'EditProfile'),
 (10, 'MobileLogin'),
 (11, 'About'),
-(12, 'TermsPri');
+(12, 'TermsPri'),
+(13, 'BecomeMember');
 
 -- --------------------------------------------------------
 

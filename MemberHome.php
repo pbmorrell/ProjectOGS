@@ -54,6 +54,11 @@ by => Stephen Giles and Paul Morrell
                                                     <li class="icon fa-bullseye">
 							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
                                                     </li>
+                                                    <?php if($objUser->IsPremiumMember): ?>
+                                                        <li class="icon fa-ban">
+                                                            <a id="unsubscribeLink" href="#" style="text-decoration:none;">Cancel Membership</a>
+                                                        </li>
+                                                    <?php endif; ?>
                                                     <div id="modalOverlay" class='overlayPanelModalBackground'></div>
                                                     <div id="searchPanel" class="overlayPanel overlayPanelCurEvts">
                                                         <form name="searchForm" method="POST" action="">
