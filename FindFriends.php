@@ -1,6 +1,6 @@
 <?php
     $mobileLoginPage = false;
-    $sessionRequired = false;
+    $sessionRequired = true;
     $sessionAllowed = true;
     include "Header.php";
 ?>
