@@ -55,9 +55,9 @@ function MemberHomeOnReady()
 	}
     });
     
-    // Add handler for unsubscribe click
-    $('#unsubscribeLink').click(function() {
-        DisplayUnsubscribeDialog();
+    // Add handler for Manage Account click
+    $('#manageAccountLink').click(function() {
+        DisplayManageAccountDialog();
         return false;
     });
 
@@ -1340,7 +1340,9 @@ function DeleteEvents(selectedEventIds)
       type: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, do it!",
-      closeOnConfirm: false
+      closeOnConfirm: false,
+      closeOnCancel: false,
+      showLoaderOnConfirm: true
    },
    function(isConfirm) {
       if(isConfirm) {
@@ -1349,24 +1351,28 @@ function DeleteEvents(selectedEventIds)
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventEditorDeleteEvents&" + $.param({'eventIds': selectedEventIds}),
-                success: function(){
-                    var fullRefresh = false;
-                    ReloadUserHostedEventsTable(fullRefresh);
-                    sweetAlert(response);
-                    return true;
+            success: function(response){
+                var fullRefresh = false;
+                ReloadUserHostedEventsTable(fullRefresh);
+                
+                if(response.match("^SYSTEM ERROR")) {
+                    sweetAlert("Events Not Deleted", response, "error");
+                }
+                else {
+                    // Show success message
+                    sweetAlert("Events Deleted!", response, "success");
+                }
+            },
+            error: function() {
+		sweetAlert("Events Not Deleted", "Unable to delete events: server error. Please try again later.", "error");
             }
         });
-
-         // Show success message
-         sweetAlert("Events Deleted!", "Your events have been deleted", "success");
       }
       else {
          // Show cancel message
          sweetAlert("Events Deletion Canceled", "Your events have not been deleted", "info");
       }
-   }
-);
-
+   });
 }
 		
 function JoinEvents(selectedEventIds)
@@ -1378,6 +1384,7 @@ function JoinEvents(selectedEventIds)
       showCancelButton: true,
       confirmButtonText: "You Bet!",
       closeOnConfirm: false,
+      closeOnCancel: false,
       showLoaderOnConfirm: true
    },
    function(isConfirm) {
@@ -1390,18 +1397,23 @@ function JoinEvents(selectedEventIds)
             success: function(response){
 		var fullRefresh = false;
 		ReloadCurrentEventsTable(fullRefresh);
-				
-		// Show success message
-		sweetAlert("Events Joined!", response, "success");
+		
+                if(response.match("^SYSTEM ERROR")) {
+                    sweetAlert("Events Not Joined", response, "error");
+                }
+                else {
+                    // Show success message
+                    sweetAlert("Events Joined!", response, "success");
+                }
             },
             error: function() {
-		sweetAlert("Events not Joined", "Unable to join events", "info");
+		sweetAlert("Events Not Joined", "Unable to join events: server error. Please try again later.", "error");
             }
         });
       }
       else {
          // Show cancel message
-         sweetAlert("Events not Joined", "Canceled join events", "info");
+         sweetAlert("Events Not Joined", "Canceled join events", "info");
       }
    });
 }
@@ -1414,33 +1426,38 @@ function LeaveEvents(selectedEventIds)
       type: "warning",
       showCancelButton: true,
       confirmButtonText: "Yep, I want out!",
-      closeOnConfirm: false
+      closeOnConfirm: false,
+      closeOnCancel: false,
+      showLoaderOnConfirm: true
    },
    function(isConfirm) {
       if(isConfirm) {
-         // Make AJAX call to remove current user up from selected events
+         // Make AJAX call to remove current user from selected events
 	$.ajax({
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=EventViewerLeaveEvents&" + $.param({'eventIds': selectedEventIds}),
-            success: function(){
+            success: function(response){
 		var fullRefresh = false;
                 ReloadCurrentEventsTable(fullRefresh);
-		sweetAlert(response);
-		return true;
+                
+                if(response.match("^SYSTEM ERROR")) {
+                    sweetAlert("Events Not Left", response, "error");
+                }
+                else {
+                    sweetAlert("Events Left!", response, "success");
+                }
+            },
+            error: function() {
+		sweetAlert("Events Not Left", "Unable to leave events: server error. Please try again later.", "error");
             }
         });
-
-         // Show success message
-         sweetAlert("Events Left!", "You left the team behind...", "success");
       }
       else {
          // Show cancel message
-         sweetAlert("Events Leave Canceled", "unable to leave events", "info");
+         sweetAlert("Events Not Left", "Canceled leave events", "info");
       }
-   }
-);
-    		
+   });
 }
 
 function ReloadUserHostedEventsTable(fullRefresh)
@@ -1926,18 +1943,64 @@ function CreateEvent($dialog)
     return false;
 }
 
-function DisplayUnsubscribeDialog()
+function DisplayManageAccountDialog()
 {
-    var dialogHTML = '<div id="dlgCancelMembership">' +
-                        '<div>To cancel your membership, click the "Unsubscribe" button below.</div><br /><br />' +
-                        '<a id="btnCancelMembership" href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW">' +
+    var divWidth = 600;
+    switch(GetCurWidthClass()) {
+        case "mobile":
+            divWidth = 400;
+            break;
+        case "xtraSmall":
+            divWidth = 275;
+            break;            
+    }
+    
+    var margin = (divWidth * 0.2);
+    
+    var dialogHTML = '<div id="dlgManageMembership" class="box style1">' +
+                        '<div style="font-weight: bold;">Renew or upgrade your membership</div><br />' +
+                        '<div><a id="btnRenewMembership" class="controlBtn button icon fa-refresh" href="BecomeMember.php">Update Membership</a></div>' +
+                        '<br /><br /><br />' + 
+                        '<div style="font-weight: bold;">Cancel your membership</div><br />' +
+                        '<div><a id="btnCancelMembership" href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW">' +
                            '<img src="https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif" border="0">' +
-                        '</a>' +
+                        '</a></div>' +
                      '</div>';
-    displayJQueryDialogFromDiv(dialogHTML, "Cancel Your Membership", 'top', window, false, true, 'auto', true, CancelMembershipDialogOnReady);
+    displayJQueryDialogFromDiv(dialogHTML, "Manage Your Account", 'top', window, false, true, 'auto', true, ManageAccountDialogOnReady);
 }
 
-function CancelMembershipDialogOnReady()
+function ManageAccountDialogOnReady()
 {
-    
+    $('#btnCancelMembership').click(function(event){
+        // Prevent default behavior of click (do not send user to PayPal site yet)
+        event.stopPropagation();
+        event.preventDefault();
+        
+        sweetAlert({
+          title: "Confirm Cancellation",
+          text: "Are you sure you want to cancel? You'll lose your friends list, and have access only to basic search and event creation functions.",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, do it!",
+          closeOnConfirm: false,
+          closeOnCancel: false
+       },
+       function(isConfirm) {
+          if(!isConfirm) {
+             // Show cancel message
+             sweetAlert("Membership Not Changed", "You are still a premium member!", "info");
+          }
+          else {
+              sweetAlert({
+                 title: "Under Construction",
+                 type: "info",
+                 text: "Paypal functionality not yet implemented",
+                 imageUrl: "images/underConstruction.gif"
+              });
+              
+              // Send user to PayPal site to log in and unsubscribe
+              //window.location = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
+          }
+       });
+    });
 }

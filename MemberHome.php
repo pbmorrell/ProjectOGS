@@ -55,8 +55,8 @@ by => Stephen Giles and Paul Morrell
 							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
                                                     </li>
                                                     <?php if($objUser->IsPremiumMember): ?>
-                                                        <li class="icon fa-ban">
-                                                            <a id="unsubscribeLink" href="#" style="text-decoration:none;">Cancel Membership</a>
+                                                        <li class="icon fa-cogs">
+                                                            <a id="manageAccountLink" href="#" style="text-decoration:none;">Manage Your Account</a>
                                                         </li>
                                                     <?php endif; ?>
                                                     <div id="modalOverlay" class='overlayPanelModalBackground'></div>

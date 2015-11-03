@@ -379,11 +379,14 @@
         font-weight:bold;
     }
 
-    .controlBtn
-    {
+    .controlBtn {
         background: #32353a;
-        color: #fff;
+        color: #fff !important;
         padding: 1em 1em 1em 0.75em !important;
+    }
+    
+    .controlBtn:hover {
+        background: rgba(192,192,192,0.9) !important;
     }
 	
     .controlBtnIndex{

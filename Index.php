@@ -31,12 +31,12 @@
                                             <div class="row double">
 						<section class="6u">
                                                     <header>
-                                                        <h2>The simplest "looking for group" site on the web. and its free.</h2>
+                                                        <h2>The simplest "looking for group" site on the web - and it's free.</h2>
                                                     </header><br/><br/>								
-                                                    <p><i id="colorCalendar" class="fa fa-calendar"></i> &nbsp Easily create gaming events and invite friends.</p><br/>
-                                                    <p><i id="colorUser" class="fa fa-user"></i> &nbsp Find new players to connect with and game together.</p><br/>
-                                                    <p><i id="colorTrophy" class="fa fa-trophy"></i> &nbsp Never be stuck looking for online players again.</p><br/>
-						</section>								
+                                                    <p><i id="colorCalendar" class="fa fa-calendar"></i>&nbsp; Easily create public or friends-only gaming events.</p><br/>
+                                                    <p><i id="colorUser" class="fa fa-user"></i>&nbsp; Team up with new allies, or smack down new victims.</p><br/>
+                                                    <p><i id="colorTrophy" class="fa fa-trophy"></i>&nbsp; Never be stuck looking for online players again.</p><br/>
+						</section>
 						<section class="6u">
                                                     <header>
                                                         <h2>Sign Up</h2>
