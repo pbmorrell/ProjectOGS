@@ -1944,19 +1944,7 @@ function CreateEvent($dialog)
 }
 
 function DisplayManageAccountDialog()
-{
-    var divWidth = 600;
-    switch(GetCurWidthClass()) {
-        case "mobile":
-            divWidth = 400;
-            break;
-        case "xtraSmall":
-            divWidth = 275;
-            break;            
-    }
-    
-    var margin = (divWidth * 0.2);
-    
+{    
     var dialogHTML = '<div id="dlgManageMembership" class="box style1">' +
                         '<div style="font-weight: bold;">Renew or upgrade your membership</div><br />' +
                         '<div><a id="btnRenewMembership" class="controlBtn button icon fa-refresh" href="BecomeMember.php">Update Membership</a></div>' +
