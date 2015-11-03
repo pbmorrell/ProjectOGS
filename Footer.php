@@ -10,7 +10,7 @@
                             <section class="newsletter">
                                 <h2>Your Feedback is Important</h2>
                                 <p>We want to make Player Unite your home. How would you improve the site? Drop us a line below.</p>
-                                <a href="mailto:feedback@playerunite.com?subject=Player Unite Feedback" class="button icon fa-comment">Comment</a>
+                                <a href="mailto:feedback@playerunite.com?subject=Player Unite Feedback" class="button icon fa-commenting">Comment</a>
                             </section>
                        </div>
 					   <div class="4u">
