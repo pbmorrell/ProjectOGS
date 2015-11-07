@@ -27,6 +27,10 @@ by => Stephen Giles and Paul Morrell
             if($objUser->IsPremiumMember) {
                 $searchPanelTextboxWrapperClass = 'overlayPanelElementContainerCheckboxListSibling';
             }
+			
+            // PayPal config settings
+            $payPalCancelSubscriptionUrl    = Constants::$isPayPalTest ? Constants::$payPalTestCancelSubscriptionUrl 	: Constants::$payPalProdCancelSubscriptionUrl;
+            $payPalUnsubscribeButtonImgUrl  = Constants::$isPayPalTest ? Constants::$payPalTestUnsubscribeButtonImgUrl 	: Constants::$payPalProdUnsubscribeButtonImgUrl;
         ?>
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">
@@ -56,7 +60,9 @@ by => Stephen Giles and Paul Morrell
                                                     </li>
                                                     <?php if($objUser->IsPremiumMember): ?>
                                                         <li class="icon fa-cogs">
-                                                            <a id="manageAccountLink" href="#" style="text-decoration:none;">Manage Your Account</a>
+                                                            <a id="manageAccountLink" href="#" 
+                                                               onclick="return DisplayManageAccountDialog('<?php echo $payPalCancelSubscriptionUrl; ?>','<?php echo $payPalUnsubscribeButtonImgUrl; ?>');" 
+                                                               style="text-decoration:none;">Manage Your Account</a>
                                                         </li>
                                                     <?php endif; ?>
                                                     <div id="modalOverlay" class='overlayPanelModalBackground'></div>

@@ -6,6 +6,7 @@
     include_once 'classes/DBSessionHandler.class.php';
     include_once 'classes/Logger.class.php';
     include_once 'classes/User.class.php';
+    include_once 'classes/Constants.class.php';
     
     $welcomeUserName = "Welcome";
     $curPageName = basename($_SERVER['PHP_SELF'], ".php");
@@ -69,7 +70,13 @@
                 '</div>'.
             '</div>'.
         '</div>';
-
+		
+    // Set PayPal donation button image (appearing in Footer.php) based on whether we are hitting the sandbox or production PayPal environment
+    $payPalButtonFormUrl 	= Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl 	: Constants::$payPalProdButtonFormUrl;
+    $payPalDonationButtonImgUrl = Constants::$isPayPalTest ? Constants::$payPalTestDonationButtonImgUrl : Constants::$payPalProdDonationButtonImgUrl;
+    $payPalDonationButtonId 	= Constants::$isPayPalTest ? Constants::$payPalTestDonationButtonId 	: Constants::$payPalProdDonationButtonId;
+    $payPalPixelImgUrl 		= Constants::$isPayPalTest ? Constants::$payPalTestPixelImgUrl 		: Constants::$payPalProdPixelImgUrl;
+		
     if($sessionAllowed) {
         $dataAccess = new DataAccess();
         $logger = new Logger($dataAccess);

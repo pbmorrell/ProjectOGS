@@ -54,12 +54,6 @@ function MemberHomeOnReady()
             CloseSearchPanel();
 	}
     });
-    
-    // Add handler for Manage Account click
-    $('#manageAccountLink').click(function() {
-        DisplayManageAccountDialog();
-        return false;
-    });
 
     // Hide all filters initially, showing only filter name and toggle in un-expanded state
     $('.overlayPanelFilterGroup').not('#joinStatusFilterDiv').hide();
@@ -756,7 +750,8 @@ function LoadCurrentEventViewer()
     // Load event list
     var postData = 
         {
-            action: currentEventViewerLoadAction
+            action: currentEventViewerLoadAction,
+			'evtStatus[]': 'showUnjoined'
         };
 		
     $(currentEventViewerJTableDiv).jtable('load', postData);
@@ -1943,21 +1938,22 @@ function CreateEvent($dialog)
     return false;
 }
 
-function DisplayManageAccountDialog()
+function DisplayManageAccountDialog(cancelUrl, cancelImgUrl)
 {    
     var dialogHTML = '<div id="dlgManageMembership" class="box style1">' +
                         '<div style="font-weight: bold;">Renew or upgrade your membership</div><br />' +
                         '<div><a id="btnRenewMembership" class="controlBtn button icon fa-refresh" href="BecomeMember.php">Update Membership</a></div>' +
                         '<br /><br /><br />' + 
                         '<div style="font-weight: bold;">Cancel your membership</div><br />' +
-                        '<div><a id="btnCancelMembership" href="https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW">' +
-                           '<img src="https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif" border="0">' +
+                        '<div><a id="btnCancelMembership" href="' + cancelUrl + '">' +
+                           '<img src="' + cancelImgUrl + '" border="0" width="125" height="25">' +
                         '</a></div>' +
                      '</div>';
-    displayJQueryDialogFromDiv(dialogHTML, "Manage Your Account", 'top', window, false, true, 'auto', true, ManageAccountDialogOnReady);
+    displayJQueryDialogFromDiv(dialogHTML, "Manage Your Account", 'top', window, false, true, 'auto', true, ManageAccountDialogOnReady, [cancelUrl]);
+    return false;
 }
 
-function ManageAccountDialogOnReady()
+function ManageAccountDialogOnReady(parms)
 {
     $('#btnCancelMembership').click(function(event){
         // Prevent default behavior of click (do not send user to PayPal site yet)
@@ -1972,23 +1968,27 @@ function ManageAccountDialogOnReady()
           confirmButtonText: "Yes, do it!",
           closeOnConfirm: false,
           closeOnCancel: false
-       },
-       function(isConfirm) {
-          if(!isConfirm) {
-             // Show cancel message
-             sweetAlert("Membership Not Changed", "You are still a premium member!", "info");
-          }
-          else {
-              sweetAlert({
-                 title: "Under Construction",
-                 type: "info",
-                 text: "Paypal functionality not yet implemented",
-                 imageUrl: "images/underConstruction.gif"
-              });
-              
-              // Send user to PayPal site to log in and unsubscribe
-              //window.location = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
-          }
-       });
+        },
+        function(isConfirm) {
+            if(!isConfirm) {
+                // Show cancel message
+                sweetAlert("Membership Not Changed", "You are still a premium member!", "info");
+            }
+            else {
+                // Send user to PayPal site to log in and unsubscribe
+                var url = "#";
+                if(parms) {
+                    url = parms[0];
+                    //window.location = url;
+                }
+
+                sweetAlert({
+                    title: "Under Construction",
+                    type: "info",
+                    text: "Unable to cancel: Paypal functionality not yet implemented",
+                    imageUrl: "images/underConstruction.gif"
+                });
+              }
+        });
     });
 }
