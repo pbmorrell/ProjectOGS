@@ -1105,8 +1105,9 @@
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#596a72',GradientType=0 ); /* IE6-9 */
     }
 
-    #footer-wrapper
+    #footer-wrapper a:hover
     {
+        color: #979797;
     }
 
 /*********************************************************************************/
@@ -1144,6 +1145,16 @@
         border-top: solid 1px rgba(255,255,255,0.1);
         color: #555;
         color: rgba(255,255,255,0.25);
+    }
+    
+    #copyright a
+    {
+        color: inherit;
+    }
+    
+    #copyright a:hover
+    {
+        color: #FFF;
     }
 
 /*********************************************************************************/
