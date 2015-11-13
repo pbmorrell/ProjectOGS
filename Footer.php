@@ -48,10 +48,10 @@
                                 <h2>Quick Links</h2>
                                 <ul class="style3">
                                     <li class="icon fa-question-circle">
-                                        <a href="Faq.php" style="text-decoration:none;"> &nbsp FAQ</a>
+                                        <a href="Faq.php" style="text-decoration:none;">&nbsp;FAQ</a>
                                     </li>
                                     <li class="icon fa-cubes">
-                                        <a href="About.php" style="text-decoration:none;"> &nbsp About Us</a>
+                                        <a href="About.php" style="text-decoration:none;">&nbsp;About Us</a>
                                     </li>
                                 </ul>
                             </section>
@@ -61,10 +61,10 @@
                                 <h2>Contact Us</h2>
                                 <ul class="style3">
                                     <li class="icon fa-envelope">
-                                        <a href="mailto:support@playerunite.com?subject=General Support" style="text-decoration:none;"> &nbsp Email</a>
+                                        <a href="mailto:support@playerunite.com?subject=General Support" style="text-decoration:none;">&nbsp;Email</a>
                                     </li>
                                     <li class="icon fa-facebook-square">
-                                        <a href="#" style="text-decoration:none;"> &nbsp Facebook</a>
+                                        <a href="#" style="text-decoration:none;">&nbsp;Facebook</a>
                                     </li>
                                 </ul>
                             </section>

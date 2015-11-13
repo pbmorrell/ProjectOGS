@@ -7,6 +7,7 @@
     include_once 'classes/Logger.class.php';
     include_once 'classes/User.class.php';
     include_once 'classes/Constants.class.php';
+    include_once 'classes/PayPalTxnMsg.class.php';
     
     $welcomeUserName = "Welcome";
     $curPageName = basename($_SERVER['PHP_SELF'], ".php");
@@ -76,7 +77,8 @@
     $payPalDonationButtonImgUrl = Constants::$isPayPalTest ? Constants::$payPalTestDonationButtonImgUrl : Constants::$payPalProdDonationButtonImgUrl;
     $payPalDonationButtonId 	= Constants::$isPayPalTest ? Constants::$payPalTestDonationButtonId 	: Constants::$payPalProdDonationButtonId;
     $payPalPixelImgUrl 		= Constants::$isPayPalTest ? Constants::$payPalTestPixelImgUrl 		: Constants::$payPalProdPixelImgUrl;
-		
+	
+    $customSessionVars = [];
     if($sessionAllowed) {
         $dataAccess = new DataAccess();
         $logger = new Logger($dataAccess);
@@ -103,6 +105,17 @@
                 }
             }
 
+            // Retrieve any custom session variables requested by the current including page
+            if(isset($customSessionVarsToRetrieve)) {
+		if(count($customSessionVarsToRetrieve) > 0) {
+                    foreach($customSessionVarsToRetrieve as $customSessionVarToRetrieve) {
+			if(isset($_SESSION[$customSessionVarToRetrieve])) {
+                            $customSessionVars[] = [$customSessionVarToRetrieve => $_SESSION[$customSessionVarToRetrieve]];
+			}
+                    }
+		}
+            }
+			
             session_write_close();
 
             // Build string that will be used to refer to the current user

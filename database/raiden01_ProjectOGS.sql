@@ -457,6 +457,54 @@ INSERT INTO `Gaming.UserPlatforms` (`ID`, `FK_User_ID`, `FK_Platform_ID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Payments.PayPalTransactions`
+--
+
+CREATE TABLE `Payments.PayPalTransactions` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
+  `TxnId` BIGINT NOT NULL COMMENT '',
+  `PayerId` BIGINT NULL COMMENT '',
+  `TxnType` VARCHAR(25) NULL COMMENT '',
+  `PDTOperation` VARCHAR(25) NULL COMMENT '',
+  `PaymentStatus` VARCHAR(25) NOT NULL COMMENT '',
+  `NotificationType` VARCHAR(5) NULL COMMENT '',
+  `NotificationDate` datetime NULL,
+  `PayPalMsgData` text,
+  PRIMARY KEY (`ID`)  COMMENT '',
+  UNIQUE INDEX `TxnId_PaymentStatus_UNIQUE` (`TxnId`, `PaymentStatus`) COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Payments.PayPalUsers`
+--
+
+CREATE TABLE `Payments.PayPalUsers` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
+  `FK_User_ID` BIGINT NULL COMMENT '',
+  `PayerId` INT NULL COMMENT '',
+  `SubscriptionType` VARCHAR(25) NULL COMMENT '',
+  `SubscriptionAmtTotal` DECIMAL(6,2) NULL COMMENT '',
+  `SubscriptionAmtPaidLastCycle` DECIMAL(6,2) NULL COMMENT '',
+  `LastBillDate` datetime NULL,
+  `NextBillDate` datetime NULL,
+  `MembershipExpirationDate` datetime NULL,
+  `IsRecurring` tinyint(1) NOT NULL DEFAULT '0',
+  `IsActive` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)  COMMENT '',
+  INDEX `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
+  CONSTRAINT `FK_PayPalUsers_UserID`
+        FOREIGN KEY (`FK_User_ID`)
+        REFERENCES `Security.Users` (`ID`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+--
 -- Table structure for table `Security.PageRoles`
 --
 

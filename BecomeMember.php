@@ -2,7 +2,14 @@
     $mobileLoginPage = false;
     $sessionRequired = true;
     $sessionAllowed = true;
+    $customSessionVarsToRetrieve = ["PayPalTxnDetails"];
     include "Header.php";
+
+    // Retrieve PayPal transaction details, if redirected to this page from a PayPal message handler
+    $replyMsg = PayPalTxnMsg::ConstructDefaultMsg();
+    if(count($customSessionVars) > 0) {
+	$replyMsg = $customSessionVars["PayPalTxnDetails"];
+    }
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -48,6 +55,7 @@
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
                                                         <input type="hidden" name="hosted_button_id" value="<?php echo $payPalMakeSubscriptionButtonId; ?>">
+                                                        <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|SubscribePremium"); ?>">
                                                         <table>
                                                             <tr><td><input type="hidden" name="on0" value="Membership Plans">Membership Plans</td></tr>
                                                             <tr>
@@ -73,6 +81,7 @@
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
                                                         <input type="hidden" name="hosted_button_id" value="<?php echo $payPalRenewSubscriptionButtonId; ?>">
+                                                        <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|RenewSubscription"); ?>">
                                                         <table>
                                                             <tr><td><input type="hidden" name="on0" value="Membership Plans">Membership Plans</td></tr>
                                                             <tr>
