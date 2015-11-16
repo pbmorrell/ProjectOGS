@@ -2,6 +2,7 @@
 include_once 'classes/DataAccess.class.php';
 include_once 'classes/SecurityHandler.class.php';
 include_once 'classes/Logger.class.php';
+include_once 'classes/Constants.class.php';
 include_once 'classes/PayPalTxnMsg.class.php';
 
 class PayPalMsgHandler
@@ -68,15 +69,15 @@ class PayPalMsgHandler
         //  directly from PayPal instead of by clicking "Cancel" from their Player Unite page.
         
         $action = "";
-        $userId = "";
+        $userId = -1;
         
         if(strlen($this->GetResponseValByKey($msgInAssocArray, "custom")) > 0) {
             $customVars = explode('|', $msgInAssocArray["custom"]);
             $action = $customVars[0];
-            $userId = $customVars[1];
+            $userId = (int)$customVars[1];
         }
         
-        $replyMsg = $this->ValidatePayPalResponse($msgInAssocArray, $userId);
+        $replyMsg = $this->ValidatePayPalResponse($msgInAssocArray);
 	$replyMsg->PDTOperation = $action;
         $replyMsg->NotificationType = $notificationType;
 		
@@ -92,44 +93,19 @@ class PayPalMsgHandler
             
             // Only proceed if DB update returns > 0 records affected (unique index prevents insert of records with identical txn ID and payment status)
             if($txnRecordAdded) {
+                // Look up user by the payer ID passed in the message, so that we can update this user's membership status as needed
+                $replyMsg->UserId = $this->LookUpPayPalUserByPayerId($replyMsg->PayerId, $dataAccess, $logger);
+                
                 // If we have a user ID in this message, insert new record in Payments.PayPalUsers table to map this 
-                // user's PayPal payer_id to their user ID in our system
-                if(strlen($userId) > 0) {
-                    $insertedPayPalUser = $this->InsertPayPalUser($replyMsg, $dataAccess, $logger);
+                // user's PayPal payer_id to their user ID in our system, unless this user already in table
+                if(($replyMsg->UserId < 0) && ($userId > -1)) {
+                    $replyMsg->UserId = $userId;
+                    $this->InsertPayPalUser($replyMsg, $dataAccess, $logger);
                 }
                 
-                // If payment was completed and payment was made in full, proceed to update user status
+                // If payment was completed and payment was made in full, proceed to update user membership status
                 if($replyMsg->IsValidated) {
-                    // Handle current PayPal message based on transaction type, if it's a type requiring further action (modification of user membership status or terms)
-                    if($replyMsg->TxnType == "subscr_signup") {
-                        // Upgrade user subscription status in DB...now a premium member
-                        $replyMsg->UserMessage = "Subscription successfully created!";
-                        $replyMsg->UserUpgradedPremium = true;
-                    }
-                    else if(($replyMsg->TxnType == "subscr_modify") || ($replyMsg->TxnType == "subscr_payment")) {
-                        // If renewal/upgrade/payment was successful, update user subscription status in DB (expiration date, period, etc.)
-                        $replyMsg->UserMessage = "Subscription successfully updated!";
-                        $replyMsg->UserSubscriptionRenewed = true;
-                    }
-                    else if($replyMsg->TxnType == "subscr_cancel") {
-                        // If an active subscription was cancelled, alter user membership expiration date but leave as premium for now
-                        $replyMsg->UserMessage = "Subscription successfully cancelled, and will expire at the end of your current term. We're sorry to see you go!";
-                        $replyMsg->UserSubscriptionCancelledPending = true;
-                    }
-                    else if($replyMsg->TxnType == "subscr_eot") {
-                        // If an active subscription is expired now, set user to basic member
-                        $replyMsg->UserMessage = "Your subscription has expired. Please join us again soon!";
-                        $replyMsg->UserSubscriptionCancelledImmediate = true;
-                    }
-                    
-                    // If we don't have the userID in this notification, look up user by the payer ID passed in the message, 
-                    // so that we can update this user's membership status as needed
-                    if(strlen($userId) == 0) {
-                        $replyMsg->UserId = $this->LookUpPayPalUserByPayerId($replyMsg->PayerId, $dataAccess, $logger);
-                    }
-                    
-                    // Update user membership status
-                    if(strlen($replyMsg->UserId) > 0) {
+                    if($replyMsg->UserId > 0) {
                         $this->UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger);
                     }
                     else {
@@ -185,13 +161,13 @@ class PayPalMsgHandler
         return $response;
     }
     
-    private function ValidatePayPalResponse($msgInAssocArray, $userId)
+    private function ValidatePayPalResponse($msgInAssocArray)
     {
         // Initialize response object
         $replyMsg = new PayPalTxnMsg($this->GetResponseValByKey($msgInAssocArray, "txn_id"),
                                      $this->GetResponseValByKey($msgInAssocArray, "txn_type"), 
                                      $this->GetResponseValByKey($msgInAssocArray, "payer_id"), 
-                                     $userId, "", $this->GetResponseValByKey($msgInAssocArray, "payment_status"),
+                                     -1, "", $this->GetResponseValByKey($msgInAssocArray, "payment_status"),
                                      "", "0", "0", "", "", gmdate('Y-m-d H:i:s'));
         
         // Verify that current payment status is "Completed"...if not, only log this update
@@ -221,14 +197,22 @@ class PayPalMsgHandler
 						
 			if($replyMsg->TxnType == "subscr_signup") {
                             $replyMsg->SubscriptionModifyDate = $this->ConvertPayPalTimestampToDBDateTime($this->GetResponseValByKey($msgInAssocArray, "subscr_date"));
-			}
-			else if($replyMsg->TxnType == "subscr_modify") {
-                            $replyMsg->SubscriptionModifyDate = $this->ConvertPayPalTimestampToDBDateTime($this->GetResponseValByKey($msgInAssocArray, "subscr_effective"));
-			}
-						
-			if(($replyMsg->TxnType == "subscr_signup") || ($replyMsg->TxnType == "subscr_modify")) {
                             $replyMsg->SubscriptionIsRecurring = ($this->GetResponseValByKey($msgInAssocArray, "recurring") == "1");
+                            
+                            // Upgrade user subscription status in DB...now a premium member
+                            $replyMsg->UserMessage = "Subscription successfully created!";
+                            $replyMsg->UserUpgradedPremium = true;
 			}
+                        else if(($replyMsg->TxnType == "subscr_modify") || ($replyMsg->TxnType == "subscr_payment")) {
+                            // If renewal/upgrade/payment was successful, update user subscription status in DB (expiration date, period, etc.)
+                            $replyMsg->UserMessage = "Subscription successfully updated!";
+                            $replyMsg->UserSubscriptionRenewed = true;
+                            
+                            if($replyMsg->TxnType == "subscr_modify") {
+                                $replyMsg->SubscriptionModifyDate = $this->ConvertPayPalTimestampToDBDateTime($this->GetResponseValByKey($msgInAssocArray, "subscr_effective"));
+                                $replyMsg->SubscriptionIsRecurring = ($this->GetResponseValByKey($msgInAssocArray, "recurring") == "1");
+                            }
+                        }
                     }
                 }
             }
@@ -236,10 +220,18 @@ class PayPalMsgHandler
 	else if($replyMsg->TxnType == "subscr_cancel") {
             $replyMsg->SubscriptionModifyDate = $this->ConvertPayPalTimestampToDBDateTime($this->GetResponseValByKey($msgInAssocArray, "subscr_date"));
             $replyMsg->IsValidated = true; // Consider this a validated (requires additional handler action) message, since this is not a txn type that requires payment
+            
+            // If an active subscription was cancelled, alter user membership expiration date but leave as premium for now
+            $replyMsg->UserMessage = "Subscription successfully cancelled, and will expire at the end of your current term. We're sorry to see you go!";
+            $replyMsg->UserSubscriptionCancelledPending = true;
 	}
 	else if($replyMsg->TxnType == "subscr_eot") {
             $replyMsg->SubscriptionModifyDate = gmdate('Y-m-d H:i:s'); // Current UTC date
             $replyMsg->IsValidated = true; // Consider this a validated (requires additional handler action) message, since this is not a txn type that requires payment
+            
+            // If an active subscription is expired now, set user to basic member
+            $replyMsg->UserMessage = "Your subscription has expired. Please join us again soon!";
+            $replyMsg->UserSubscriptionCancelledImmediate = true;
 	}
         
         return $replyMsg;
@@ -290,7 +282,7 @@ class PayPalMsgHandler
 			
 	$errors = $dataAccess->CheckErrors();
 
-	if(strlen($errors) != 0) {
+	if(strlen($errors) > 0) {
             $logger->LogError(sprintf("Could not insert PayPal transaction msg [txnId=%d] for payer ID %d. %s", $replyMsg->TxnId, $replyMsg->PayerId, $errors));
 	}
 	else {
@@ -306,7 +298,7 @@ class PayPalMsgHandler
                                                                       `SubscriptionAmtPaidLastCycle`, `IsActive`) " .
                                  "VALUES (:userId, :payerId, :subscrType, :subscrAmtTotal, :subscrAmtPaidLastCycle, :isActive);";
 		
-	$parmUserId = new QueryParameter(':userId', (int)$replyMsg->UserId, PDO::PARAM_INT);
+	$parmUserId = new QueryParameter(':userId', $replyMsg->UserId, PDO::PARAM_INT);
 	$parmPayerId = new QueryParameter(':payerId', (int)$replyMsg->PayerId, PDO::PARAM_INT);
 	$parmSubscrType = new QueryParameter(':subscrType', $replyMsg->SelectedSubscriptionOption, PDO::PARAM_STR);
 	$parmSubscrAmtTotal = new QueryParameter(':subscrAmtTotal', $replyMsg->SubscriptionAmtTotal, PDO::PARAM_STR);
@@ -321,12 +313,125 @@ class PayPalMsgHandler
 			
 	$errors = $dataAccess->CheckErrors();
 
-	if(strlen($errors) != 0) {
+	if(strlen($errors) > 0) {
             $logger->LogError(sprintf("Could not insert PayPal user %d [payer ID: %d; subscription type: %s; subscription amount paid: %s]. %s", 
                                         $replyMsg->UserId, $replyMsg->PayerId, $replyMsg->SelectedSubscriptionOption, $replyMsg->SubscriptionAmtPaid, $errors));
             return false;
 	}
 	
 	return true;
+    }
+    
+    private function LookUpPayPalUserByPayerId($payerId, $dataAccess, $logger)
+    {
+        $getUserIdQuery = "SELECT `FK_User_ID` FROM `Payments.PayPalUsers` " .
+                          "WHERE `PayerId` = :payerId;";
+        
+        $parmPayerId = new QueryParameter(':payerId', (int)$payerId, PDO::PARAM_INT);
+        $queryParms = array($parmPayerId);
+        $userID = -1;
+        
+        if($dataAccess->BuildQuery($getUserIdQuery, $queryParms)){
+            $results = $dataAccess->GetSingleResult();
+
+            if($results != null){
+                $userID = $results['FK_User_ID'];
+            }
+        }
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve user ID associated with payer ID " . $payerId . ". " . $errors);
+	}
+        
+        return $userID;
+    }
+    
+    private function UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger)
+    {
+	$updateSuccess = false;
+        $transactionComplete = false;
+        $isPremium = ($replyMsg->UserUpgradedPremium || $replyMsg->UserSubscriptionRenewed || $replyMsg->UserSubscriptionCancelledPending);
+	$updateUserQuery = "UPDATE `Security.Users` SET `IsPremiumMember` = :isPremium WHERE `ID` = :userId;";
+	
+        $parmIsPremium = new QueryParameter(':isPremium', $isPremium, PDO::PARAM_INT);
+	$parmUserId = new QueryParameter(':userId', $replyMsg->UserId, PDO::PARAM_INT);
+	$queryParms = array($parmIsPremium, $parmUserId);
+
+        // Wrap Security.Users, Security.UserRoles, and Payments.PayPalUsers updates in transaction:
+        // if one fails, must roll back any successful updates.
+        $dataAccess->BeginTransaction();
+        $errors = $dataAccess->CheckErrors();
+
+        if(strlen($errors) == 0) {
+            // Update Security.Users
+            if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+                $updateSuccess = $dataAccess->ExecuteNonQuery();
+                $errors = $dataAccess->CheckErrors();
+                
+                if($updateSuccess && (strlen($errors) == 0)) {
+                    $roleName = Constants::$basicMemberRoleName;
+                    if($isPremium)  $roleName = Constants::$premiumMemberRoleName;
+                    $updateUserQuery = "UPDATE `Security.UserRoles` ur, `Security.Roles` r " . 
+                                       "SET ur.`FK_Role_ID` = r.`ID` " . 
+                                       "WHERE (r.`Name` = :roleName) AND (ur.`FK_User_ID` = :userId);";
+                    
+                    $parmRoleName = new QueryParameter(':roleName', $roleName, PDO::PARAM_STR);
+                    $queryParms = array($parmUserId, $parmRoleName);
+                    
+                    // Update Security.UserRoles
+                    if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+                        $updateSuccess = $dataAccess->ExecuteNonQuery();
+                        $errors = $dataAccess->CheckErrors();
+                        
+                        if($updateSuccess && (strlen($errors) == 0)) {
+                            $parmSubscrType = new QueryParameter(':subscrType', $replyMsg->SelectedSubscriptionOption, PDO::PARAM_STR);
+                            $parmSubscrAmtTotal = new QueryParameter(':subscrAmtTotal', $replyMsg->SubscriptionAmtTotal, PDO::PARAM_STR);
+                            $parmSubscrAmtLastPaid = new QueryParameter(':subscrAmtLastPaid', $replyMsg->SelectedSubscriptionOption, PDO::PARAM_STR);
+                            $parmIsRecurring = new QueryParameter(':isRecurring', ($replyMsg->SubscriptionIsRecurring ? 1 : 0), PDO::PARAM_INT);
+                            $queryParms = array($parmSubscrType, $parmSubscrAmtTotal, $parmSubscrAmtLastPaid, $parmIsRecurring, $parmUserId);
+                            
+                            $additionalVarsToSet = ", `MembershipExpirationDate` = NULL";
+                            if($replyMsg->UserSubscriptionCancelledPending || $replyMsg->UserSubscriptionCancelledImmediate) {
+                                $expDate = $replyMsg->SubscriptionModifyDate;
+                                $additionalVarsToSet = ", `MembershipExpirationDate` = :expDate";
+                                $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
+                                array_push($queryParms, $parmMembershipExpDate);
+                            }
+                            
+                            if($replyMsg->TxnType == "subscr_payment") {
+                                $lastBillDate = gmdate('Y-m-d H:i:s');
+                                $additionalVarsToSet .= ", `LastBillDate` = :lastBillDate";
+                                $parmLastBillDate = new QueryParameter(':lastBillDate', $lastBillDate, PDO::PARAM_STR);
+                                array_push($queryParms, $parmLastBillDate);
+                            }
+                            
+                            $updateUserQuery = "UPDATE `Payments.PayPalUsers` SET `SubscriptionType` = :subscrType, " .
+                                               "`SubscriptionAmtTotal` = :subscrAmtTotal, `SubscriptionAmtPaidLastCycle` = :subscrAmtLastPaid, " .
+                                               "`IsRecurring` = :isRecurring" . $additionalVarsToSet .
+                                               " WHERE `FK_User_ID` = :userId;";
+                            
+                            // Update Payments.PayPalUsers
+                            if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+                                $transactionComplete = $dataAccess->ExecuteNonQuery();
+                                $errors = $dataAccess->CheckErrors();
+                                
+                                if($transactionComplete && (strlen($errors) == 0)) {
+                                    $dataAccess->CommitTransaction();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+		
+	if($transactionComplete == false) {
+            $logger->LogError(sprintf("Could not update user membership status to '%s' for user ID '%d'. %s", 
+                                      (($isPremium == 1) ? "Premium" : "Basic"), $replyMsg->UserId, $errors));
+            $dataAccess->RollbackTransaction();
+	}
+			
+	return $updateSuccess;
     }
 }

@@ -14,6 +14,8 @@ class Constants
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = true; // Change this to false when ready to move to production
     public static $subscriptionOptionNames = ["Month-by-month" => "3.95", "Full Year" => "39.95"];
+    public static $premiumMemberRoleName = "PremiumMember";
+    public static $basicMemberRoleName = "BasicMember";
 	
     // Sandbox testing variables
     public static $payPalTestMerchantId = "8PF58UQ6LLAZA";

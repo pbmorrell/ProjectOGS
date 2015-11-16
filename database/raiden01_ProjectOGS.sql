@@ -489,7 +489,6 @@ CREATE TABLE `Payments.PayPalUsers` (
   `SubscriptionAmtTotal` DECIMAL(6,2) NULL COMMENT '',
   `SubscriptionAmtPaidLastCycle` DECIMAL(6,2) NULL COMMENT '',
   `LastBillDate` datetime NULL,
-  `NextBillDate` datetime NULL,
   `MembershipExpirationDate` datetime NULL,
   `IsRecurring` tinyint(1) NOT NULL DEFAULT '0',
   `IsActive` tinyint(1) NOT NULL DEFAULT '0',

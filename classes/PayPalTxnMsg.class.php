@@ -4,7 +4,7 @@ class PayPalTxnMsg
     public $TxnId = "-1";
     public $TxnType = "";
     public $PayerId = "-1";
-    public $UserId = "-1";
+    public $UserId = -1;
     public $NotificationType = "";
     public $PDTOperation = "";
     public $NotificationDate = "";
@@ -40,7 +40,7 @@ class PayPalTxnMsg
     
     public static function ConstructDefaultMsg()
     {   
-        $instance = new self("", "", "", "", "", "", "", "", "", "", "", "");
+        $instance = new self("", "", "", -1, "", "", "", "", "", "", "", "");
         return $instance;
     }
 }
