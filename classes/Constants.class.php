@@ -18,7 +18,7 @@ class Constants
     public static $basicMemberRoleName = "BasicMember";
 	
     // Sandbox testing variables
-    public static $payPalTestMerchantId = "8PF58UQ6LLAZA";
+    public static $payPalTestMerchantId = "stephengiles2011@comcast.net";
     public static $payPalTestButtonFormUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr";
     public static $payPalTestCancelSubscriptionUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=8PF58UQ6LLAZA";
     public static $payPalTestMakeSubscriptionButtonId = "ZHAXXJD9UND5W";
@@ -31,7 +31,7 @@ class Constants
     public static $payPalTestPostIdentityToken = "NyoAhK2wqNWZZ53U4B96QvQhBwxqEGAeiyhxTRPbAS4HEvyP-28LUC51zMe";
 
     // Production 
-    public static $payPalProdMerchantId = "A92KZXWFK8REW";
+    public static $payPalProdMerchantId = "admin@morrellweb.com";
     public static $payPalProdButtonFormUrl = "https://www.paypal.com/cgi-bin/webscr";
     public static $payPalProdCancelSubscriptionUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
     public static $payPalProdMakeSubscriptionButtonId = "9H4QGFRL3F7HS";

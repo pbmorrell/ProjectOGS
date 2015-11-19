@@ -15,7 +15,7 @@ $payPalMsgHandler = new PayPalMsgHandler();
 if(isset($_GET['tx'])) {
     $tx = filter_var($_GET['tx'], FILTER_SANITIZE_STRING);
     if(strlen($tx) > 0) {
-	$replyMsg = PalPalTxnMsg::ConstructDefaultMsg();
+	$replyMsg = PayPalTxnMsg::ConstructDefaultMsg();
 	$url = Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl : Constants::$payPalProdButtonFormUrl;
 	$identityToken = Constants::$isPayPalTest ? Constants::$payPalTestPostIdentityToken : Constants::$payPalProdPostIdentityToken;
 	$status = 500;

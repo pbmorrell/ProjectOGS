@@ -1,7 +1,7 @@
 <?php
 class PayPalTxnMsg
 {
-    public $TxnId = "-1";
+    public $TxnId = "";
     public $TxnType = "";
     public $PayerId = "-1";
     public $UserId = -1;
@@ -9,6 +9,7 @@ class PayPalTxnMsg
     public $PDTOperation = "";
     public $NotificationDate = "";
     public $PaymentStatus = "";
+    public $PaymentPendingReason = "";
     public $SelectedSubscriptionOption = "";
     public $SubscriptionAmtPaid = "0";
     public $SubscriptionAmtTotal = "0";
@@ -21,6 +22,7 @@ class PayPalTxnMsg
     public $UserSubscriptionCancelledImmediate = false;
     public $IsValidBusiness = true;
     public $IsValidated = false;
+    public $UpdateUserMembershipStatus = false;
 	
     public function __construct($tid, $tt, $pid, $uid, $nt, $ps, $sso, $ssp, $sst, $smd, $um, $nd)
     {

@@ -2,13 +2,32 @@
     $mobileLoginPage = false;
     $sessionRequired = true;
     $sessionAllowed = true;
-    $customSessionVarsToRetrieve = ["PayPalTxnDetails"];
+    $customSessionVarsToRetrieve = array("PayPalTxnDetails");
     include "Header.php";
 
     // Retrieve PayPal transaction details, if redirected to this page from a PayPal message handler
     $replyMsg = PayPalTxnMsg::ConstructDefaultMsg();
-    if(count($customSessionVars) > 0) {
+    if((isset($customSessionVars)) && (count($customSessionVars) > 0)) {
 	$replyMsg = $customSessionVars["PayPalTxnDetails"];
+        $logger->LogInfo("SESSION['PayPalTxnDetails'] is set. replyMsg: " . serialize($replyMsg));
+		
+	// If transaction details message is available, need to update related session variables
+        $sessionDataAccess = new DataAccess();
+        $sessionHandler = new DBSessionHandler($sessionDataAccess);
+        session_set_save_handler($sessionHandler, true);
+        session_start();
+		
+	// Update user membership status in session
+	$curMembershipStatus = ($replyMsg->UserUpgradedPremium || $replyMsg->UserSubscriptionRenewed || $replyMsg->UserSubscriptionCancelledPending);
+	if($objUser->IsPremiumMember != $curMembershipStatus) {
+            $objUser->IsPremiumMember = $curMembershipStatus;
+            $_SESSION['WebUser'] = $objUser;
+	}
+		
+	// Remove transaction details from session storage, so that they are only shown immediately after user is returned to this page from PayPal
+	unset($_SESSION['PayPalTxnDetails']);
+		
+	session_write_close();
     }
 ?>
 <!DOCTYPE HTML>
@@ -20,14 +39,14 @@
     <head>
         <?php 
             echo $pageHeaderHTML;
-            $action = $objUser->IsPremiumMember ? "renew" : "join";
+            $action = $objUser->IsPremiumMember ? "upgrade" : "join";
 			
             // PayPal config settings
             $payPalButtonFormUrl                = Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl                : Constants::$payPalProdButtonFormUrl;
             $payPalMakeSubscriptionButtonId     = Constants::$isPayPalTest ? Constants::$payPalTestMakeSubscriptionButtonId  	: Constants::$payPalProdMakeSubscriptionButtonId;
             $payPalRenewSubscriptionButtonId    = Constants::$isPayPalTest ? Constants::$payPalTestRenewSubscriptionButtonId 	: Constants::$payPalProdRenewSubscriptionButtonId;
             $payPalSubscribeButtonImgUrl 	= Constants::$isPayPalTest ? Constants::$payPalTestSubscribeButtonImgUrl 	: Constants::$payPalProdSubscribeButtonImgUrl;
-            $payPalPixelImgUrl 			= Constants::$isPayPalTest ? Constants::$payPalTestPixelImgUrl 			: Constants::$payPalProdPixelImgUrl;
+            $payPalPixelImgUrl 			= Constants::$isPayPalTest ? Constants::$payPalTestPixelImgUrl                  : Constants::$payPalProdPixelImgUrl;
         ?>
     </head>
     <body class="">
@@ -40,9 +59,50 @@
 			<div id="main">
                             <div class="row">
 				<div class="12u">
-                                    <!-- About -->
                                     <div id="content">
-					<article class="box style1">
+					<?php if(strlen($replyMsg->TxnId) > 0): ?>
+                                            <article  class="box style1">
+						<h2>Transaction Details</h2>
+						<p><?php echo $replyMsg->UserMessage; ?></p>
+						<div id="txnDetailsTable" class="detailsTable">
+                                                    <div class="detailsTableRow">
+							<div class="detailsTableCol">Transaction ID:</div>
+							<div class="detailsTableCol"><?php echo $replyMsg->TxnId; ?></div>
+                                                    </div>
+                                                    <div class="detailsTableRow">
+							<div class="detailsTableCol">Transaction Type:</div>
+							<div class="detailsTableCol"><?php echo (($replyMsg->PDTOperation == 'SubscribePremium') ? 'New Subscription' : 'Update To Existing Subscription'); ?></div>
+                                                    </div>
+                                                    <div class="detailsTableRow">
+                                                        <div class="detailsTableCol">Recurring Subscription?</div>
+                                                        <div class="detailsTableCol"><?php echo ($replyMsg->SubscriptionIsRecurring ? 'Yes' : 'No'); ?></div>
+                                                    </div>
+                                                    <div class="detailsTableRow">
+                                                        <div class="detailsTableCol">Transaction Amount:</div>
+                                                        <div class="detailsTableCol"><?php echo '$' . $replyMsg->SubscriptionAmtPaid; ?></div>
+                                                    </div>
+                                                    <div class="detailsTableRow">
+                                                        <div class="detailsTableCol">Payment Status:</div>
+                                                        <div class="detailsTableCol"><?php echo $replyMsg->PaymentStatus; ?></div>
+                                                    </div>
+                                                    <?php if(strlen($replyMsg->PaymentPendingReason) > 0): ?>
+                                                        <div class="detailsTableRow">
+                                                            <div class="detailsTableCol">Pending Reason:</div>
+                                                            <div class="detailsTableCol"><?php echo $replyMsg->PaymentPendingReason; ?></div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <div class="detailsTableRow">
+                                                        <div class="detailsTableCol">Date Effective:</div>
+                                                        <div class="detailsTableCol"><?php echo ((strlen($replyMsg->SubscriptionModifyDate) > 0) ? $replyMsg->SubscriptionModifyDate : 'N/A'); ?></div>
+                                                    </div>
+                                                    <div class="detailsTableRow">
+                                                        <div class="detailsTableCol">PayPal Payer ID:</div>
+                                                        <div class="detailsTableCol"><?php echo $replyMsg->PayerId; ?></div>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        <?php endif; ?>
+                                        <article class="box style1">
                                             <?php if(!$objUser->IsPremiumMember): ?>
                                                 <h2>Become a Member</h2>
                                                 <p>By upgrading your free account to a membership, you are helping us cover our hosting cost and paving a way for future expansions of the site!</p>

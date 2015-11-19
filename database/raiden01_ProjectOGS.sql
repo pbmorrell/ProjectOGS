@@ -462,16 +462,17 @@ INSERT INTO `Gaming.UserPlatforms` (`ID`, `FK_User_ID`, `FK_Platform_ID`) VALUES
 
 CREATE TABLE `Payments.PayPalTransactions` (
   `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
-  `TxnId` BIGINT NOT NULL COMMENT '',
-  `PayerId` BIGINT NULL COMMENT '',
+  `TxnId` VARCHAR(35) NOT NULL COMMENT '',
+  `PayerId` VARCHAR(25) NULL COMMENT '',
   `TxnType` VARCHAR(25) NULL COMMENT '',
   `PDTOperation` VARCHAR(25) NULL COMMENT '',
   `PaymentStatus` VARCHAR(25) NOT NULL COMMENT '',
   `NotificationType` VARCHAR(5) NULL COMMENT '',
   `NotificationDate` datetime NULL,
   `PayPalMsgData` text,
+  `TransactionDate` datetime NULL,
   PRIMARY KEY (`ID`)  COMMENT '',
-  UNIQUE INDEX `TxnId_PaymentStatus_UNIQUE` (`TxnId`, `PaymentStatus`) COMMENT '')
+  UNIQUE INDEX `IDX_TxnId_TxnType_PaymentStatus_TxnDate_UNIQUE` (`TxnId` ASC, `TxnType` ASC, `PaymentStatus` ASC, `TransactionDate` ASC) COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
@@ -484,7 +485,7 @@ COLLATE = utf8_general_ci;
 CREATE TABLE `Payments.PayPalUsers` (
   `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
   `FK_User_ID` BIGINT NULL COMMENT '',
-  `PayerId` INT NULL COMMENT '',
+  `PayerId` VARCHAR(25) NULL COMMENT '',
   `SubscriptionType` VARCHAR(25) NULL COMMENT '',
   `SubscriptionAmtTotal` DECIMAL(6,2) NULL COMMENT '',
   `SubscriptionAmtPaidLastCycle` DECIMAL(6,2) NULL COMMENT '',
@@ -492,6 +493,8 @@ CREATE TABLE `Payments.PayPalUsers` (
   `MembershipExpirationDate` datetime NULL,
   `IsRecurring` tinyint(1) NOT NULL DEFAULT '0',
   `IsActive` tinyint(1) NOT NULL DEFAULT '0',
+  `SubscriptionStartedDate` datetime NULL,
+  `SubscriptionModifiedDate` datetime NULL,
   PRIMARY KEY (`ID`)  COMMENT '',
   INDEX `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
   CONSTRAINT `FK_PayPalUsers_UserID`

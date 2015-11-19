@@ -110,7 +110,7 @@
 		if(count($customSessionVarsToRetrieve) > 0) {
                     foreach($customSessionVarsToRetrieve as $customSessionVarToRetrieve) {
 			if(isset($_SESSION[$customSessionVarToRetrieve])) {
-                            $customSessionVars[] = [$customSessionVarToRetrieve => $_SESSION[$customSessionVarToRetrieve]];
+                            $customSessionVars[$customSessionVarToRetrieve] = $_SESSION[$customSessionVarToRetrieve];
 			}
                     }
 		}
