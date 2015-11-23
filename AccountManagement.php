@@ -9,7 +9,6 @@
     $replyMsg = PayPalTxnMsg::ConstructDefaultMsg();
     if((isset($customSessionVars)) && (count($customSessionVars) > 0)) {
 	$replyMsg = $customSessionVars["PayPalTxnDetails"];
-        $logger->LogInfo("SESSION['PayPalTxnDetails'] is set. replyMsg: " . serialize($replyMsg));
 		
 	// If transaction details message is available, need to update related session variables
         $sessionDataAccess = new DataAccess();
@@ -22,6 +21,12 @@
 	if($objUser->IsPremiumMember != $curMembershipStatus) {
             $objUser->IsPremiumMember = $curMembershipStatus;
             $_SESSION['WebUser'] = $objUser;
+	}
+	
+	// Convert SubscriptionStartedTime from UTC to user's local timezone
+	if(strlen($replyMsg->SubscriptionModifyDate) > 0) {
+            $utcTimestamp = strtotime($replyMsg->SubscriptionModifyDate . ' UTC');
+            $replyMsg->SubscriptionModifyDate = date("Y-m-d H:i:s", $utcTimestamp);
 	}
 		
 	// Remove transaction details from session storage, so that they are only shown immediately after user is returned to this page from PayPal
@@ -44,9 +49,11 @@
             // PayPal config settings
             $payPalButtonFormUrl                = Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl                : Constants::$payPalProdButtonFormUrl;
             $payPalMakeSubscriptionButtonId     = Constants::$isPayPalTest ? Constants::$payPalTestMakeSubscriptionButtonId  	: Constants::$payPalProdMakeSubscriptionButtonId;
-            $payPalRenewSubscriptionButtonId    = Constants::$isPayPalTest ? Constants::$payPalTestRenewSubscriptionButtonId 	: Constants::$payPalProdRenewSubscriptionButtonId;
+            $payPalChangeSubscriptionButtonId   = Constants::$isPayPalTest ? Constants::$payPalTestChangeSubscriptionButtonId 	: Constants::$payPalProdChangeSubscriptionButtonId;
             $payPalSubscribeButtonImgUrl 	= Constants::$isPayPalTest ? Constants::$payPalTestSubscribeButtonImgUrl 	: Constants::$payPalProdSubscribeButtonImgUrl;
             $payPalPixelImgUrl 			= Constants::$isPayPalTest ? Constants::$payPalTestPixelImgUrl                  : Constants::$payPalProdPixelImgUrl;
+            //$payPalCancelSubscriptionUrl        = Constants::$isPayPalTest ? Constants::$payPalTestCancelSubscriptionUrl 	: Constants::$payPalProdCancelSubscriptionUrl;
+            $payPalUnsubscribeButtonImgUrl      = Constants::$isPayPalTest ? Constants::$payPalTestUnsubscribeButtonImgUrl 	: Constants::$payPalProdUnsubscribeButtonImgUrl;
         ?>
     </head>
     <body class="">
@@ -63,7 +70,7 @@
 					<?php if(strlen($replyMsg->TxnId) > 0): ?>
                                             <article  class="box style1">
 						<h2>Transaction Details</h2>
-						<p><?php echo $replyMsg->UserMessage; ?></p>
+						<p style="color:red;"><?php echo $replyMsg->UserMessage; ?></p>
 						<div id="txnDetailsTable" class="detailsTable">
                                                     <div class="detailsTableRow">
 							<div class="detailsTableCol">Transaction ID:</div>
@@ -72,10 +79,6 @@
                                                     <div class="detailsTableRow">
 							<div class="detailsTableCol">Transaction Type:</div>
 							<div class="detailsTableCol"><?php echo (($replyMsg->PDTOperation == 'SubscribePremium') ? 'New Subscription' : 'Update To Existing Subscription'); ?></div>
-                                                    </div>
-                                                    <div class="detailsTableRow">
-                                                        <div class="detailsTableCol">Recurring Subscription?</div>
-                                                        <div class="detailsTableCol"><?php echo ($replyMsg->SubscriptionIsRecurring ? 'Yes' : 'No'); ?></div>
                                                     </div>
                                                     <div class="detailsTableRow">
                                                         <div class="detailsTableCol">Transaction Amount:</div>
@@ -108,9 +111,9 @@
                                                 <p>By upgrading your free account to a membership, you are helping us cover our hosting cost and paving a way for future expansions of the site!</p>
                                                 <br />
                                                 <h2>What is included in the membership?</h2>
-                                                <ul><li class="icon fa-search">&nbsp;Additional search tools for quickly pinpointing the information you need</li></ul>
-                                                <ul><li class="icon fa-user">&nbsp;A dedicated friends section that allows you to see other users information.</li></ul>
-                                                <ul><li class="icon fa-flask">&nbsp;The ability to keep your events open to only your friends, keeping random users out.</li></ul>
+                                                <ul><li class="icon fa-search">&nbsp;&nbsp;Additional search tools for quickly pinpointing the information you need</li></ul>
+                                                <ul><li class="icon fa-user">&nbsp;&nbsp;A dedicated friends section that allows you to see other users information.</li></ul>
+                                                <ul><li class="icon fa-flask">&nbsp;&nbsp;The ability to keep your events open to only your friends, keeping random users out.</li></ul>
                                                 <article>
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
@@ -134,16 +137,15 @@
                                                     </form>
                                                 </article>
                                             <?php else: ?>
-                                                <h2>Renew Your Membership</h2>
-                                                <p>By renewing your membership, you are helping us cover our hosting cost and paving a way for future expansions of the site!</p>
-                                                <br />
-                                                <article>
+                                                <h2>Update Your Membership Plan</h2>
+                                                <p>Choose a membership plan with the billing cycle that best fits your needs!</p>
+                                                <article class="box style1" style="padding-top: 1em;">
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
-                                                        <input type="hidden" name="hosted_button_id" value="<?php echo $payPalRenewSubscriptionButtonId; ?>">
+                                                        <input type="hidden" name="hosted_button_id" value="<?php echo $payPalChangeSubscriptionButtonId; ?>">
                                                         <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|RenewSubscription"); ?>">
                                                         <table>
-                                                            <tr><td><input type="hidden" name="on0" value="Membership Plans">Membership Plans</td></tr>
+                                                            <tr><td style="font-weight: bold;"<input type="hidden" name="on0" value="Membership Plans">Choose A New Membership Plan<br /></td></tr>
                                                             <tr>
                                                                 <td>
                                                                     <select name="os0">
@@ -158,6 +160,12 @@
                                                                alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe" onclick="return SubscribeOnClick('<?php echo $action; ?>');">
                                                         <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
                                                     </form>
+                                                </article>
+                                                <article class="box style1" style="padding-top: 1em; padding-bottom: 1.5em !important;">
+                                                    <div style="font-weight: bold;">Cancel Your Membership</div><br />
+                                                    <div><a id="btnCancelMembership" href="#">
+                                                        <img src="<?php echo $payPalUnsubscribeButtonImgUrl; ?>" border="0" width="125" height="25">
+                                                    </a></div>
                                                 </article>
                                             <?php endif; ?>
 					</article>

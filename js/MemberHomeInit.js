@@ -1008,15 +1008,15 @@ function EventManagerOnReady()
 
 function IsPastEvent(eventScheduledForDate)
 {
-	var curMoment = moment().utc();
+    var curMoment = moment().utc();
 	
-	// Event date already in UTC, and is in 24-hr format
-	var gameTimeMoment = moment(eventScheduledForDate + " +0000", "YYYY-MM-DD HH:mm:ss Z");
-	if (gameTimeMoment.isBefore(curMoment)) {
-		return true;
-	}
-	
-	return false;
+    // Event date already in UTC, and is in 24-hr format
+    var gameTimeMoment = moment(eventScheduledForDate + " +0000", "YYYY-MM-DD HH:mm:ss Z");
+    if (gameTimeMoment.isBefore(curMoment)) {
+	return true;
+    }
+
+    return false;
 }
 
 function DeselectAllJTableRows(jTableContainer)
@@ -1938,57 +1938,3 @@ function CreateEvent($dialog)
     return false;
 }
 
-function DisplayManageAccountDialog(cancelUrl, cancelImgUrl)
-{    
-    var dialogHTML = '<div id="dlgManageMembership" class="box style1">' +
-                        '<div style="font-weight: bold;">Renew or upgrade your membership</div><br />' +
-                        '<div><a id="btnRenewMembership" class="controlBtn button icon fa-refresh" href="BecomeMember.php">Update Membership</a></div>' +
-                        '<br /><br /><br />' + 
-                        '<div style="font-weight: bold;">Cancel your membership</div><br />' +
-                        '<div><a id="btnCancelMembership" href="' + cancelUrl + '">' +
-                           '<img src="' + cancelImgUrl + '" border="0" width="125" height="25">' +
-                        '</a></div>' +
-                     '</div>';
-    displayJQueryDialogFromDiv(dialogHTML, "Manage Your Account", 'top', window, false, true, 'auto', true, ManageAccountDialogOnReady, [cancelUrl]);
-    return false;
-}
-
-function ManageAccountDialogOnReady(parms)
-{
-    $('#btnCancelMembership').click(function(event){
-        // Prevent default behavior of click (do not send user to PayPal site yet)
-        event.stopPropagation();
-        event.preventDefault();
-        
-        sweetAlert({
-          title: "Confirm Cancellation",
-          text: "Are you sure you want to cancel? You'll lose your friends list, and have access only to basic search and event creation functions.",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Yes, do it!",
-          closeOnConfirm: false,
-          closeOnCancel: false
-        },
-        function(isConfirm) {
-            if(!isConfirm) {
-                // Show cancel message
-                sweetAlert("Membership Not Changed", "You are still a premium member!", "info");
-            }
-            else {
-                // Send user to PayPal site to log in and unsubscribe
-                var url = "#";
-                if(parms) {
-                    url = parms[0];
-                    //window.location = url;
-                }
-
-                sweetAlert({
-                    title: "Under Construction",
-                    type: "info",
-                    text: "Unable to cancel: Paypal functionality not yet implemented",
-                    imageUrl: "images/underConstruction.gif"
-                });
-              }
-        });
-    });
-}

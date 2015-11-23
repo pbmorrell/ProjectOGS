@@ -32,12 +32,12 @@ if(isset($_GET['tx'])) {
             $replyMsg = $payPalMsgHandler->HandlePayPalTxnResponse($txnDetailsAssociativeArray, $rawPdtMessage, $dataAccess, $logger, $notificationType);
 	}
 		
-	// Redirect to BecomeMember page to report results to user
+	// Redirect to AccountManagement page to report results to user
         $sessionDataAccess = new DataAccess();
         $sessionHandler = new DBSessionHandler($sessionDataAccess);
         session_set_save_handler($sessionHandler, true);
         session_start();
 	$_SESSION["PayPalTxnDetails"] = $replyMsg;
-	header("Location: BecomeMember.php");
+	header("Location: AccountManagement.php");
     }
 }

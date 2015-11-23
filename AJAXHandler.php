@@ -2,6 +2,7 @@
     include_once 'classes/DataAccess.class.php';
     include_once 'classes/SecurityHandler.class.php';
     include_once 'classes/GamingHandler.class.php';
+    include_once 'classes/PayPalMsgHandler.class.php';
     include_once 'classes/DBSessionHandler.class.php';
     include_once 'classes/Logger.class.php';
     include_once 'classes/User.class.php';
@@ -513,6 +514,10 @@
 		$gamerTagID = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
 			
                 echo $securityHandler->DeleteGamerTagsForUser($dataAccess, $logger, $objUser->UserID, $gamerTagID);
+                break;
+            case "CancelPayPalSubscription":
+                $payPalMsgHandler = new PayPalMsgHandler();
+                echo $payPalMsgHandler->CancelSubscriptionForUser($dataAccess, $logger, $objUser->UserID);
                 break;
         }
     }

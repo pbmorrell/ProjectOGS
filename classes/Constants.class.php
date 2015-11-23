@@ -20,28 +20,36 @@ class Constants
     // Sandbox testing variables
     public static $payPalTestMerchantId = "stephengiles2011@comcast.net";
     public static $payPalTestButtonFormUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr";
-    public static $payPalTestCancelSubscriptionUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=8PF58UQ6LLAZA";
+    //public static $payPalTestCancelSubscriptionUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=8PF58UQ6LLAZA";
     public static $payPalTestMakeSubscriptionButtonId = "ZHAXXJD9UND5W";
-    public static $payPalTestRenewSubscriptionButtonId = "6NXXK8S52LWJS";
+    public static $payPalTestChangeSubscriptionButtonId = "6NXXK8S52LWJS";
     public static $payPalTestDonationButtonId = "CR9CAS34T5BZ2";
     public static $payPalTestSubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalTestUnsubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_unsubscribe_LG.gif";
     public static $payPalTestDonationButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_paynow_LG.gif";
     public static $payPalTestPixelImgUrl = "https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif";
     public static $payPalTestPostIdentityToken = "NyoAhK2wqNWZZ53U4B96QvQhBwxqEGAeiyhxTRPbAS4HEvyP-28LUC51zMe";
+    public static $payPalTestAPIURL = "https://api-3t.sandbox.paypal.com/nvp";
+    public static $payPalTestAPIUsername = "stephengiles2011_api1.comcast.net";
+    public static $payPalTestAPIPassword = "GWFEUGDRJHMXMP5F";
+    public static $payPalTestAPISignature = "An5ns1Kso7MWUdW4ErQKJJJ4qi4-AsiEpTILBNuocaRuASZDvMYMDNuB";
 
     // Production 
     public static $payPalProdMerchantId = "admin@morrellweb.com";
     public static $payPalProdButtonFormUrl = "https://www.paypal.com/cgi-bin/webscr";
-    public static $payPalProdCancelSubscriptionUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
+    //public static $payPalProdCancelSubscriptionUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
     public static $payPalProdMakeSubscriptionButtonId = "9H4QGFRL3F7HS";
-    public static $payPalProdRenewSubscriptionButtonId = "NW9MDQLDJS8D6";
+    public static $payPalProdChangeSubscriptionButtonId = "NW9MDQLDJS8D6";
     public static $payPalProdDonationButtonId = "KPJMEYCDVH4XW";
     public static $payPalProdSubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalProdUnsubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif";
     public static $payPalProdDonationButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_paynow_LG.gif";
     public static $payPalProdPixelImgUrl = "https://www.paypalobjects.com/en_US/i/scr/pixel.gif";
     public static $payPalProdPostIdentityToken = "YJ0q__STdxwVpTQg5X6-JMLqZnppTTEMBRmg6Iao0kyqSQEsYOjDoxoyv3e";
+    public static $payPalProdAPIURL = "https://api-3t.paypal.com/nvp";
+    public static $payPalProdAPIUsername = "admin_api1.morrellweb.com";
+    public static $payPalProdAPIPassword = "D4BEWPEQ6792PQBT";
+    public static $payPalProdAPISignature = "AN-TgTMVCpYHCc3KCiFcKast2SyHAVzcTpuUlSXVhndDVTV-VWeG03cB";
     /* ************************************ END PAYPAL CONFIGURATION *****************************************/
 }
 

@@ -15,6 +15,7 @@ class PayPalTxnMsg
     public $SubscriptionAmtTotal = "0";
     public $SubscriptionIsRecurring = false;
     public $SubscriptionModifyDate = "";
+    public $SubscriptionID = "";
     public $UserMessage = "";
     public $UserUpgradedPremium = false;
     public $UserSubscriptionRenewed = false;
@@ -24,7 +25,7 @@ class PayPalTxnMsg
     public $IsValidated = false;
     public $UpdateUserMembershipStatus = false;
 	
-    public function __construct($tid, $tt, $pid, $uid, $nt, $ps, $sso, $ssp, $sst, $smd, $um, $nd)
+    public function __construct($tid, $tt, $pid, $uid, $nt, $ps, $sso, $ssp, $sst, $smd, $um, $nd, $pdto, $sid)
     {
         $this->TxnId = $tid;
         $this->TxnType = $tt;
@@ -38,11 +39,13 @@ class PayPalTxnMsg
 	$this->SubscriptionModifyDate = $smd;
         $this->UserMessage = $um;
 	$this->NotificationDate = $nd;
+	$this->PDTOperation = $pdto;
+	$this->SubscriptionID = $sid;
     }
     
     public static function ConstructDefaultMsg()
     {   
-        $instance = new self("", "", "", -1, "", "", "", "", "", "", "", "");
+        $instance = new self("", "", "", -1, "", "", "", "", "", "", "", "", "", "");
         return $instance;
     }
 }
