@@ -1,6 +1,20 @@
 function AccountManagementOnReady()
 {
     $('#btnCancelMembership').click(function(event) { CancelOnClick(event); });
+	
+    // Format subscription date in Transaction Details table in user's local time (if shown)
+    if($("#subscrDateColumn").length) {
+        var subscrDateUTC = moment.utc($('#subscrDateColumn').text().trim(), "YYYY-MM-DD H:mm:ss");
+        var subscrDateLocal = subscrDateUTC.local();
+        $('#subscrDateColumn').text(subscrDateLocal.format("MMM Do, YYYY, [a]t h:mma"));
+    }
+
+    // Format membership expiration date in user's local time (if shown)
+    if($("#expDateSpan").length) {
+        var membershipExpDateUTC = moment.utc($('#expDateSpan').text().trim(), "YYYY-MM-DD H:mm:ss");
+        var membershipExpDateLocal = membershipExpDateUTC.local();
+        $('#expDateSpan').text(membershipExpDateLocal.format("MMM Do, YYYY"));
+    }
 }
 
 function SubscribeOnClick(action)

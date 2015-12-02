@@ -13,16 +13,15 @@ class Constants
 	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = true; // Change this to false when ready to move to production
-    public static $subscriptionOptionNames = ["Month-by-month" => "3.95", "Full Year" => "39.95"];
+    //public static $subscriptionOptionNames = ["Monthly" => "6.50", "Yearly" => "39.95"];
+    public static $subscriptionOptionNames = ["Monthly" => "6.50"];
     public static $premiumMemberRoleName = "PremiumMember";
     public static $basicMemberRoleName = "BasicMember";
 	
     // Sandbox testing variables
     public static $payPalTestMerchantId = "stephengiles2011@comcast.net";
     public static $payPalTestButtonFormUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr";
-    //public static $payPalTestCancelSubscriptionUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=8PF58UQ6LLAZA";
     public static $payPalTestMakeSubscriptionButtonId = "ZHAXXJD9UND5W";
-    public static $payPalTestChangeSubscriptionButtonId = "6NXXK8S52LWJS";
     public static $payPalTestDonationButtonId = "CR9CAS34T5BZ2";
     public static $payPalTestSubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalTestUnsubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_unsubscribe_LG.gif";
@@ -37,9 +36,7 @@ class Constants
     // Production 
     public static $payPalProdMerchantId = "admin@morrellweb.com";
     public static $payPalProdButtonFormUrl = "https://www.paypal.com/cgi-bin/webscr";
-    //public static $payPalProdCancelSubscriptionUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=A92KZXWFK8REW";
     public static $payPalProdMakeSubscriptionButtonId = "9H4QGFRL3F7HS";
-    public static $payPalProdChangeSubscriptionButtonId = "NW9MDQLDJS8D6";
     public static $payPalProdDonationButtonId = "KPJMEYCDVH4XW";
     public static $payPalProdSubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalProdUnsubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif";

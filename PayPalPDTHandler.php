@@ -4,6 +4,7 @@ include_once 'classes/DBSessionHandler.class.php';
 include_once 'classes/PayPalMsgHandler.class.php';
 include_once 'classes/Logger.class.php';
 include_once 'classes/Constants.class.php';
+include_once 'classes/User.class.php';
 include_once 'classes/PayPalTxnMsg.class.php';
 
 $dataAccess = new DataAccess();
@@ -38,6 +39,21 @@ if(isset($_GET['tx'])) {
         session_set_save_handler($sessionHandler, true);
         session_start();
 	$_SESSION["PayPalTxnDetails"] = $replyMsg;
+		
+	// Update user membership status in session
+	$objUser = $_SESSION['WebUser'];
+	$curMembershipStatus = ($replyMsg->UserUpgradedPremium || $replyMsg->UserSubscriptionRenewed || 
+				$replyMsg->UserSubscriptionModified || $replyMsg->UserSubscriptionCancelledPending);
+	if($objUser->IsPremiumMember != $curMembershipStatus) {
+            $objUser->IsPremiumMember = $curMembershipStatus;
+            $_SESSION['WebUser'] = $objUser;
+	}
+		
+	// Redirect user to AccountManagement page, to view the transaction details
 	header("Location: AccountManagement.php");
     }
+}
+else {
+    // If user cancelled the transaction, just send them back to AccountManagement page
+    header("Location: AccountManagement.php");
 }

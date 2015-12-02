@@ -473,7 +473,7 @@ CREATE TABLE `Payments.PayPalTransactions` (
   `PayPalMsgData` text,
   `TransactionDate` datetime NULL,
   PRIMARY KEY (`ID`)  COMMENT '',
-  UNIQUE INDEX `IDX_TxnId_TxnType_PaymentStatus_TxnDate_UNIQUE` (`TxnId` ASC, `TxnType` ASC, `PaymentStatus` ASC, `TransactionDate` ASC) COMMENT '')
+  UNIQUE INDEX `IDX_SubscriptionID_TxnId_TxnType_PaymentStatus_UNIQUE` (`SubscriptionID` ASC, `TxnId` ASC, `TxnType` ASC, `PaymentStatus` ASC) COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;

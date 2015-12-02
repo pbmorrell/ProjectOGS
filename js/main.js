@@ -625,12 +625,12 @@ function SelectAllTextInTextArea()
 
 function DonateOnClick()
 {
-    sweetAlert({
-        title: "Under Construction",
-        text: "Unable to donate: Paypal functionality not yet implemented",
-	type: "info",
-	imageUrl: "images/underConstruction.gif"
-    });
+//	sweetAlert({
+//		title: "Under Construction",
+//		text: "Unable to donate: Paypal functionality not yet implemented",
+//		type: "info",
+//		imageUrl: "images/underConstruction.gif"
+//	});
 	
-    return false;
+    return true;
 }

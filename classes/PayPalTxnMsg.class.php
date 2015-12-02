@@ -19,6 +19,7 @@ class PayPalTxnMsg
     public $UserMessage = "";
     public $UserUpgradedPremium = false;
     public $UserSubscriptionRenewed = false;
+    public $UserSubscriptionModified = false;
     public $UserSubscriptionCancelledPending = false;
     public $UserSubscriptionCancelledImmediate = false;
     public $IsValidBusiness = true;

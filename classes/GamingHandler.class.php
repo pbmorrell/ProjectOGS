@@ -1512,10 +1512,10 @@ class GamingHandler
     private function SetEventJoinStatus($userGame, $evtMembers, $requiredMemberCount, $thisUserIsJoined, $eventScheduledDate)
     {
         // Calculate join status of this game: full (all required members signed up), join (open for current user to join), leave (current user is joined already),
-		// or past (event was scheduled for a past time, so join status cannot be changed)
-		$eventDate = date_create_from_format("Y-m-d H:i:s", $eventScheduledDate, new DateTimeZone("UTC"));
-		$curUTCDate = new DateTime(null, new DateTimeZone("UTC"));
-		$isPastEvent = ($curUTCDate > $eventDate);
+	// or past (event was scheduled for a past time, so join status cannot be changed)
+	$eventDate = date_create_from_format("Y-m-d H:i:s", $eventScheduledDate, new DateTimeZone("UTC"));
+	$curUTCDate = new DateTime(null, new DateTimeZone("UTC"));
+	$isPastEvent = ($curUTCDate > $eventDate);
 		
         $joinStatus = $isPastEvent ? "UNJOINED" : "JOIN";
         if($thisUserIsJoined == 1) {
