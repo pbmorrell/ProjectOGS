@@ -179,7 +179,16 @@ class PayPalMsgHandler
 
                         // Only update user membership status when we receive a Completed payment or a membership expiration notice
                         if($replyMsg->UpdateUserMembershipStatus) {
-                            $this->UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger, $notificationType, $payPalUser->IsActive);
+                            // If this is a EOT IPN, downgrade user to basic membership only if they are not currently in extended membership
+                            $extendedMember = false;
+                            $curDatetimeUTC = new DateTime(null, new DateTimeZone("UTC"));
+                            $membershipExpDateTime = date_create_from_format('Y-m-d H:i:s', $payPalUser->MembershipExpDate, new DateTimeZone("UTC"));
+                            if(($replyMsg->UserSubscriptionCancelledImmediate) && ((($payPalUser->ExtendedMembershipDays > 0) && $payPalUser->IsRecurring) || 
+                                                                                    ($curDatetimeUTC < $membershipExpDateTime))) {
+                                $extendedMember = true;
+                            }
+                            
+                            $this->UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger, $notificationType, $payPalUser->IsActive, $extendedMember);
                         }
                     }
                     else {
@@ -493,7 +502,7 @@ class PayPalMsgHandler
         $getUserQuery = "SELECT `ID`, IFNULL(`FK_User_ID`, -1) AS UserID, IFNULL(`SubscriptionType`, '') AS SubscriptionType, IFNULL(`SubscriptionAmtTotal`, 0) AS SubscriptionAmtTotal, " .
                             "IFNULL(`SubscriptionAmtPaidLastCycle`, 0) AS SubscriptionAmtPaidLastCycle, IFNULL(`SubscriptionStartedDate`, '') AS SubscriptionStartedDate, " .
                             "IFNULL(`SubscriptionModifiedDate`, '') AS SubscriptionModifiedDate, IFNULL(`LastBillDate`, '') AS LastBillDate, " .
-                            "IFNULL(`MembershipExpirationDate`, '') AS MembershipExpirationDate, `IsRecurring`, `IsActive` " .
+                            "IFNULL(`MembershipExpirationDate`, '') AS MembershipExpirationDate, `IsRecurring`, `IsActive`, `ExtendedMembershipDays` " .
 			"FROM `Payments.PayPalUsers` " .
                         "WHERE (`PayerId` = :payerId) AND (`SubscriptionID` = :subscrID);";
         
@@ -508,7 +517,8 @@ class PayPalMsgHandler
             if($results != null){
 		$payPalUser = new PayPalUser($results['ID'], $results['UserID'], ($results['IsActive'] == 1), ($results['IsRecurring'] == 1), $results['LastBillDate'], 
                                              $results['MembershipExpirationDate'], $payerId, $results['SubscriptionType'], $results['SubscriptionAmtTotal'], 
-                                             $results['SubscriptionAmtPaidLastCycle'], $results['SubscriptionStartedDate'], $results['SubscriptionModifiedDate'], $subscrID);
+                                             $results['SubscriptionAmtPaidLastCycle'], $results['SubscriptionStartedDate'], $results['SubscriptionModifiedDate'],
+                                             $subscrID, $results['ExtendedMembershipDays']);
             }
         }
         
@@ -559,12 +569,13 @@ class PayPalMsgHandler
         return $payPalUser;
     }
     
-    private function UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger, $notificationType, $isActive)
+    private function UpdateUserMembershipStatus($replyMsg, $dataAccess, $logger, $notificationType, $isActive, $isExtendedMember = false)
     {
 	$updateSuccess = false;
         $transactionComplete = false;
         $isPremium = ($replyMsg->UserUpgradedPremium || (($replyMsg->UserSubscriptionRenewed || $replyMsg->UserSubscriptionModified || 
-                                                          $replyMsg->UserSubscriptionCancelledPending) && $isActive));
+                                                          $replyMsg->UserSubscriptionCancelledPending) && $isActive) || 
+                     ($replyMsg->UserSubscriptionCancelledImmediate && $isExtendedMember));
 														  
 	$updateUserQuery = "UPDATE `Security.Users` SET `IsPremiumMember` = :isPremium WHERE `ID` = :userId;";
 	
@@ -662,14 +673,23 @@ class PayPalMsgHandler
             if($replyMsg->UserSubscriptionCancelledPending) {
                 // If we are processing a cancel request, update user's membership expiration date by adding any unused billing cycle days from previous cycle(s)
                 $varsToSet = "SET `MembershipExpirationDate` = DATE_ADD(:expDate, INTERVAL `ExtendedMembershipDays` DAY)";
+                $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
+                array_push($queryParms, $parmMembershipExpDate);
             }
-			
-            $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
-            array_push($queryParms, $parmMembershipExpDate);
-	}
-		
-	if($replyMsg->UserSubscriptionCancelledImmediate) {
-            $varsToSet .= ", `IsActive` = 0, `SubscriptionAmtPaidLastCycle` = 0";
+            if($replyMsg->UserSubscriptionCancelledImmediate) {
+                // If we are receiving a notification that the user's paid subscription has ended, apply extended (unused) membership days
+                // to user's membership expiration date, if have not already done so on a prior user-requested cancellation
+                $varsToSet .= ("SET `MembershipExpirationDate` = (CASE WHEN ((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) " .
+                                    "THEN DATE_ADD(:expDate, INTERVAL `ExtendedMembershipDays` DAY) ELSE `MembershipExpirationDate` END), " .
+                               "`SubscriptionAmtPaidLastCycle` = 0, " . 
+                               "`IsActive` = (CASE WHEN (((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) OR " .
+                                    "(NOW() < :expDate2)) THEN `IsActive` ELSE 0 END)"
+                              );
+                
+                $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
+                $parmMembershipExpDate2 = new QueryParameter(':expDate2', $expDate, PDO::PARAM_STR);
+                array_push($queryParms, $parmMembershipExpDate, $parmMembershipExpDate2);
+            }
 	}
 		
 	if($replyMsg->UserSubscriptionCancelledPending) {

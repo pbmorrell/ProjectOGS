@@ -7,6 +7,7 @@ class PayPalUser
     public $IsRecurring = false;
     public $LastBillDate = "";
     public $MembershipExpDate = "";
+    public $ExtendedMembershipDays = 0;
     public $PayerId = "";
     public $SubscriptionType = "";
     public $SubscriptionAmtTotal = 0;
@@ -15,26 +16,27 @@ class PayPalUser
     public $SubscriptionModifiedDate = "";
     public $SubscriptionID = "";
 	
-    public function __construct($id, $uid, $ia, $ir, $lbd, $med, $pid, $st, $sat, $sapl, $ssd, $smd, $sid)
+    public function __construct($id, $uid, $ia, $ir, $lbd, $med, $pid, $st, $sat, $sapl, $ssd, $smd, $sid, $emd = 0)
     {
-		$this->ID = $id;
+	$this->ID = $id;
         $this->UserID = $uid;
-		$this->IsActive = $ia;
-		$this->IsRecurring = $ir;
-		$this->LastBillDate = $lbd;
-		$this->MembershipExpDate = $med;
-		$this->PayerId = $pid;
-		$this->SubscriptionType = $st;
-		$this->SubscriptionAmtTotal = $sat;
-		$this->SubscriptionAmtPaidLastCycle = $sapl;
-		$this->SubscriptionStartedDate = $ssd;
-		$this->SubscriptionModifiedDate = $smd;
-		$this->SubscriptionID = $sid;
+	$this->IsActive = $ia;
+	$this->IsRecurring = $ir;
+	$this->LastBillDate = $lbd;
+	$this->MembershipExpDate = $med;
+	$this->PayerId = $pid;
+	$this->SubscriptionType = $st;
+	$this->SubscriptionAmtTotal = $sat;
+	$this->SubscriptionAmtPaidLastCycle = $sapl;
+	$this->SubscriptionStartedDate = $ssd;
+	$this->SubscriptionModifiedDate = $smd;
+	$this->SubscriptionID = $sid;
+        $this->ExtendedMembershipDays = $emd;
     }
     
     public static function constructDefaultPayPalUser()
     {
-        $instance = new self(-1, -1, false, false, "", "", "", "", 0, 0, "", "", "");
+        $instance = new self(-1, -1, false, false, "", "", "", "", 0, 0, "", "", "", 0);
         return $instance;
     }
 }
