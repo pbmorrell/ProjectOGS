@@ -17,19 +17,19 @@ class PayPalUser
 	
     public function __construct($id, $uid, $ia, $ir, $lbd, $med, $pid, $st, $sat, $sapl, $ssd, $smd, $sid)
     {
-	$this->ID = $id;
+		$this->ID = $id;
         $this->UserID = $uid;
-	$this->IsActive = $ia;
-	$this->IsRecurring = $ir;
-	$this->LastBillDate = $lbd;
-	$this->MembershipExpDate = $med;
-	$this->PayerId = $pid;
-	$this->SubscriptionType = $st;
-	$this->SubscriptionAmtTotal = $sat;
-	$this->SubscriptionAmtPaidLastCycle = $sapl;
-	$this->SubscriptionStartedDate = $ssd;
-	$this->SubscriptionModifiedDate = $smd;
-	$this->SubscriptionID = $sid;
+		$this->IsActive = $ia;
+		$this->IsRecurring = $ir;
+		$this->LastBillDate = $lbd;
+		$this->MembershipExpDate = $med;
+		$this->PayerId = $pid;
+		$this->SubscriptionType = $st;
+		$this->SubscriptionAmtTotal = $sat;
+		$this->SubscriptionAmtPaidLastCycle = $sapl;
+		$this->SubscriptionStartedDate = $ssd;
+		$this->SubscriptionModifiedDate = $smd;
+		$this->SubscriptionID = $sid;
     }
     
     public static function constructDefaultPayPalUser()

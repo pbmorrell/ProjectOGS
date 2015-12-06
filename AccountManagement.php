@@ -19,7 +19,7 @@
 	// Look up PayPal user info for this user
 	$payPalMsgHandler = new PayPalMsgHandler();
 	$payPalUser = $payPalMsgHandler->LookUpPayPalUserByUserId($dataAccess, $logger, $objUser->UserID);
-		
+			
 	// If transaction details message is available, need to update related session variables
         $sessionDataAccess = new DataAccess();
         $sessionHandler = new DBSessionHandler($sessionDataAccess);
@@ -36,20 +36,6 @@
 	$payPalUser = $payPalMsgHandler->LookUpPayPalUserByUserId($dataAccess, $logger, $objUser->UserID);
 	$replyMsg->SelectedSubscriptionOption = $payPalUser->SubscriptionType;
 	$replyMsg->SubscriptionIsRecurring = $payPalUser->IsRecurring;
-        
-        // Calculate number of days until end of current billing cycle
-        if(!$payPalUser->IsRecurring) {
-            sscanf($payPalUser->MembershipExpDate, "%s %s", $dateStr, $timeStr);
-            $membershipExpDateUTC = date_create_from_format("Y-m-d", $dateStr, new DateTimeZone("UTC"));
-            $curDatetimeUTC = new DateTime(null, new DateTimeZone("UTC"));
-            $curDateUTC = date_create_from_format("Y-m-d", $curDatetimeUTC->format("Y-m-d"), new DateTimeZone("UTC"));
-            
-            if($curDateUTC < $membershipExpDateUTC) {
-                $numDaysTillNextCycle = $membershipExpDateUTC->diff($curDateUTC)->days;
-                // TODO: append this number of days to end of membership exp. date when next cancel/expiration occurs (after new signup)
-                //  Will need new field in PayPalUsers table: ExtendedMembershipDays (only add to exp. date if/when new cancel comes thru later)
-            }
-        }
     }
 ?>
 <!DOCTYPE HTML>
