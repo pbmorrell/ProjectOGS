@@ -239,6 +239,14 @@
         '<script src="js/jquery.maskedinput.min.js"></script>'.
         '<script src="js/jquery.timepicker.min.js"></script>'.
         '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->'.
+            
+        '<!-- Newly added function for accordian widget -->'.  
+        '<script>'.
+            '$(function() {'.
+                '$( "#accordion" ).accordion();'.
+            '});'.
+	'</script>'.    
+            
         '<script>'.
             '$(document).ready(function($) { '.
                 'GlobalStartupActions(); '.
