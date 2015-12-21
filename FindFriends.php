@@ -12,6 +12,10 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
+	<script src="js/jTable/jquery.jtable.min.js"></script>
+	<script src="js/jquery.slidereveal.min.js"></script>
+	<script src="js/GamerTagViewer.js"></script>
+	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
@@ -23,16 +27,24 @@
 			<div id="main">
                             <div class="row">
 				<div class="12u">
-                                    <!-- About -->
                                     <div id="content">
 					<article class="box style1">
-                                            <header>
-						<h2>Find Friends</h2><br/>
-                                                    <p>Placeholder</p>
-                                            </header>
-                                                <article>
-                                                    <a href="#" class="button icon fa-question">Placeholder</a>
-                                                </article>
+                                            <div id="searchForFriendsDiv" class="9u jTableContainer">
+                                                <section class="box style1" style="padding-bottom: 1em !important;">
+                                                    <h2>Search For New Friends</h2>
+                                                    <div id="searchForFriendsContent">
+                                                    </div>
+                                                </section><br/>
+                                            </div>
+					</article>
+					<article class="box style1">
+                                            <div id="manageFriendsListDiv" class="9u jTableContainer">
+                                                <section class="box style1" style="padding-bottom: 1em  !important;">
+                                                    <h2>Manage Friends List</h2>
+                                                    <div id="manageFriendsListContent">
+                                                    </div>
+                                                </section><br/>
+                                            </div>
 					</article>
                                     </div>
                                 </div>

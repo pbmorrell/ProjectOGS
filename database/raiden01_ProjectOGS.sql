@@ -275,17 +275,6 @@ CREATE TABLE IF NOT EXISTS `Gaming.EventMembers` (
   `FK_User_ID` bigint(20) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `Gaming.EventMembers`
---
-
-INSERT INTO `Gaming.EventMembers` (`ID`, `FK_Event_ID`, `FK_User_ID`) VALUES
-(3, 67, 44),
-(4, 68, 44),
-(5, 69, 44),
-(6, 70, 44),
-(7, 71, 44),
-(8, 72, 44);
 
 -- --------------------------------------------------------
 
@@ -322,19 +311,6 @@ CREATE TABLE IF NOT EXISTS `Gaming.Events` (
   `DisplayTime` time NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `Gaming.Events`
---
-
-INSERT INTO `Gaming.Events` (`ID`, `FK_User_ID_EventCreator`, `FK_Game_ID`, `FK_Genre_ID`, `FK_Platform_ID`, `FK_Timezone_ID`, `EventCreatedDate`, `EventModifiedDate`, `EventScheduledForDate`, `RequiredMemberCount`, `IsActive`, `IsPublic`, `FK_UserGames_ID`, `Notes`, `DisplayDate`, `DisplayTime`) VALUES
-(37, 29, NULL, NULL, 11, 142, '2015-08-24 06:31:08', '2015-08-24 06:31:08', '2015-08-26 12:30:00', 5, 1, 1, 3, 'Looking to play through some team deathmatch! On the road to improve my overall k/d!', '2015-08-25', '20:30:00'),
-(67, 44, NULL, NULL, 9, 142, '2015-08-26 14:36:00', '2015-08-26 14:36:00', '2015-08-27 20:00:00', 7, 1, 1, 15, 'Play me, please!!', '2015-08-27', '16:00:00'),
-(68, 44, NULL, NULL, 13, 143, '2015-08-26 14:37:10', '2015-08-26 14:37:10', '2015-08-27 22:30:00', 3, 1, 1, 24, 'You just gotta play me now!!', '2015-08-27', '17:30:00'),
-(69, 44, 7, 5, 9, 142, '2015-08-26 15:11:37', '2015-08-26 15:11:37', '2015-08-29 23:00:00', 2, 1, 1, NULL, 'Event with existing game', '2015-08-29', '19:00:00'),
-(70, 44, NULL, NULL, 12, 142, '2015-08-26 15:19:13', '2015-08-26 15:19:13', '2015-08-29 02:00:00', 2, 1, 1, 25, 'Time for a fun game', '2015-08-28', '22:00:00'),
-(71, 44, NULL, NULL, 12, 142, '2015-08-26 15:20:00', '2015-08-26 15:20:00', '2015-08-30 01:00:00', 2, 1, 1, 25, 'Time for a rematch!', '2015-08-29', '21:00:00'),
-(72, 44, 5, 5, 13, 142, '2015-08-27 16:33:42', '2015-08-27 16:33:42', '2015-08-31 01:00:00', 5, 1, 1, NULL, '''Slayer'' action, 25 kills to win...join up everyone!!!', '2015-08-30', '21:00:00');
-
 -- --------------------------------------------------------
 
 --
@@ -363,17 +339,21 @@ CREATE TABLE IF NOT EXISTS `Gaming.UserFriends` (
   `FK_User_ID_Friend` bigint(20) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `Gaming.UserFriends`
---
-
-INSERT INTO `Gaming.UserFriends` (`ID`, `FK_User_ID_ThisUser`, `FK_User_ID_Friend`) VALUES
-(2, 10, 29),
-(3, 10, 31),
-(4, 10, 44),
-(7, 10, 79);
-
 -- --------------------------------------------------------
+
+--
+-- Table structure for table `Gaming.UserFriendInvitations`
+--
+
+CREATE TABLE IF NOT EXISTS `Gaming.UserFriendInvitations` (
+        `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+        `FK_User_ID_Inviter` bigint(20) NOT NULL,
+        `FK_User_ID_Invitee` bigint(20) NOT NULL,
+        `IsRejected` tinyint(4) NOT NULL DEFAULT '0',
+    PRIMARY KEY (`ID`),
+    KEY `IDX_UserFriendInvitations_FK_User_ID_Invitee` (`FK_User_ID_Invitee`),
+    KEY `IDX_UserFriendInvitations_FK_User_ID_Inviter` (`FK_User_ID_Inviter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `Gaming.UserGames`
@@ -387,26 +367,12 @@ CREATE TABLE IF NOT EXISTS `Gaming.UserGames` (
   `ModifiedDate` datetime NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `Gaming.UserGames`
---
-
-INSERT INTO `Gaming.UserGames` (`ID`, `FK_User_ID`, `Name`) VALUES
-(1, 10, 'Madden 2015'),
-(2, 79, 'TestGame1'),
-(3, 29, 'Call of Duty: Black Ops III'),
-(4, 10, 'TestGame2'),
-(5, 79, 'TestGame2'),
-(15, 44, 'Gamer2''s Event'),
-(23, 44, 'Gamer2''s New Event'),
-(24, 44, 'Made-Up Game'),
-(25, 44, 'Candyland');
-
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `Gaming.UserGamerTags`
 --
+
 CREATE TABLE `Gaming.UserGamerTags` (
   `ID` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `FK_User_ID` BIGINT NULL COMMENT '',
@@ -415,17 +381,7 @@ CREATE TABLE `Gaming.UserGamerTags` (
   PRIMARY KEY (`ID`)  COMMENT '',
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC)  COMMENT '',
   INDEX `IDX_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
-  INDEX `IDX_FK_Platform_ID` (`FK_Platform_ID` ASC)  COMMENT '',
-  CONSTRAINT `FK_UserGamerTags_UserID`
-    FOREIGN KEY (`FK_User_ID`)
-    REFERENCES `Security.Users` (`ID`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `FK_UserGamerTags_PlatformID`
-    FOREIGN KEY (`FK_Platform_ID`)
-    REFERENCES `Configuration.Platforms` (`ID`)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE)
+  INDEX `IDX_FK_Platform_ID` (`FK_Platform_ID` ASC)  COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
@@ -441,18 +397,6 @@ CREATE TABLE IF NOT EXISTS `Gaming.UserPlatforms` (
   `FK_User_ID` bigint(11) NOT NULL,
   `FK_Platform_ID` int(11) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `Gaming.UserPlatforms`
---
-
-INSERT INTO `Gaming.UserPlatforms` (`ID`, `FK_User_ID`, `FK_Platform_ID`) VALUES
-(91, 79, 9),
-(92, 79, 13),
-(93, 86, 9),
-(94, 86, 11),
-(96, 29, 11),
-(97, 87, 12);
 
 -- --------------------------------------------------------
 
@@ -499,12 +443,7 @@ CREATE TABLE `Payments.PayPalUsers` (
   `SubscriptionStartedDate` datetime NULL,
   `SubscriptionModifiedDate` datetime NULL,
   PRIMARY KEY (`ID`)  COMMENT '',
-  INDEX `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
-  CONSTRAINT `FK_PayPalUsers_UserID`
-        FOREIGN KEY (`FK_User_ID`)
-        REFERENCES `Security.Users` (`ID`)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE)
+  INDEX `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
@@ -596,23 +535,6 @@ CREATE TABLE IF NOT EXISTS `Security.UserRoles` (
   `FK_Role_ID` int(11) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `Security.UserRoles`
---
-
-INSERT INTO `Security.UserRoles` (`ID`, `FK_User_ID`, `FK_Role_ID`) VALUES
-(13, 10, 2),
-(32, 29, 3),
-(34, 31, 3),
-(47, 44, 3),
-(62, 59, 3),
-(82, 79, 2),
-(85, 82, 3),
-(86, 83, 3),
-(89, 86, 3),
-(90, 87, 3),
-(91, 88, 3);
-
 -- --------------------------------------------------------
 
 --
@@ -633,22 +555,6 @@ CREATE TABLE IF NOT EXISTS `Security.Users` (
   `Autobiography` text,
   `IsActive` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `Security.Users`
---
-
-INSERT INTO `Security.Users` (`ID`, `FK_Timezone_ID`, `UserName`, `FirstName`, `LastName`, `EmailAddress`, `IsPremiumMember`, `Password`, `Gender`, `Birthdate`, `Autobiography`) VALUES
-(10, 142, 'sgilesTest', 'Stephen', 'Giles', 'sgilestest@morrellweb.com', 1, '$2a$15$IQyMRpBDO7uFbRVp4qxDFuP5Wkn/uCssysDMfYgt3edoc/kz8s.Q2', 'M', '1983-11-14', 'My name is ''Stephen"'),
-(29, 142, 'Paul Morrell', 'Paul', 'Morrell', 'pbmorrell@att.net', 0, '$2y$10$7BNqIlWNifBCvlVowyzWVuIPlVomA.bbKwQE88EVeTbA.acmUtGDy', 'M', '1983-11-27', 'Adult gamer, Looking for other friends to play with. Must have a mic!'),
-(31, 142, 'gamerTest', 'Gamer', 'Test', 'gamerTest@ogs.com', 0, '$2y$10$WKKurt8XlSKH.0wAnDhX2etlBYghz7z1xliFZvRYrhAA2UvYPG1Si', 'M', '2013-07-31', 'my bio'),
-(44, 144, 'gamerTest2', 'Gamer2', 'Test', 'gamerTest2@ogs.com', 0, '$2y$10$UwLWePLi.rkexdOFdWCOSeAvlf/U1v/fsZ29Cns7Y7vQJj8gNLV8m', 'M', '1985-07-21', 'here''s my bio'),
-(79, 143, 'gamerTest3', 'Gamer', 'Test3', 'gamertest3@gamers.com', 1, '$2y$10$cyaJMPsmQO4zwXMLxvzylec9byh854QcsWc9UcqnRvnSTU.Xw24xW', 'M', '2013-08-20', 'Bio'),
-(82, 163, 'pbmorrell', 'Pablo', 'Morello', 'pbmorrell@att2.net', 0, '$2y$10$nQmCZOkK.eEhPTQ4AinMpeQZ6kRRd.1gE0S3HBCdZdarfY6GW0jte', 'F', '1952-11-13', 'I am the Unicorn Master of the Universe.'),
-(83, 144, 'theGiles01', 'The', 'Giles', 'thegiles01@gmail.com', 0, '$2y$10$TIzWuxcK9fCryA3xYSo0w.H.2RrWPsY9MjcAxex7VZBM7Dv9o2/j6', 'M', '1986-08-20', 'I am the Master of the Universe (no unicorns)'),
-(86, 142, 'gamerTest4', 'Gamer', 'Test4', 'gamertest4@ogs.com', 0, '$2y$10$3XpsJ1cJN2.iHCGmg8KOXupw.BW.2UTp8GpZZsaXp5bW4IWG1cbda', 'F', '1984-08-15', 'Biography is this'),
-(87, 158, 'donkeymaster@donkey.com', 'Pablo', 'Morrello', 'donkeymaster@donkey.com', 0, '$2y$10$5SnRaby1SzCXj4KsFDb/2OzQ9jfkqtMjwdJC2vbX32SVL0Ysjojsi', 'M', '1996-09-11', 'I like donkeys'),
-(88, NULL, 'trialanderror@ogs.com', '', '', 'trialanderror@ogs.com', 0, '$2y$10$r0ueC7gIxgXpYTU4T/Q54OzvTzToA8avIGqbbx5eBnP0cQPoKJOb.', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -947,10 +853,24 @@ ADD CONSTRAINT `FK_UserFriends_Users_Friend` FOREIGN KEY (`FK_User_ID_Friend`) R
 ADD CONSTRAINT `FK_UserFriends_Users_ThisUser` FOREIGN KEY (`FK_User_ID_ThisUser`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `Gaming.UserFriendInvitations`
+--
+ALTER TABLE `Gaming.UserFriendInvitations`
+ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Invitee` FOREIGN KEY (`FK_User_ID_Invitee`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Inviter` FOREIGN KEY (`FK_User_ID_Inviter`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
 -- Constraints for table `Gaming.UserGames`
 --
 ALTER TABLE `Gaming.UserGames`
 ADD CONSTRAINT `FK_UserGames_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `Gaming.UserGamerTags`
+--
+ALTER TABLE `Gaming.UserGamerTags`
+ADD CONSTRAINT `FK_UserGamerTags_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD CONSTRAINT `FK_UserGamerTags_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Gaming.UserPlatforms`
@@ -958,6 +878,12 @@ ADD CONSTRAINT `FK_UserGames_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Sec
 ALTER TABLE `Gaming.UserPlatforms`
 ADD CONSTRAINT `FK_UserPlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD CONSTRAINT `FK_UserPlatforms_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `Payments.PayPalUsers`
+--
+ALTER TABLE `Payments.PayPalUsers`
+ADD CONSTRAINT `FK_PayPalUsers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Security.PageRoles`

@@ -648,28 +648,28 @@ function LoadCurrentEventViewer()
                 display: function (data) {
                     // Create JOIN or LEAVE link
                     if((data.record.Joined == 'JOIN') || (data.record.Joined == 'LEAVE')) {
-						var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
-					
-						if(data.record.Joined === 'JOIN') {
+			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
+				
+			if(data.record.Joined === 'JOIN') {
                             $expandLink.click(function () {
-								var eventIds = [data.record.ID];
-								JoinEvents(eventIds);
-								return false;
+                                var eventIds = [data.record.ID];
+				JoinEvents(eventIds);
+				return false;
                             });
-						}
-						else {
+			}
+			else {
                             $expandLink.click(function () {
-								var eventIds = [data.record.ID];
-								LeaveEvents(eventIds);
-								return false;
+				var eventIds = [data.record.ID];
+				LeaveEvents(eventIds);
+				return false;
                             });
-						}
+			}
 							
-						// Return image for display in jTable
-						return $expandLink;
+			// Return image for display in jTable
+			return $expandLink;
                     }
                     else {
-						return $('<label>' + data.record.Joined + '</label>');
+			return $('<label>' + data.record.Joined + '</label>');
                     }
                 }
             },
@@ -701,57 +701,57 @@ function LoadCurrentEventViewer()
                 sorting: false
             }
         },
-		recordsLoaded: function(event, data) {
+	recordsLoaded: function(event, data) {
             // Set total count of games that need joining
             if((data.records !== null) && (data.records.length > 0)) {
-				var totalGameCount = data.records[0].TotalGamesToJoinCount;
-				var needText = "need";
-				if(totalGameCount == 1) {
+		var totalGameCount = data.records[0].TotalGamesToJoinCount;
+		var needText = "need";
+		if(totalGameCount == 1) {
                     needText = "needs";
-				}
+		}
 				
-				$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
+		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
             }
 				
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
-				// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
-				var id = $(this).attr('data-record-key');
-				var dataRecordArray = $.grep(data.records, function (e) {
+		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
+		var id = $(this).attr('data-record-key');
+		var dataRecordArray = $.grep(data.records, function (e) {
                     return e.ID === id;
-				});
+		});
 										
-				var playerData = dataRecordArray[0].PlayersSignedUpData;
-				$(this).attr('data-playersSignedUp', playerData);
+		var playerData = dataRecordArray[0].PlayersSignedUpData;
+		$(this).attr('data-playersSignedUp', playerData);
 															
-				// Pre-load each child table, but do not show yet
-				OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
+		// Pre-load each child table, but do not show yet
+		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
 							
-				// If an event is joined by current user, set forecolor to green
-				var isJoined = dataRecordArray[0].Joined;
-				if(isJoined === 'LEAVE') {
+		// If an event is joined by current user, set forecolor to green
+		var isJoined = dataRecordArray[0].Joined;
+		if(isJoined === 'LEAVE') {
                     $(this).css('color', 'green');
-				}
-				// If all required players are signed up for a given event,
-				// such that it is "full", set forecolor to red
-				else if((isJoined === 'FULL') && (!IsPastEvent(dataRecordArray[0].EventScheduledForDate))) {
+		}
+		// If all required players are signed up for a given event,
+		// such that it is "full", set forecolor to red
+		else if((isJoined === 'FULL') && (!IsPastEvent(dataRecordArray[0].EventScheduledForDate))) {
                     $(this).css('color', 'red');
-				}
-				// If event occurred in the past, set forecolor to gray
-				else if(isJoined !== 'JOIN') {
+		}
+		// If event occurred in the past, set forecolor to gray
+		else if(isJoined !== 'JOIN') {
                     $(this).css('color', 'gray');
-				}				
+		}				
             });
 				
             var curWidthClass = GetCurWidthClass();
             if(curWidthClass != 'desktop')  FormatCurrentEventsTableForCurrentView(true, curWidthClass);
-		}
+	}
     });
 
     // Load event list
     var postData = 
         {
             action: currentEventViewerLoadAction,
-			'evtStatus[]': 'showUnjoined'
+            'evtStatus[]': 'showUnjoined'
         };
 		
     $(currentEventViewerJTableDiv).jtable('load', postData);

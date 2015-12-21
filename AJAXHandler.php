@@ -6,7 +6,8 @@
     include_once 'classes/DBSessionHandler.class.php';
     include_once 'classes/Logger.class.php';
     include_once 'classes/User.class.php';
-    include_once 'classes/SearchParameters.class.php';
+    include_once 'classes/EventSearchParameters.class.php';
+    include_once 'classes/UserSearchParameters.class.php';
     include_once 'securimage/securimage.php';
     
     $dataAccess = new DataAccess();
@@ -416,8 +417,8 @@
                 $showOpenEventsOnly = false;
                 $showHiddenEvents = in_array('showHidden', $evtStatusFilters);
                 
-		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
-                                                    true, true, $showFullEventsOnly, false, "", $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
+		$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
+                                                         true, true, $showFullEventsOnly, false, "", $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
 		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $searchParms);
                 break;
@@ -432,7 +433,7 @@
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
 		$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
 		$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
-				
+						
 		if(strlen($startDateRangeInDays) > 0) {
                     $curUTCStartDate = new DateTime(null, new DateTimeZone("UTC"));
                     $curUTCEndDate = new DateTime(null, new DateTimeZone("UTC"));
@@ -465,9 +466,9 @@
                 $showFullEventsOnly = false;
                 $showOpenEventsOnly = in_array('openOnly', $evtStatusFilters);
 				
-		$searchParms = new SearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, 
-                                                    $platforms, $showJoinedEvents, $showUnjoinedEvents, $showFullEventsOnly, false, $customUserEntry, 
-                                                    $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
+		$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, 
+                                                         $platforms, $showJoinedEvents, $showUnjoinedEvents, $showFullEventsOnly, false, $customUserEntry, 
+                                                         $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly);
 		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                   $pageSize, $searchParms);
                 break;
@@ -518,6 +519,60 @@
             case "CancelPayPalSubscription":
                 $payPalMsgHandler = new PayPalMsgHandler();
                 echo $payPalMsgHandler->CancelSubscriptionForUser($dataAccess, $logger, $objUser->UserID);
+                break;
+            case "GetFriendInviteAvailUsersForJTable":
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
+
+                //$startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
+                //$existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
+                //$showJoinedEvents = in_array('showJoined', $evtStatusFilters);
+                //$showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);
+
+		$searchParms = new UserSearchParameters();
+
+		echo $gamingHandler->JTableAvailableUsersViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
+                                                                    $pageSize, $searchParms);
+                break;
+            case "GetCurrentFriendsListForJTable":
+		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
+		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+		$paginationEnabled = ($startIndex === "-1") ? false : true;
+
+                //$startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
+                //$existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
+                //$showJoinedEvents = in_array('showJoined', $evtStatusFilters);
+                //$showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);	
+
+		$searchParms = new UserSearchParameters();
+		echo $gamingHandler->JTableCurrentFriendsListViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
+                                                                        $pageSize, $searchParms);
+                break;
+            case "SendFriendInviteToUsers":				
+		echo 'Invite sent to users ' . implode(',', $_POST['userIds']);
+                //echo $gamingHandler->SendFriendInviteToUsers($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
+                break;
+            case "AcceptUserFriendInvites":
+		echo 'Invites from users ' . implode(',', $_POST['userIds']) . ' accepted';
+                //echo $gamingHandler->AcceptUserFriendInvites($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
+                break;
+            case "RemoveUserFromFriendList":
+                $targetUserId = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
+                $logger->LogInfo('User ID "' . $targetUserId . '" removed from friends list (not really)');
+                
+                $jTableResult = [];
+                $jTableResult['Result'] = 'OK';
+                echo json_encode($jTableResult);
+                
+                //$userIds = [$targetUserId];
+                //echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $userIds);
+                break;
+            case "RemoveUsersFromFriendList":
+                echo 'Users ' . implode(',', $_POST['userIds']) . ' removed from friends list';
+                //echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
                 break;
         }
     }

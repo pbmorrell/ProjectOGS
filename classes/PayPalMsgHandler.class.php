@@ -586,34 +586,31 @@ class PayPalMsgHandler
         // Wrap Security.Users and Security.UserRoles updates in transaction:
         // if one fails, must roll back the successful update, if any.
         $dataAccess->BeginTransaction();
-        $errors = $dataAccess->CheckErrors();
 
-        if(strlen($errors) == 0) {
-            // Update Security.Users
-            if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
-                $updateSuccess = $dataAccess->ExecuteNonQuery();
-                $errors = $dataAccess->CheckErrors();
-                
-                if($updateSuccess && (strlen($errors) == 0)) {
-                    $roleName = Constants::$basicMemberRoleName;
-                    if($isPremium)  $roleName = Constants::$premiumMemberRoleName;
-                    $updateUserQuery = "UPDATE `Security.UserRoles` ur, `Security.Roles` r " . 
-                                       "SET ur.`FK_Role_ID` = r.`ID` " . 
-                                       "WHERE (r.`Name` = :roleName) AND (ur.`FK_User_ID` = :userId);";
-                    
-                    $parmRoleName = new QueryParameter(':roleName', $roleName, PDO::PARAM_STR);
-                    $queryParms = array($parmUserId, $parmRoleName);
-                    
-                    // Update Security.UserRoles
-                    if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
-                        $transactionComplete = $dataAccess->ExecuteNonQuery();
-                        $errors = $dataAccess->CheckErrors();
-                        
-                        if($transactionComplete && (strlen($errors) == 0)) {
-                            $dataAccess->CommitTransaction();
-                            $logger->LogInfo(sprintf("[Notification Type: %s]  Updated user membership status to '%s' for user ID '%d'.", 
-                                                     $notificationType, (($isPremium == 1) ? "Premium" : "Basic"), $replyMsg->UserId));
-                        }
+        // Update Security.Users
+        if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+            $updateSuccess = $dataAccess->ExecuteNonQuery();
+            $errors = $dataAccess->CheckErrors();
+
+            if($updateSuccess && (strlen($errors) == 0)) {
+                $roleName = Constants::$basicMemberRoleName;
+                if($isPremium)  $roleName = Constants::$premiumMemberRoleName;
+                $updateUserQuery = "UPDATE `Security.UserRoles` ur, `Security.Roles` r " . 
+                                   "SET ur.`FK_Role_ID` = r.`ID` " . 
+                                   "WHERE (r.`Name` = :roleName) AND (ur.`FK_User_ID` = :userId);";
+
+                $parmRoleName = new QueryParameter(':roleName', $roleName, PDO::PARAM_STR);
+                $queryParms = array($parmUserId, $parmRoleName);
+
+                // Update Security.UserRoles
+                if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+                    $transactionComplete = $dataAccess->ExecuteNonQuery();
+                    $errors = $dataAccess->CheckErrors();
+
+                    if($transactionComplete && (strlen($errors) == 0)) {
+                        $dataAccess->CommitTransaction();
+                        $logger->LogInfo(sprintf("[Notification Type: %s]  Updated user membership status to '%s' for user ID '%d'.", 
+                                                 $notificationType, (($isPremium == 1) ? "Premium" : "Basic"), $replyMsg->UserId));
                     }
                 }
             }
@@ -669,17 +666,16 @@ class PayPalMsgHandler
 	}
 		
 	if(strlen($expDate) > 0) {
-            $varsToSet = "SET `MembershipExpirationDate` = :expDate";
             if($replyMsg->UserSubscriptionCancelledPending) {
                 // If we are processing a cancel request, update user's membership expiration date by adding any unused billing cycle days from previous cycle(s)
                 $varsToSet = "SET `MembershipExpirationDate` = DATE_ADD(:expDate, INTERVAL `ExtendedMembershipDays` DAY)";
                 $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
                 array_push($queryParms, $parmMembershipExpDate);
             }
-            if($replyMsg->UserSubscriptionCancelledImmediate) {
+            else if($replyMsg->UserSubscriptionCancelledImmediate) {
                 // If we are receiving a notification that the user's paid subscription has ended, apply extended (unused) membership days
                 // to user's membership expiration date, if have not already done so on a prior user-requested cancellation
-                $varsToSet .= ("SET `MembershipExpirationDate` = (CASE WHEN ((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) " .
+                $varsToSet = ("SET `MembershipExpirationDate` = (CASE WHEN ((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) " .
                                     "THEN DATE_ADD(:expDate, INTERVAL `ExtendedMembershipDays` DAY) ELSE `MembershipExpirationDate` END), " .
                                "`SubscriptionAmtPaidLastCycle` = 0, " . 
                                "`IsActive` = (CASE WHEN (((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) OR " .
@@ -689,6 +685,9 @@ class PayPalMsgHandler
                 $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
                 $parmMembershipExpDate2 = new QueryParameter(':expDate2', $expDate, PDO::PARAM_STR);
                 array_push($queryParms, $parmMembershipExpDate, $parmMembershipExpDate2);
+            }
+            else {
+                $varsToSet = "SET `MembershipExpirationDate` = :expDate";
             }
 	}
 		
@@ -752,6 +751,10 @@ class PayPalMsgHandler
             if($updateSuccess && (strlen($errors) == 0)) {
 		$logger->LogInfo(sprintf("[Notification Type: %s]  Updated user PayPal account information for user ID '%d'.", 
                                          $notificationType, $replyMsg->UserId));
+            }
+            else {
+                $logger->LogError(sprintf("[Notification Type: %s]  Could not update user PayPal account info for user ID '%d'. %s", 
+                                          $notificationType, $replyMsg->UserId, $errors));
             }
 	}
 	

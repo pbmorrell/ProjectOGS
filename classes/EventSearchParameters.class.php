@@ -1,5 +1,5 @@
 <?php
-class SearchParameters
+class EventSearchParameters
 {
     public $ShowHiddenEvents = false;
     public $StartDateTime = "";

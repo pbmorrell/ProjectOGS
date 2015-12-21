@@ -24,7 +24,7 @@
         color: #fff;
         text-decoration: underline;
     }
-    
+
     a.actionLink {
         color: blue;
     }
@@ -91,15 +91,15 @@
     .box.style1 input[type=text],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
-	
+
     .box.style1 input[type=password],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
-    
+
     .box.style3 input[type=text],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
-	
+    
     .box.style3 input[type=password],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
@@ -107,17 +107,17 @@
     #ddlTimeZones, #toggleShowPastEvents{
         width: auto !important;
     }
-    
+
     br.clear
     {
         clear: both;
     }
-
+    
     p, ul, ol, dl, table
     {
         margin-bottom: 2em;
     }
-    
+
     .byline{
 	font-style: oblique;
     }
@@ -175,7 +175,7 @@
         float: right;
         margin: 0em 0 2.5em 2.5em;
     }
-    
+
     ul.style1
     {
         list-style: disc;
@@ -228,7 +228,7 @@
         padding-top: 0;
         margin-top: 0;
     }
-    
+
 	ul.style4
     {
     }
@@ -341,7 +341,7 @@
         background-color: black;
         float: right;
     }
-    
+
     .mobilePreLogin {
         display: none;
         color:blue;
@@ -361,7 +361,7 @@
         background-color: black;
         float: right;
     }
-    
+
     .mobileLoginError {
         color:red;
         font-family:verdana;
@@ -384,19 +384,19 @@
         color: #fff !important;
         padding: 1em 1em 1em 0.75em !important;
     }
-    
+
     .controlBtn:hover {
         background: rgba(192,192,192,0.9) !important;
     }
-	
+
     .controlBtnIndex{
 	width: 21em;
     }
-        
+
     .signupInp input{
         width: 22em;
     }
-
+    
     .memberHomeBtn {
         background: rgba(255,255,255,0.05);
         position: relative;
@@ -414,7 +414,7 @@
         -moz-transition: background-color .25s ease-in-out;
         -webkit-transition: background-color .25s ease-in-out;
     }
-	
+
     .gamerTagManagerBtn {
         background: #32353a;
         position: relative;
@@ -432,35 +432,35 @@
         -moz-transition: background-color .25s ease-in-out;
         -webkit-transition: background-color .25s ease-in-out;		
     }
-
+    
     .memberHomeBtn:hover{
         background: rgba(255,255,255,0.2);
     }
-
+    
     .memberHomeBtn:before{
         margin-right: 1em;
     }
-
+    
     .gamerTagManagerBtn:hover{
         background: rgba(255,255,255,0.2);
     }
-
+    
     .gamerTagManagerBtn:before{
         margin-right: 1em;
     }	
-	
+
     .submitFormDiv {
         float: right;
         padding-right: 1em;
         font-size: 0.4em;
     }
-
+    
     .memberHomeSubmitDiv {
         float: right;
         padding-right: 1em;
         font-size: 0.6em;
     }
-
+    
     .preEditProfile {
         color:blue;
         background-color: black;
@@ -468,7 +468,7 @@
         font-size: 1.1em;
         font-weight:bold;
     }
-    
+
     .editProfileErr {
         color:red;
         background-color: black;
@@ -476,88 +476,88 @@
         font-size: 1.1em;
         font-weight:bold;
     }
-    
+
     #editProfileStatus.preEditProfile {
         float: right;
     }
     #editProfileStatusMobile.preEditProfile {
         float: left;
     }
-        
+
     #editProfileStatus.editProfileErr {
         float: right;
     }
     #editProfileStatusMobile.editProfileErr {
         float: left;
     }
-
+    
     .hidden {
         display:none !important;
     }
-    
+
     .mobileButtonDisplay {
         display:none;
     }
-    
+
     .desktopButtonDisplay {
         display:block;
     }
-    
+
     .desktopButtonDisplay > button {
         margin-right: 10px;
     }
-    
+
     .evtMgrHiddenInMobileView {
         display:none !important;
     }
-	
+
     .curEvtsHiddenInMobileView {
         display:none !important;
     }
-
+    
     .hiddenDesktopAds {
         display:none;
     }
-
+    
     .hiddenMobileAds {
         display:none;
     }
-
+    
     .usernameStatusAvail {
         font-family:verdana;
         font-size: 0.9em;
         font-weight:bold;
         color:green;
     }
-
+    
     .usernameStatusTaken {
         font-family:verdana;
         font-size: 0.9em;
         font-weight:bold;
         color:red;
     }
-
+    
     .selectAllCheckbox {
         margin-left: 5em;
     }
-
+    
     .xtraSmallSelectAllCheckbox {
         margin-left: 0.5em !important;
     }
-    
+
     .globalGameOption {
         background-color: #F0F0F0;
     }
-
+    
     .userGameOption {
         background-color: #66CCFF;
     }
-
+    
     .custom-combobox {
         position: relative;
         display: inline-block;
     }
-
+    
     .custom-combobox-toggle {
         position: absolute;
         top: 0;
@@ -565,19 +565,19 @@
         margin-left: -1px;
         padding: 0;
     }
-
+    
     .custom-combobox-input {
         margin: 0;
         padding: 5px 10px;
     }
-
+    
     .ui-autocomplete {
         max-height: 150px;
         overflow-y: auto;
         overflow-x: hidden;
         z-index:1000 !important;
     }
-
+    
     #loginBtn, #signupBtnLoginForm {
         background: #32353a;
         color: #fff;
@@ -586,55 +586,55 @@
         border-radius: .5em;
         padding: .6em;
     }
-	
+
     .captchaInput {
 	max-width:6em;
     }
-	
+
     .captchaImage {
         border: 0%;
         vertical-align:bottom;
     }
-	
+
     .captchaInputDiv {
 	margin-bottom: 0.5em;
 	display:inline-block;
 	vertical-align: middle;
     }
-
+    
     .captchaImageDiv {
 	display:inline-block;
 	vertical-align: middle;
     }	
-	
+
     .desktopAdStyle {
         min-height: 100%;
         max-height: 100%;
         margin-top: 1em;
     }
-    
+
     .mobileAdStyle {
         min-width: 100%;
         max-width: 100%;        
     }
-	
+
     .detailsTable {
 	display: table;
 	border:2px solid #000;
 	border-collapse: collapse;
     }
-	
+
     .detailsTableRow {
 	display: table-row;
     }
-	
+
     .detailsTableCol {
 	display: table-cell;
 	text-align: left;
 	border:1px solid #000;
 	padding: 5px;
     }
-	
+
     .overlayPanelModalBackground {
 	z-index: 100000;
 	background:
@@ -643,37 +643,37 @@
 		rgba(128, 128, 128, 0.45)
             );
     }
-	
+
     .overlayPanel {
 	z-index: 100001;
     }
-	
+
     .overlayPanelEvtMgr {
 	background-color:#84c9b6;
     }
-	
+
     .overlayPanelCurEvts {
 	background-color:#cf9c30;
     }
-
+    
     .overlayPanelToggleGroup {
         display: table;
         width: 100%;
     }
-    
+
     .overlayPanelToggleLinkWrap {
         display: table-cell;
         padding: 0.5em;
         width: 25%;
         text-align: left;
     }
-
+    
     .overlayPanelToggleChkboxWrap {
         display: table-cell;
         padding: 0.5em;
         text-align: left;
     }
-    
+
     .overlayPanelToggleElementActive {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
@@ -684,7 +684,7 @@
         color: blue;
         float: left;
     }
-	
+
     .overlayPanelToggleElementInactive {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
@@ -694,20 +694,20 @@
         color: black;
         float: left;
     }
-    
+
     .overlayPanelToggleActiveChk {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
 	margin-right: 5px;
     }
-    
+
     .overlayPanelToggleActiveLbl {
         opacity: 0.9;
         filter: alpha(opacity=90); /* IE6+ */
 	color: white;
 	font-size: 1em;
     }
-    
+
     .overlayPanelFilterGroup {
         margin-top: 1%;
         margin-left: 1%;
@@ -715,21 +715,21 @@
         padding-top: 1%;
         padding-bottom: 1%;
     }
-    
+
     .overlayPanelGroupBorder {
         border:1px solid blue;
     }
-	
+
     .overlayPanelGroupExpanded {
 	margin-bottom: 3%;
     }
-    
+
     .overlayPanelFilterSubGroup {
         height: auto;
         box-sizing: border-box;
         overflow-y: auto;
     }
-
+    
     .overlayPanelElementContainer {
         width: 20% !important;
         height: 8%;
@@ -737,7 +737,7 @@
         margin-left: 5%;
         margin-right: 5%;
     }
-    
+
     .overlayPanelElementContainerWide {
         width: 40% !important;
         height: 8%;
@@ -745,7 +745,7 @@
         margin-left: 5%;
         margin-right: 5%;
     }
-	
+
     .overlayPanelElementContainerCheckboxList {
         width: 65% !important;
         height: 8%;
@@ -753,7 +753,7 @@
         margin-left: 2%;
         margin-right: 2%;
     }
-	
+
     .overlayPanelElementContainerCheckboxListSibling {
         width: 25% !important;
         height: 8%;
@@ -761,7 +761,7 @@
         margin-left: 2%;
         margin-right: 2%;
     }
-    
+
     .overlayPanelElementContainerCheckboxListSiblingWide {
         width: 95% !important;
         height: 8%;
@@ -769,13 +769,13 @@
         margin-left: 2%;
         margin-right: 2%;
     }
-    
+
     .overlayPanelElement {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
         width: 100%;
     }
-    
+
     .overlayPanelLabel {
 	margin-right: 5px;
         font-weight:bold;
@@ -783,14 +783,14 @@
         filter: alpha(opacity=90); /* IE6+ */
         color: white;
     }
-    
+
     .overlayPanelLabelMultiSelector {
         opacity: 0.9; /* CSS3 */
         filter: alpha(opacity=90); /* IE6+ */
 	color: white;
 	font-size: 1em;
     }
-    
+
     .overlayPanelControlElement {
         width: 250px !important;
         height: 55px;
@@ -798,7 +798,7 @@
         margin-left: 7%;
         margin-top: 5px;
     }
-    
+
     .overlayPanelControlElementGroup {
         position: absolute;
         bottom: 10px;
@@ -806,7 +806,7 @@
         height: auto;
         width: 95%;
     }
-    
+
     .swipeHoverIconContainer {
         position: absolute;
         bottom: 5%;
@@ -815,11 +815,11 @@
         filter: alpha(opacity=50); /* IE6+ */
         z-index: 100002;
     }
-    
+
     .searchPanelCurEvtsFilter {}
     .searchPanelEvtMgrFilter {}
     .filterFieldActive {}
-
+    
     .fixedHeightScrollableContainer  {
         border:2px solid #ccc;
         box-sizing: border-box;
@@ -828,16 +828,16 @@
         height: 100px;
         overflow-y: auto;
     }
-    
+
     .overlayPanelFixedHeightScrollableContainer  {
         width: 95%;
         overflow-y: auto;
     }
-    
+
     .paddingOverride {
         padding: 1em 0.5em !important;
     }
-
+    
     .fixedHeightScrollableContainerLarge  {
         border:2px solid #ccc;
         box-sizing: border-box;
@@ -846,7 +846,7 @@
         height: 225px;
         overflow-y: auto;
     }
-    
+
     .fixedHeightScrollableContainerJumbo  {
         box-sizing: border-box;
         padding: 0em;
@@ -854,50 +854,50 @@
         max-height: 400px;
         overflow-y: auto;
     }
-    
+
     .fixedWidthScrollableContainer {
         border:none;
         box-sizing: border-box;
         overflow-x: auto;
     }
-    
+
     .multiLineTableColumn {
         white-space: pre-wrap;
     }
-	
+
     .mobileViewFontSize {
 	font-size: 9px;
     }
-	
+
     .desktopViewFontSize {
 	font-size: 11px;
     }
-	
+
     .tableHeaderFooterFixed {
 	position: fixed !important;
     }
-        
+
     .sectionHeader
     {
         font-size: 1.2em;
         color: #fff;
     }
-
+    
     .hiddenDiv
     {
         width: 0px;
     }
-
+    
     .controlPanelSection {
 	width: 23%;
     }
-	
+
     .offPage {
         position: absolute;
         bottom: 100%;
         right: 100%;
     }
-
+    
     .button
     {
         position: relative;
@@ -915,17 +915,17 @@
         -moz-transition: background-color .25s ease-in-out;
         -webkit-transition: background-color .25s ease-in-out;
     }
-	
+
     .button:hover
     {
         background: rgba(255,255,255,0.05);
     }
-
+    
     .button:before
     {
         margin-right: 1em;
     }
-
+    
     .bigbutton
     {
         position: relative;
@@ -944,39 +944,39 @@
         -moz-transition: background-color .25s ease-in-out;
         -webkit-transition: background-color .25s ease-in-out;
     }
-
+    
     .bigbutton:hover
     {
         background: #2d3238;
     }
-
+    
     .bigbutton:before
     {
         position: relative;
         top: 0.1em;
         margin-right: 0.65em;
     }
-
+    
     .bigbutton.style1
     {
         background: #32AECF;
     }
-
+    
     .bigbutton.style1:hover
     {
         background: #32BADB;
     }
-
+    
     .bigbutton.style2
     {
         background: #7B915B;
     }
-
+    
     .bigbutton.style2:hover
     {
         background: #8BA16B;
     }
-
+    
     .box
     {
         background: #2c2f34;
@@ -985,22 +985,22 @@
         padding: 3em 2em 3em 2em;
         overflow: hidden;
     }
-	
+
     .box header
     {
         margin-bottom: 2em;
     }
-
+    
     .box header h2
     {
         margin-bottom: 0.5em;
     }
-
+    
     .box footer
     {
         clear: both;
     }
-
+    
     .box section,
     .box article
     {
@@ -1008,12 +1008,12 @@
         padding-bottom: 2em;
         margin-bottom: 2em;
     }
-
+    
     #signupForm section
     {
         padding-bottom: 0em !important;
     }
-
+    
     .box section:last-of-type,
     .box article:last-of-type
     {
@@ -1021,7 +1021,7 @@
         margin-bottom: 0!important;
         padding-bottom: 0!important;
     }
-
+    
     .box.style1
     {
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
@@ -1029,7 +1029,7 @@
         color: rgba(255,255,255,0.75);
         background: #0066CC;
     }
-
+    
     .box.style2
     {
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
@@ -1037,7 +1037,7 @@
         color: rgba(255,255,255,0.75);
         background: #7B915B;
     }
-    
+
     .box.style3
     {
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.25);
@@ -1045,56 +1045,56 @@
         color: rgba(255,255,255,0.75);
         background: #2c2f34;
     }
-    
+
     .box.style3 .controlBtn
     {
         font-size: 1.5em;
     }
-
+    
     .box.main
     {
     }
-
+    
     .box.main p
     {
         color: #fff;
         font-size: 1.4em;
     }
-
+    
     .box.main p label
     {
         color: #fff;
         font-size: 0.7em;
     }
-	
+
     .box.main h2
     {
         line-height: 1.2em;
     }
-
+    
     .box.main i
     {
         color: #A0A0A0;
     }
-
+    
     .box.cta
     {
     }
-		
+
     .box.cta p
     {
         color: #c9c9c9;
     }
-			
+
     .box.features
     {
     }
-
+    
     .box.features .button
     {
         margin-top: 2em;
     }
-
+    
 /*********************************************************************************/
 /* Wrappers                                                                      */
 /*********************************************************************************/
@@ -1105,11 +1105,11 @@
         background-repeat: no-repeat;
         background-size: cover;
     }
-
+    
     #banner-wrapper
     {
     }
-
+    
     #main-wrapper
     {
         background: rgb(206,220,231); /* Old browsers */
@@ -1121,12 +1121,12 @@
         background: linear-gradient(to bottom,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* W3C */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cedce7', endColorstr='#596a72',GradientType=0 ); /* IE6-9 */
     }
-
+    
     #footer-wrapper a:hover
     {
         color: #979797;
     }
-
+    
 /*********************************************************************************/
 /* Banner                                                                        */
 /*********************************************************************************/
@@ -1134,24 +1134,24 @@
     #banner
     {
     }
-
+    
     #banner .caption
     {
     }
-
+    
     #banner .caption h2
     {
         font-weight: 700;
         text-transform: capitalize;
         color: #fff;
     }
-
+    
     #banner .caption p
     {
         color: #ddd;
         color: rgba(255,255,255,0.65);
     }
-	
+
 /*********************************************************************************/
 /* Copyright                                                                     */
 /*********************************************************************************/
@@ -1163,17 +1163,17 @@
         color: #555;
         color: rgba(255,255,255,0.25);
     }
-    
+
     #copyright a
     {
         color: inherit;
     }
-    
+
     #copyright a:hover
     {
         color: #FFF;
     }
-
+    
 /*********************************************************************************/
 /* Icons                                                                         */
 /*********************************************************************************/
@@ -1182,7 +1182,7 @@
     {
         text-decoration: none;
     }
-
+    
     .icon:before
     {
         display: inline-block;
@@ -1196,7 +1196,7 @@
         -moz-osx-font-smoothing:grayscale;
     }
 		
-		
+
 /*********************************************************************************/
 /* Add-Ons for Mock up Examples                                     */
 /*********************************************************************************/
@@ -1206,61 +1206,61 @@
         margin: 5px 5px 5px 0px;
         padding: 10px;
     }
-
+    
     #mobileLoginForm input
     {
         margin: 5px 5px 5px 0px;
         padding: 10px;
     }
-
+    
     #loginForm input
     {
         min-height: 3em;
 		width: 17.5em;
     }
-
+    
     .newsletter input
     {
         margin: 5px 5px 5px 0px;
         padding: 12px;
         width: 22em;
     }
-
+    
     .newsletter input
     {
         margin: 5px 5px 5px 0px;
         padding: 12px;
         width: 22em;
     }
-
+    
     #autocenter
     {
         display: block;
         margin-left: auto;
         margin-right: auto;
     }
-
+    
     ::-webkit-input-placeholder {
         color: #000;
     }
-
+    
     :-moz-placeholder { /* Firefox 18- */
         color: #000;
     }
-
+    
     ::-moz-placeholder {  /* Firefox 19+ */
         color: #000;  
     }
-
+    
     :-ms-input-placeholder {  
         color: #000;  
     }
-
+    
     #login{
         float:right;
         margin: 0px 15px 0px 0px;
     }
-
+    
     input[type=checkbox] {
         padding-left:5px;
         padding-right:5px;
@@ -1274,17 +1274,17 @@
         width:15px;
         height:15px;
     }
-
+    
     input[type=checkbox]:checked {
         background-color:#000;
         border-left-color:#06F;
         border-right-color:#06F;
     }
-
+    
     input[type=checkbox]:hover {
         box-shadow:0px 0px 10px #1300ff;
     }
-
+    
     input[type=radio] {
         padding-left:5px;
         padding-right:5px;
@@ -1298,17 +1298,17 @@
         width:15px;
         height:15px;
     }
-
+    
     input[type=radio]:checked {
         background-color:#000;
         border-left-color:#06F;
         border-right-color:#06F;
     }
-
+    
     input[type=radio]:hover {
         box-shadow:0px 0px 10px #1300ff;
     }
-
+    
     textarea{
         background: #fff;
         color: #000;
@@ -1316,20 +1316,20 @@
         line-height: 1.75em;
         width: 28em;
     }
-    
+
     #signupForm textarea {
         height: 10em;
         resize: none;
     }
-    
+
     .customDialogStyle .ui-dialog-titlebar > span {
         white-space: normal !important;
     }
-    
+
     .autoSelectTextArea {
         min-height: 300px;
     }
-
+    
     select{
         background: #fff;
         color: #000;
@@ -1337,7 +1337,7 @@
         line-height: 1.75em;
         height: 2.3em;
     }
-	
+
     .ui-datepicker {
         width: 216px;
         height: auto;
@@ -1347,15 +1347,15 @@
         -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
         box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
     }
-	
+
     .ui-datepicker a {
         text-decoration: none;
     }
-	
+
     .ui-datepicker table {
         width: 100%;
     }
-	
+
     .ui-datepicker-header {
         background: #000;
         color: #e0e0e0;
@@ -1370,17 +1370,17 @@
         border-style: solid;
         border-color: #111;
     }
-	
+
     .ui-datepicker-prev {
         float: left;
         background-position: center -30px;
     }
-	
+
     .ui-datepicker-next {
         float: right;
         background-position: center 0px;
     }
-	
+
     .ui-datepicker th {
         text-transform: uppercase;
         font-size: 6pt;
@@ -1388,37 +1388,37 @@
         color: #666666;
         background: #fff;
     }
-
+    
     .ui-datepicker tbody td {
         padding: 0;
         border-right: 1px solid #bbb;
     }
 	
-	
+
     .ui-datepicker-title {
         text-align: center;
     }
-	
+
     .ui-datepicker select {
         width: 5em;
 	height: 1.5em;
     }
-	
+
     .ui-datepicker tbody td:last-child {
         border-right: 0px;
     }
-
+    
     .ui-datepicker tbody tr {
         border-bottom: 1px solid #bbb;
     }
     .ui-datepicker tbody tr:last-child {
         border-bottom: 0px;
     }
-
+    
     .ui-datepicker-calendar .ui-state-hover {
         background: #f7f7f7;
     }
-
+    
     .ui-datepicker-calendar .ui-state-active {
         background: #6eafbf;
         -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
@@ -1431,11 +1431,11 @@
         position: relative;
         margin: -1px;
     }
-
+    
     #search{
         width: 14em;
     }
-    
+
     .dlgToolbarContainer {
         width: 28em;
         height: auto;
@@ -1443,7 +1443,7 @@
         box-sizing: border-box;
         overflow-y: auto;
     }
-    
+
     .dlgToolbarContainer > button {
         width: 45%;
         height: 65px;
@@ -1454,7 +1454,7 @@
         margin-right: 2%;
         padding: 1em 1em 1em 0.75em !important;
     }
-	
+
     .mobileButtonToolbarContainer {
         width: 95%;
         height: auto;
@@ -1463,7 +1463,7 @@
         overflow-y: auto;
 	margin-bottom: 10px;
     }
-    
+
     .mobileButtonToolbarContainer > button {
         width: 45%;
         height: 65px;
@@ -1474,7 +1474,7 @@
         margin-right: 2%;
         padding: 1.5em 1em 1em 0.75em !important;
     }
-
+    
     /* Custom theme for current events jTable: override lightcolor/green CSS to make table orange */
     #currentEventsContent div.jtable-main-container div.jtable-title {
 	background: #E69316 !important;
@@ -1488,22 +1488,51 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#E69316', endColorstr='#D4902B', GradientType=0);
 	border-color: #CF8414;
     }
-	
+
     #currentEventsContent div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
         background-color: #CF8414;
     }
-	
+
     #currentEventsContent div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
 			  div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
 	background-color: #E69316;
 	border-color: #CF8414;
     }
-	
+
     #currentEventsContent div.jtable-main-container table.jtable tbody > tr.jtable-row-selected,
 			  div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
 	background-color: #D4902B;
     }
-    
+
+    /* Custom theme for Search For Friends jTable: override lightcolor/green CSS to make table orange */
+    #searchForFriendsContent div.jtable-main-container div.jtable-title {
+	background: #E69316 !important;
+        color: #000;
+	background: -moz-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #E69316), color-stop(100%, #D4902B));
+	background: -webkit-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -o-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: -ms-linear-gradient(top, #E69316 0%, #D4902B 100%);
+	background: linear-gradient(to bottom, #E69316 0%, #D4902B 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#E69316', endColorstr='#D4902B', GradientType=0);
+	border-color: #CF8414;
+    }
+
+    #searchForFriendsContent div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
+        background-color: #CF8414;
+    }
+
+    #searchForFriendsContent div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
+                             div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
+	background-color: #E69316;
+	border-color: #CF8414;
+    }
+
+    #searchForFriendsContent div.jtable-main-container table.jtable tbody > tr.jtable-row-selected,
+                             div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
+	background-color: #D4902B;
+    }
+
     /* Custom theme for gamer tag viewer jTable: override lightcolor/green CSS to make table light blue */
     #viewGamerTagsDiv div.jtable-main-container div.jtable-title {
 	background: #78b1ed !important;
@@ -1517,55 +1546,55 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#78b1ed', endColorstr='#5f9cdc', GradientType=0);
 	border-color: #417bb5;
     }
-	
+
     #viewGamerTagsDiv div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
         background-color: #417bb5;
     }
-	
+
     #viewGamerTagsDiv div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
-			  div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
+                      div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active:hover {
 	background-color: #78b1ed;
 	border-color: #417bb5;
     }
-	
+
     #viewGamerTagsDiv div.jtable-main-container table.jtable tbody > tr.jtable-row-selected,
-			  div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
+                      div.jtable-main-container table.jtable tbody > tr.jtable-row-selected:hover {
 	background-color: #5f9cdc;
     }
-    
+
     /* Custom theme for child tables: override lightcolor/green CSS to make child table headers black, and to not allow them to expand to fill the entire parent row space */
     table.jtable.jTableChild thead {
 	background: #000 !important;
         color: #fff;
     }
-
+    
     table.jtable.jTableChild {
         width: 60% !important;
 	float: right !important;
         margin-bottom: 0.5em;
     }
-    
+
     /* Alternating row colors for child table */
     table.jtable tbody > tr.customTheme {
         background-color: #fdfbec !important;
         color: #919691 !important;
     }
-    
+
     table.jtable tbody > tr .jtable-row-even.customTheme {
         background-color: #faf6d5 !important;
         color: #919691 !important;
     }
-	
+
     .jTableChildRowHidden {
         height:0px !important;
     }
-	
+
     /* Limit width of jTable selects */
     .jtable-main-container > .jtable-bottom-panel select,
     #viewGamerTagsDiv .jtable-main-container > .jtable-bottom-panel select {
 	max-width: 5em !important;
     }
-	
+
 /*********************************************************************************/
 /* Favicon Icon Colors                                                           */
 /*********************************************************************************/	
@@ -1573,11 +1602,11 @@
     #colorCalendar{
         color: #CC3300;
     }
-	
+
     #colorUser{
 	color: #009966;
     }
-	
+
     #colorTrophy{
 	color: #FFCC00;
     }
