@@ -226,7 +226,7 @@ function LoadCurrentFriendListForUser()
                 sorting: false,
                 columnSelectable: false,
                 display: function (data) {
-                    if(data.record.InviteType == 'To Me') {
+                    if((data.record.InviteType == 'To Me') && (data.record.InviteReply != 'Rejected')) {
                         var $answerImage = $('<label><img alt="Accept" id="acc' + data.record.ID + '" class="acceptIcon" title="Accept this invite" src="images/activate.png" />&nbsp;&nbsp;' + 
                                                     '<img alt="Reject" id="rej' + data.record.ID + '" class="rejectIcon" title="Reject this invite" src="images/deactivate.png" /></label>');
 
@@ -397,14 +397,15 @@ function SendFriendInviteToUsers(userIDs)
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=SendFriendInviteToUsers&" + $.param({'userIds': userIDs}),
-            success: function(response){
-                var fullRefresh = false;
-                ReloadAvailUsersTable(fullRefresh);
-                
+            success: function(response){                
                 if(response.match("^SYSTEM ERROR")) {
                     sweetAlert("Invitations Not Sent", response, "error");
                 }
                 else {
+                    var fullRefresh = false;
+                    ReloadManageFriendsTable(fullRefresh);
+                    ReloadAvailUsersTable(fullRefresh);
+                    
                     // Show success message
                     sweetAlert("Invitations Sent!", response, "success");
                 }
@@ -441,13 +442,13 @@ function SendInviteAccept(userIDs)
             url: "AJAXHandler.php",
             data: "action=AcceptUserFriendInvites&" + $.param({'userIds': userIDs}),
             success: function(response){
-                var fullRefresh = false;
-                ReloadManageFriendsTable(fullRefresh);
-                
                 if(response.match("^SYSTEM ERROR")) {
                     sweetAlert("Could Not Accept Invitations", response, "error");
                 }
                 else {
+                    var fullRefresh = false;
+                    ReloadManageFriendsTable(fullRefresh);
+                    
                     // Show success message
                     sweetAlert("Invitations Accepted!", response, "success");
                 }
@@ -483,14 +484,15 @@ function SendInviteReject(userIDs)
             type: "POST",
             url: "AJAXHandler.php",
             data: "action=RemoveUsersFromFriendList&" + $.param({'userIds': userIDs}),
-            success: function(response){
-                var fullRefresh = false;
-                ReloadManageFriendsTable(fullRefresh);
-                
+            success: function(response){                             
                 if(response.match("^SYSTEM ERROR")) {
                     sweetAlert("Could Not Remove Users", response, "error");
                 }
                 else {
+                    var fullRefresh = false;
+                    ReloadManageFriendsTable(fullRefresh);
+                    ReloadAvailUsersTable(fullRefresh);
+                    
                     // Show success message
                     sweetAlert("Users Removed", response, "success");
                 }

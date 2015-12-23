@@ -116,7 +116,6 @@ class GamingHandler
         
 	$userFriends = array();
         
-        //$logger->LogInfo("GetFriendList Query: " . $getAvailableUserQuery);
         if($dataAccess->BuildQuery($getAvailableUserQuery)) {
             $results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
 
@@ -2028,9 +2027,9 @@ class GamingHandler
     
     public function SendFriendInviteToUsers($dataAccess, $logger, $userID, $userIds)
     {
-	// Remove any existing active invitations between current user and the current set of invitees
-        if(!$this->DeletePendingInvitationsBetweenUsers($dataAccess, $userID, $userIds)) {
-            $logger->LogError(sprintf("SendFriendInviteToUsers(): Could not remove active invitations for invitees [%s], inviter [%d]. %s", 
+	// Remove any existing invitations between current user and the current set of invitees
+        if(!$this->DeleteInvitationsBetweenUsers($dataAccess, $userID, $userIds)) {
+            $logger->LogError(sprintf("SendFriendInviteToUsers(): Could not remove invitations for invitees [%s], inviter [%d]. %s", 
                                         implode(',', $userIds), $userID, $dataAccess->CheckErrors()));
             return 'SYSTEM ERROR: Could not send invitation to selected users. Please try again later.';
         }
@@ -2161,8 +2160,8 @@ class GamingHandler
 		
 	$errors = $dataAccess->CheckErrors();
 	if($insertSuccess && (strlen($errors) == 0)) {
-            // If friends successfully added to this user's friend list, remove pending invitations
-            $deleteSuccess = $this->DeletePendingInvitationsBetweenUsers($dataAccess, $userID, $userIds);
+            // If friends successfully added to this user's friend list, remove invitations
+            $deleteSuccess = $this->DeleteInvitationsBetweenUsers($dataAccess, $userID, $userIds);
 
             if($deleteSuccess) {
 		if($dataAccess->CommitTransaction())  return "SUCCESS: Accepted friend invitations from all selected users";
@@ -2180,14 +2179,13 @@ class GamingHandler
 	return 'SYSTEM ERROR: Could not accept invitations from selected users. Please try again later.';
     }
     
-    public function DeletePendingInvitationsBetweenUsers($dataAccess, $pivotUser, $selectedUsers)
+    public function DeleteInvitationsBetweenUsers($dataAccess, $pivotUser, $selectedUsers)
     {
         $deleteSuccess = false;
 	$userIdParamList = (str_repeat("?,", count($selectedUsers) - 1)) . "?";
 	$deleteQuery = "DELETE FROM `Gaming.UserFriendInvitations` WHERE " . 
                        "(((`FK_User_ID_Invitee` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Inviter` = ?)) OR " .
-                       "((`FK_User_ID_Inviter` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Invitee` = ?))) " .
-                       "AND (`IsRejected` = 0);";
+                       "((`FK_User_ID_Inviter` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Invitee` = ?)));";
         
 	$queryParms = $selectedUsers;
 	array_push($queryParms, $pivotUser);
