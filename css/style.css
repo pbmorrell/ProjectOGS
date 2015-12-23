@@ -897,6 +897,9 @@
         bottom: 100%;
         right: 100%;
     }
+	
+    .acceptIcon { }
+    .rejectIcon { }
     
     .button
     {

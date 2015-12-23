@@ -227,18 +227,8 @@ function LoadCurrentFriendListForUser()
                 columnSelectable: false,
                 display: function (data) {
                     if(data.record.InviteType == 'To Me') {
-                        var $answerImage = $('<label><img alt="Accept" id="acc"' + data.record.ID + ' title="Accept this invite" src="images/activate.png" />&nbsp;' + 
-                                                    '<img alt="Reject" id="rej"' + data.record.ID + ' title="Reject this invite" src="images/deactivate.png" /></label>');
-
-                        $('acc' + data.record.ID).click(function () {
-                            var userIds = [data.record.ID];
-                            SendInviteAccept(userIds);
-                        });
-
-                        $('rej' + data.record.ID).click(function () {
-                            var userIds = [data.record.ID];
-                            SendInviteReject(userIds);
-                        });
+                        var $answerImage = $('<label><img alt="Accept" id="acc' + data.record.ID + '" class="acceptIcon" title="Accept this invite" src="images/activate.png" />&nbsp;&nbsp;' + 
+                                                    '<img alt="Reject" id="rej' + data.record.ID + '" class="rejectIcon" title="Reject this invite" src="images/deactivate.png" /></label>');
 
                         // Return HTML element for display in jTable
                         return $answerImage;
@@ -269,12 +259,20 @@ function LoadCurrentFriendListForUser()
 	recordsLoaded: function(event, data) {
             $(manageFriendsListJTableDiv + ' .jtable-data-row').each(function() {
 		var id = $(this).attr('data-record-key');
-		var dataRecordArray = $.grep(data.records, function (e) {
-                    return e.ID === id;
-                });
-					
-		//var playerData = dataRecordArray[0].PlayersSignedUpData;
-                
+				
+                $(this).find('.acceptIcon').each(function() {
+                    $(this).click(function () {
+                        var userIds = [id];
+                        SendInviteAccept(userIds);
+                    });
+		});
+				
+                $(this).find('.rejectIcon').each(function() {
+                    $(this).click(function () {
+                        var userIds = [id];
+                        SendInviteReject(userIds);
+                    });
+		});
             });
 			
             var curWidthClass = GetCurWidthClass();

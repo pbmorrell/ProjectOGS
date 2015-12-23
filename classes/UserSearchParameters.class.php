@@ -7,12 +7,12 @@ class UserSearchParameters
     public $LastName = "";
     public $Platforms = [];
     public $Gender = "";
-    public $ShowInvitesForUser = false;
+    public $ShowInvitesForUser = true;
     public $ShowInvitesSentByUser = false;
     //public $ShowRejectedInvites = true;
     public $ShowCurrentFriendsForUser = true;
 	
-    public function __construct($gt = [], $un = "", $fn = "", $ln = "", $p = [], $g = "", $sifu = false, $sibu = false, /*$sri = true,*/ $scf = true)
+    public function __construct($gt = [], $un = "", $fn = "", $ln = "", $p = [], $g = "", $sifu = true, $sibu = false, /*$sri = true,*/ $scf = true)
     {
         $this->GamerTags = $gt;
         $this->UserName = $un;

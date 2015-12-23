@@ -548,31 +548,30 @@
                 //$showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);	
 
 		$searchParms = new UserSearchParameters();
+		$searchParms->ShowInvitesSentByUser = true;
 		echo $gamingHandler->JTableCurrentFriendsListViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                         $pageSize, $searchParms);
                 break;
             case "SendFriendInviteToUsers":				
-		echo 'Invite sent to users ' . implode(',', $_POST['userIds']);
-                //echo $gamingHandler->SendFriendInviteToUsers($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
+                echo $gamingHandler->SendFriendInviteToUsers($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
                 break;
             case "AcceptUserFriendInvites":
-		echo 'Invites from users ' . implode(',', $_POST['userIds']) . ' accepted';
-                //echo $gamingHandler->AcceptUserFriendInvites($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
+                echo $gamingHandler->AcceptUserFriendInvites($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
                 break;
             case "RemoveUserFromFriendList":
                 $targetUserId = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
-                $logger->LogInfo('User ID "' . $targetUserId . '" removed from friends list (not really)');
+                
+                $userIds = [$targetUserId];
+                $resultMsg = $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $userIds);
+                $isError = stripos($resultMsg, "SYSTEM ERROR") !== FALSE;
                 
                 $jTableResult = [];
-                $jTableResult['Result'] = 'OK';
+                $jTableResult['Result'] = $isError ? 'ERROR' : 'OK';
+                if($isError)  $jTableResult['Message'] = $resultMsg;
                 echo json_encode($jTableResult);
-                
-                //$userIds = [$targetUserId];
-                //echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $userIds);
                 break;
             case "RemoveUsersFromFriendList":
-                echo 'Users ' . implode(',', $_POST['userIds']) . ' removed from friends list';
-                //echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
+                echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
                 break;
         }
     }

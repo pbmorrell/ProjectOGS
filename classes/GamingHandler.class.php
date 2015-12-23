@@ -98,7 +98,7 @@ class GamingHandler
             $limitClause = "LIMIT " . $startIndex . "," . $pageSize;
 	}
 	
-	$queryParms = [$userID, $userID];
+	$queryParms = [$userID, $userID, $userID];
 	$orderByClause = "ORDER BY " . $this->TranslateOrderByToUserQueryOrderByClause($orderBy);
 	$filterWhereClause = $this->BuildWhereClauseForFriendListQuery($userID, $queryParms, $searchParms, $forAvailableFriendList);
 		
@@ -109,7 +109,7 @@ class GamingHandler
 				 "(CASE WHEN ufiInviter.`IsRejected` IS NULL THEN '' ELSE (CASE WHEN ufiInviter.`IsRejected` = 0 THEN 'Pending' ELSE 'Rejected' END) END) as ReceivedInviteReply, " .
 				 "(CASE WHEN ufiInvitee.`IsRejected` IS NULL THEN '' ELSE (CASE WHEN ufiInvitee.`IsRejected` = 0 THEN 'Pending' ELSE 'Rejected' END) END) as SentInviteReply " .
                                  "FROM `Security.Users` as u " .
-				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) " .
+				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) AND (uf.`FK_User_ID_ThisUser` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInviter ON (u.`ID` = ufiInviter.`FK_User_ID_Inviter`) AND (ufiInviter.`FK_User_ID_Invitee` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInvitee ON (u.`ID` = ufiInvitee.`FK_User_ID_Invitee`) AND (ufiInvitee.`FK_User_ID_Inviter` = ?) " .
                                  $filterWhereClause . $orderByClause . $limitClause;
@@ -1399,6 +1399,15 @@ class GamingHandler
             case "UserName":
                 $queryOrderByClause = "u.`UserName` " . $orderByDirection;
                 break;
+            case "InviteType":
+                $queryOrderByClause = "(CASE WHEN ufiInvitee.`ID` IS NOT NULL THEN 'From Me' ELSE " . 
+                                        "(CASE WHEN ufiInviter.`ID` IS NOT NULL THEN 'To Me' ELSE 'No' END) END) " . $orderByDirection;
+                break;
+            case "InviteReply":
+                $queryOrderByClause = "(CASE WHEN ((IFNULL(ufiInvitee.`IsRejected`, -1) = -1) AND (IFNULL(ufiInviter.`IsRejected`, -1) = -1)) THEN 'N/A' " .
+                                      "ELSE (CASE WHEN ((IFNULL(ufiInvitee.`IsRejected`, -1) = 0) OR (IFNULL(ufiInviter.`IsRejected`, -1) = 0)) THEN 'Pending' ELSE 'Rejected' END) " .
+                                      "END) "  . $orderByDirection;
+                break;
         }
         
         return $queryOrderByClause . " ";
@@ -1452,8 +1461,7 @@ class GamingHandler
         $userWhereClause .= "AND (u.`IsPremiumMember` = 1) ";
         
 	if(($forAvailableFriendList) || ((!$forAvailableFriendList) && (!$searchParms->ShowCurrentFriendsForUser))) {
-            $userWhereClause .= "AND (IFNULL(uf.`FK_User_ID_ThisUser`, -1) <> ?) ";
-            array_push($queryParms, $userID);
+            $userWhereClause .= "AND (uf.`FK_User_ID_ThisUser` IS NULL) ";
 	}
         else {
             $userWhereClause .= ("AND ((IFNULL(uf.`FK_User_ID_ThisUser`, -1) = ?) OR " . 
@@ -1729,12 +1737,12 @@ class GamingHandler
     {
 	$totalUserCnt = 0;
 		
-	$queryParms = [$userID, $userID];
+	$queryParms = [$userID, $userID, $userID];
 	$filterWhereClause = $this->BuildWhereClauseForFriendListQuery($userID, $queryParms, $searchParms, $forAvailableFriendList);
 		
         $getAvailableUserQuery = "SELECT COUNT(u.`ID`) AS Cnt " .
                                  "FROM `Security.Users` as u " .
-				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) " .
+				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) AND (uf.`FK_User_ID_ThisUser` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInviter ON (u.`ID` = ufiInviter.`FK_User_ID_Inviter`) AND (ufiInviter.`FK_User_ID_Invitee` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInvitee ON (u.`ID` = ufiInvitee.`FK_User_ID_Invitee`) AND (ufiInvitee.`FK_User_ID_Inviter` = ?) " .
                                  $filterWhereClause;
@@ -2018,128 +2026,178 @@ class GamingHandler
         return $joinedEventIDs;
     }
     
-    public function SendFriendInviteToUsers($dataAccess, $logger, $userID, $eventIds)
+    public function SendFriendInviteToUsers($dataAccess, $logger, $userID, $userIds)
     {
-        $addUsersToEventQuery = "INSERT INTO `Gaming.EventMembers` (`FK_Event_ID`,`FK_User_ID`) VALUES ";
+	// Remove any existing active invitations between current user and the current set of invitees
+        if(!$this->DeletePendingInvitationsBetweenUsers($dataAccess, $userID, $userIds)) {
+            $logger->LogError(sprintf("SendFriendInviteToUsers(): Could not remove active invitations for invitees [%s], inviter [%d]. %s", 
+                                        implode(',', $userIds), $userID, $dataAccess->CheckErrors()));
+            return 'SYSTEM ERROR: Could not send invitation to selected users. Please try again later.';
+        }
+		
+	// Insert current friend invitations
+        $sendInviteToUsersQuery = "INSERT INTO `Gaming.UserFriendInvitations` (`FK_User_ID_Invitee`,`FK_User_ID_Inviter`) VALUES ";
 		
         $valuesClauseFormat = "(%s, %s)";
-        $eventParmNameFormat = ":eventId%d";
-        $userParmNameFormat = ":FKUserId%d";
+        $inviteeParmNameFormat = ":userIdInvitee%d";
+        $inviterParmNameFormat = ":userIdInviter%d";
         $queryParms = [];
 
         // Build insert statement
-        for($i = 0; $i < count($joinedUsers); $i++) {
+        for($i = 0; $i < count($userIds); $i++) {
             $valuesClauseSuffix = ", ";
-            if($i === (count($joinedUsers) - 1)) {
+            if($i === (count($userIds) - 1)) {
                 $valuesClauseSuffix = ";";
             }
 
-            $eventParmName = sprintf($eventParmNameFormat, $i);
-            $userParmName = sprintf($userParmNameFormat, $i);
-            $addUsersToEventQuery .= (sprintf($valuesClauseFormat, $eventParmName, $userParmName) . $valuesClauseSuffix);
+            $inviteeParmName = sprintf($inviteeParmNameFormat, $i);
+            $inviterParmName = sprintf($inviterParmNameFormat, $i);
+            $sendInviteToUsersQuery .= (sprintf($valuesClauseFormat, $inviteeParmName, $inviterParmName) . $valuesClauseSuffix);
 
-            $parmEventId = new QueryParameter($eventParmName, $eventID, PDO::PARAM_INT);
-            $parmUserId = new QueryParameter($userParmName, $joinedUsers[$i], PDO::PARAM_INT);
-            array_push($queryParms, $parmEventId, $parmUserId);
+            $parmInviteeUserId = new QueryParameter($inviteeParmName, $userIds[$i], PDO::PARAM_INT);
+            $parmInviterUserId = new QueryParameter($inviterParmName, $userID, PDO::PARAM_INT);
+            array_push($queryParms, $parmInviteeUserId, $parmInviterUserId);
         }
 		
+	if($dataAccess->BuildQuery($sendInviteToUsersQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+	}
+			
 	$errors = $dataAccess->CheckErrors();
-	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($addUsersToEventQuery, $queryParms)){
-		$dataAccess->ExecuteNonQuery();
-            }
-				
-            $errors = $dataAccess->CheckErrors();
 
-            if(strlen($errors) == 0) {
-		return true;
-            }
+	if(strlen($errors) == 0) {
+            return 'SUCCESS: All selected users have been sent a friend invitation.';
 	}
 	
-        $logger->LogError("Could not add users to new event [ID = " . $eventID . "]. " . $errors);
-	return false;
+        $logger->LogError(sprintf("Could not send invite to user IDs [%s] for current user ID [%d]. %s", implode(',', $userIds), $userID, $errors));
+	return 'SYSTEM ERROR: Could not send invitation to selected users. Please try again later.';
     }
     
-    public function RemoveUsersFromFriendList($dataAccess, $logger, $userID, $eventIDs)
-    {		
-	$deleteSuccess = false;
-	$eventIdList = "";
-	$deleteEventQuery = "";
-	$errors = "";
-		
-	try {
-            if(is_array($eventIDs)) {
-		$eventIdList = implode(",", $eventIDs);
-		$eventIdListForQuery = (str_repeat("?,", count($eventIDs) - 1)) . "?";
-		$deleteEventQuery = "DELETE FROM `Gaming.Events` WHERE `ID` IN (" . $eventIdListForQuery . ");";
-            }
-            else {
-		$errors = "Error when preparing delete events query: event list is not an array";
-            }
-	}
-	catch(Exception $e) {
-            $errors = "Exception when preparing delete events query: " . $e->getMessage();
-	}
-			
-	if(strlen($errors) == 0) {
-            try {				
-		if($dataAccess->BuildQuery($deleteEventQuery)){
-                    $deleteSuccess = $dataAccess->ExecuteNonQueryWithPositionalParms($eventIDs);
-		}
-
-		$errors = $dataAccess->CheckErrors();
-            }
-            catch(Exception $e) {
-		$logger->LogError("Could not delete events (" . $eventIdList . "). Exception: " . $e->getMessage());
-            }
-	}
-			
-	if(!$deleteSuccess) {
-            $logger->LogError("Could not delete events (" . $eventIdList . "). " . $errors);
-	}
-				
-	return ($deleteSuccess === true) ? ("SUCCESS: Deleted requested events") : ("SYSTEM ERROR: Could not delete requested events. Please try again later.");
-    }
-    
-    public function AcceptUserFriendInvites($dataAccess, $logger, $userID, $eventIds)
+    public function RemoveUsersFromFriendList($dataAccess, $logger, $userID, $userIds)
     {
-        $addUsersToEventQuery = "INSERT INTO `Gaming.EventMembers` (`FK_Event_ID`,`FK_User_ID`) VALUES ";
+        // Reject any pending invitations from selected users
+        $userIdParamList = (str_repeat("?,", count($userIds) - 1)) . "?";
+	$queryParms = $userIds;
+	array_push($queryParms, $userID);
+        
+        $rejectPendingInvitesQuery = "UPDATE `Gaming.UserFriendInvitations` SET `IsRejected` = 1 " . 
+                                     "WHERE (`FK_User_ID_Inviter` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Invitee` = ?) AND (`IsRejected` = 0);";
+
+        if($dataAccess->BuildQuery($rejectPendingInvitesQuery)){
+            $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            // Remove any of the selected users who are currently friends of the logged-in user
+            $deleteQuery = "DELETE FROM `Gaming.UserFriends` WHERE " . 
+                           "((`FK_User_ID_Friend` IN (" . $userIdParamList . ")) AND (`FK_User_ID_ThisUser` = ?)) OR " .
+                           "((`FK_User_ID_ThisUser` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Friend` = ?));";
+
+            $queryParms = array_merge($queryParms, $userIds);
+            array_push($queryParms, $userID);
+            if($dataAccess->BuildQuery($deleteQuery)){
+                $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
+                
+                $errors = $dataAccess->CheckErrors();
+                if(strlen($errors) == 0) {
+                    return 'SUCCESS: Removed all selected users from friends list, including any pending invitations.';
+                }
+            }
+        }
+        
+        $logger->LogError(sprintf("RemoveUsersFromFriendList(): Could not reject invite from user IDs [%s] for current user ID [%d]. %s", 
+                                    implode(',', $userIds), $userID, $errors));
+        return 'SYSTEM ERROR: Could not reject invitations from selected users. Please try again later.';
+    }
+    
+    public function AcceptUserFriendInvites($dataAccess, $logger, $userID, $userIds)
+    {
+	// Wrap UserFriends insert and UserFriendInvitations update in transaction: both must succeed, or must roll back both
+	if(!$dataAccess->BeginTransaction()) {
+            $errors = "Could not begin transaction.";
+            $logger->LogError(sprintf("Could not accept invite from user IDs [%s] for current user ID [%d]. %s", implode(',', $userIds), $userID, $errors));
+            return 'SYSTEM ERROR: Could not accept invitations from selected users. Please try again later.';
+	}
+		
+        $acceptInviteFromUsersQuery = "INSERT INTO `Gaming.UserFriends` (`FK_User_ID_Friend`,`FK_User_ID_ThisUser`) VALUES ";
 		
         $valuesClauseFormat = "(%s, %s)";
-        $eventParmNameFormat = ":eventId%d";
-        $userParmNameFormat = ":FKUserId%d";
+        $friendParmNameFormat = ":userIdFriend%d";
+        $thisUserParmNameFormat = ":userIdThisUser%d";
         $queryParms = [];
+	$insertSuccess = false;
+        $deleteSuccess = false;
 
         // Build insert statement
-        for($i = 0; $i < count($joinedUsers); $i++) {
+        for($i = 0, $j = 0; $i < count($userIds); $i++, $j += 2) {
             $valuesClauseSuffix = ", ";
-            if($i === (count($joinedUsers) - 1)) {
+            if($i === (count($userIds) - 1)) {
                 $valuesClauseSuffix = ";";
             }
+            
+            // Add this user as current (logged-in) user's friend
+            $friendParmName = sprintf($friendParmNameFormat, $j);
+            $thisUserParmName = sprintf($thisUserParmNameFormat, $j);
+            $acceptInviteFromUsersQuery .= (sprintf($valuesClauseFormat, $friendParmName, $thisUserParmName) . ', ');
 
-            $eventParmName = sprintf($eventParmNameFormat, $i);
-            $userParmName = sprintf($userParmNameFormat, $i);
-            $addUsersToEventQuery .= (sprintf($valuesClauseFormat, $eventParmName, $userParmName) . $valuesClauseSuffix);
+            $parmFriendUserId = new QueryParameter($friendParmName, $userIds[$i], PDO::PARAM_INT);
+            $parmThisUserId = new QueryParameter($thisUserParmName, $userID, PDO::PARAM_INT);
+            array_push($queryParms, $parmFriendUserId, $parmThisUserId);
+            
+            // Add current (logged-in) user as this user's friend
+            $friendParmName = sprintf($friendParmNameFormat, ($j + 1));
+            $thisUserParmName = sprintf($thisUserParmNameFormat, ($j + 1));
+            $acceptInviteFromUsersQuery .= (sprintf($valuesClauseFormat, $friendParmName, $thisUserParmName) . $valuesClauseSuffix);
 
-            $parmEventId = new QueryParameter($eventParmName, $eventID, PDO::PARAM_INT);
-            $parmUserId = new QueryParameter($userParmName, $joinedUsers[$i], PDO::PARAM_INT);
-            array_push($queryParms, $parmEventId, $parmUserId);
+            $parmFriendUserId = new QueryParameter($friendParmName, $userID, PDO::PARAM_INT);
+            $parmThisUserId = new QueryParameter($thisUserParmName, $userIds[$i], PDO::PARAM_INT);
+            array_push($queryParms, $parmFriendUserId, $parmThisUserId);            
         }
 		
+	if($dataAccess->BuildQuery($acceptInviteFromUsersQuery, $queryParms)){
+            $insertSuccess = $dataAccess->ExecuteNonQuery();
+	}
+		
 	$errors = $dataAccess->CheckErrors();
-	if(strlen($errors) == 0) {
-            if($dataAccess->BuildQuery($addUsersToEventQuery, $queryParms)){
-		$dataAccess->ExecuteNonQuery();
-            }
-				
-            $errors = $dataAccess->CheckErrors();
+	if($insertSuccess && (strlen($errors) == 0)) {
+            // If friends successfully added to this user's friend list, remove pending invitations
+            $deleteSuccess = $this->DeletePendingInvitationsBetweenUsers($dataAccess, $userID, $userIds);
 
-            if(strlen($errors) == 0) {
-		return true;
+            if($deleteSuccess) {
+		if($dataAccess->CommitTransaction())  return "SUCCESS: Accepted friend invitations from all selected users";
+		else                                  $errors = "Could not commit transaction...rolling back";
             }
 	}
-	
-        $logger->LogError("Could not add users to new event [ID = " . $eventID . "]. " . $errors);
-	return false;
+		
+	if($dataAccess->CheckIfInTransaction())
+	{
+            $dataAccess->RollbackTransaction();
+	}
+		
+	$logger->LogError(sprintf("AcceptUserFriendInvites(): Could not accept invite from user IDs [%s] for current user ID [%d]. %s", 
+                                    implode(',', $userIds), $userID, $errors));
+	return 'SYSTEM ERROR: Could not accept invitations from selected users. Please try again later.';
+    }
+    
+    public function DeletePendingInvitationsBetweenUsers($dataAccess, $pivotUser, $selectedUsers)
+    {
+        $deleteSuccess = false;
+	$userIdParamList = (str_repeat("?,", count($selectedUsers) - 1)) . "?";
+	$deleteQuery = "DELETE FROM `Gaming.UserFriendInvitations` WHERE " . 
+                       "(((`FK_User_ID_Invitee` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Inviter` = ?)) OR " .
+                       "((`FK_User_ID_Inviter` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Invitee` = ?))) " .
+                       "AND (`IsRejected` = 0);";
+        
+	$queryParms = $selectedUsers;
+	array_push($queryParms, $pivotUser);
+        $queryParms = array_merge($queryParms, $selectedUsers);
+        array_push($queryParms, $pivotUser);
+		
+	if($dataAccess->BuildQuery($deleteQuery)){
+            $deleteSuccess = $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
+	}
+
+        return ($deleteSuccess && (strlen($dataAccess->CheckErrors()) == 0));
     }
 }
