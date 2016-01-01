@@ -521,34 +521,44 @@
                 echo $payPalMsgHandler->CancelSubscriptionForUser($dataAccess, $logger, $objUser->UserID);
                 break;
             case "GetFriendInviteAvailUsersForJTable":
-		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
-		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-		$paginationEnabled = ($startIndex === "-1") ? false : true;
+                $orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
+                $startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+                $pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+                $paginationEnabled = ($startIndex === "-1") ? false : true;
 
-                //$startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
-                //$existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
-                //$showJoinedEvents = in_array('showJoined', $evtStatusFilters);
-                //$showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);
+                $userName = isset($_POST['usernameFilter']) ? filter_var($_POST['usernameFilter'], FILTER_SANITIZE_STRING) : "";
+                $gamerTag = isset($_POST['gamerTagFilter']) ? filter_var($_POST['gamerTagFilter'], FILTER_SANITIZE_STRING) : "";
+                $firstName = isset($_POST['firstnameFilter']) ? filter_var($_POST['firstnameFilter'], FILTER_SANITIZE_STRING) : "";
+                $lastName = isset($_POST['lastnameFilter']) ? filter_var($_POST['lastnameFilter'], FILTER_SANITIZE_STRING) : "";
+                $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
+                $gender = isset($_POST['genderFilter']) ? filter_var($_POST['genderFilter'], FILTER_SANITIZE_STRING) : "";
 
-		$searchParms = new UserSearchParameters();
+		$searchParms = new UserSearchParameters($gamerTag, $userName, $firstName, $lastName, $platforms, $gender);
 
 		echo $gamingHandler->JTableAvailableUsersViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                     $pageSize, $searchParms);
                 break;
             case "GetCurrentFriendsListForJTable":
-		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
-		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-		$paginationEnabled = ($startIndex === "-1") ? false : true;
+                $orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
+                $startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+                $pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+                $paginationEnabled = ($startIndex === "-1") ? false : true;
 
-                //$startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
-                //$existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
-                //$showJoinedEvents = in_array('showJoined', $evtStatusFilters);
-                //$showUnjoinedEvents = in_array('showUnjoined', $evtStatusFilters);	
+                $userName = isset($_POST['usernameFilter']) ? filter_var($_POST['usernameFilter'], FILTER_SANITIZE_STRING) : "";
+                $gamerTag = isset($_POST['gamerTagFilter']) ? filter_var($_POST['gamerTagFilter'], FILTER_SANITIZE_STRING) : "";
+                $firstName = isset($_POST['firstnameFilter']) ? filter_var($_POST['firstnameFilter'], FILTER_SANITIZE_STRING) : "";
+                $lastName = isset($_POST['lastnameFilter']) ? filter_var($_POST['lastnameFilter'], FILTER_SANITIZE_STRING) : "";
+                $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
+                
+                $friendTypeFilters = (isset($_POST['friendTypes'])) ? ($_POST['friendTypes']) : [];
+                $showInvitationsToMe = in_array('showInvToMe', $friendTypeFilters);
+                $showInvitationsFromMe = in_array('showInvFromMe', $friendTypeFilters);
+                $showRejectedInvitations = in_array('showRejectedInv', $friendTypeFilters);
+                $showCurrentFriends = in_array('showCurFriends', $friendTypeFilters);
+                
+                $searchParms = new UserSearchParameters($gamerTag, $userName, $firstName, $lastName, $platforms, "", $showInvitationsToMe, 
+                                                        $showInvitationsFromMe, $showRejectedInvitations, $showCurrentFriends);
 
-		$searchParms = new UserSearchParameters();
-		$searchParms->ShowInvitesSentByUser = true;
 		echo $gamingHandler->JTableCurrentFriendsListViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                         $pageSize, $searchParms);
                 break;
@@ -573,6 +583,14 @@
             case "RemoveUsersFromFriendList":
                 echo $gamingHandler->RemoveUsersFromFriendList($dataAccess, $logger, $objUser->UserID, $_POST['userIds']);
                 break;
+            case "ShowUserProfileDetails":
+		$userId = '';
+		if(isset($_GET['userId'])) {
+                    $userId = filter_var(trim($_GET['userId']), FILTER_SANITIZE_STRING);
+		}
+
+		echo $securityHandler->ShowUserProfileDetails($dataAccess, $logger, $userId);
+		break;
         }
     }
     else {

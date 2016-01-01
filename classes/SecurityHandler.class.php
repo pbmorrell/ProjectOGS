@@ -93,6 +93,34 @@ class SecurityHandler
         return $userPlatforms;
     }
     
+    public function LoadUserPlatformNames($dataAccess, $logger, $userID)
+    {
+        $getUserPlatformsQuery = "SELECT p.`Name` FROM `Gaming.UserPlatforms` as upl " .
+                                 "INNER JOIN `Configuration.Platforms` as p ON p.`ID` = upl.`FK_Platform_ID` " .
+                                 "WHERE upl.`FK_User_ID` = :userID;";
+        
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+	$userPlatforms = array();
+        
+        if($dataAccess->BuildQuery($getUserPlatformsQuery, $queryParms)){
+            $results = $dataAccess->GetResultSet();
+
+            if($results != null){
+                foreach($results as $row) {
+                    array_push($userPlatforms, $row['Name']);
+                }
+            }
+        }
+        
+        $errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve user platforms. " . $errors);
+	}
+        
+        return $userPlatforms;
+    }
+    
     public function UserCanAccessThisPage($dataAccess, $logger, $pageName, $redirectPageOnFailure)
     {
         // Ensure user is logged in
@@ -733,5 +761,82 @@ class SecurityHandler
 	}
 				
 	return $count == 0;
+    }
+    
+    public function ShowUserProfileDetails($dataAccess, $logger, $userId)
+    {
+        $objUser = User::constructDefaultUser();
+
+        $getUserProfileDetailsQuery = "SELECT u.`UserName`, t.`Abbreviation`, u.`FirstName`, u.`LastName`, u.`Gender`, u.`Autobiography` " .
+                                      "FROM `Security.Users` as u " .
+                                      "INNER JOIN `Configuration.TimeZones` as t ON t.`ID` = u.`FK_Timezone_ID`" .
+                                      "WHERE (u.`ID` = :userId);";
+		
+	$parmUserId = new QueryParameter(':userId', $userId, PDO::PARAM_INT);
+	$queryParms = array($parmUserId);
+	
+        $success = false;
+        
+        if($dataAccess->BuildQuery($getUserProfileDetailsQuery, $queryParms)){
+            $results = $dataAccess->GetSingleResult();
+
+            if($results != null){
+                $userPlatforms = $this->LoadUserPlatformNames($dataAccess, $logger, $userId);
+
+                $objUser = new User($userId, -1, -1, $results['UserName'], 
+                                    $results['FirstName'], $results['LastName'], '', 1, 
+                                    $results['Gender'], '', $results['Autobiography'], $userPlatforms);
+                $success = true;
+            }
+        }
+        
+        if(!$success) {
+            $errors = $dataAccess->CheckErrors();
+            $logger->LogError("Could not retrieve user profile details for user ID '" . $userId . "'. " . $errors);
+        }
+        
+        // Format user platform name list as scrollable list
+        $platformList = "<ul>";
+        foreach($objUser->GamePlatforms as $platform) {
+            $platformList .= "<li><label>" . $platform . "</label></li>";
+        }
+        $platformList .= "</ul>";
+        
+	// Return User Profile Details HTML
+	return
+            '<article class="box style1">'.
+                '<div id="txnDetailsTable" class="detailsTable">' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Username:</div>' .
+                        '<div class="detailsTableCol">' . $objUser->UserName . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">First Name:</div>' .
+                        '<div class="detailsTableCol">' . $objUser->FirstName . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Last Name:</div>' .
+                        '<div class="detailsTableCol">' . $objUser->LastName . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Gender:</div>' .
+                        '<div class="detailsTableCol">' . ($objUser->Gender == 'M' ? 'Male' : 'Female') . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Time Zone:</div>' .
+                        '<div class="detailsTableCol">' . $results['Abbreviation'] . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Autobiography:</div>' .
+                        '<div class="detailsTableCol">' . $objUser->Autobiography . '</div>' .
+                    '</div>' .
+                    '<div class="detailsTableRow">' .
+                        '<div class="detailsTableCol">Platforms:</div>' .
+                        '<div class="detailsTableCol">' .
+                            '<div class="fixedHeightScrollableContainerNoBorder">' . $platformList . '</div>' .
+                        '</div>' .
+                    '</div>' .                
+                '</div>' .
+            '</article>';
     }
 }

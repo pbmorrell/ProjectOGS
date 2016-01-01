@@ -35,7 +35,7 @@ by => Stephen Giles and Paul Morrell
                     <div class="12u">
 			<div id="main">
                             <div class="row">
-				<div class="controlPanelSection">						
+				<div class="controlPanelSection">
                                     <!-- Content -->
                                     <div id="content">							
 					<section class="box ctaz">
@@ -43,24 +43,28 @@ by => Stephen Giles and Paul Morrell
                                                 <h2>Control Panel</h2>
 						<ul class="style3 contact">
                                                     <li class="icon fa-calendar">
-							<a href="#" onclick="return DisplayCreateEventDialog();" style="text-decoration:none;">Schedule Event</a>
+							<a href="#" onclick="return DisplayCreateEventDialog();" 
+                                                           style="text-decoration:none;font-weight:bold;">Schedule Event</a>
                                                     </li>
                                                     <li class="icon fa-gamepad">
-							<a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer, 0);" style="text-decoration:none;">Manage Your Events</a>
+							<a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer);" 
+                                                           style="text-decoration:none;font-weight:bold;">Manage Your Events</a>
                                                     </li>
                                                     <li class="icon fa-flask">
-							<a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed, 0);" style="text-decoration:none;">See Event Feed</a>
+							<a href="#currentEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.CurrentEventFeed);" 
+                                                           style="text-decoration:none;font-weight:bold;">See Event Feed</a>
                                                     </li>
                                                     <li class="icon fa-bullseye">
-							<a id="searchFilterLink" href="#" style="text-decoration:none;">Filter Events</a>
+							<a id="searchFilterLink" href="#" style="text-decoration:none;font-weight:bold;">Filter Events</a>
                                                     </li>
                                                     <?php if($objUser->IsPremiumMember): ?>
                                                         <li class="icon fa-cogs">
-                                                            <a id="manageAccountLink" href="AccountManagement.php" style="text-decoration:none;">Manage Your Account</a>
+                                                            <a id="manageAccountLink" href="AccountManagement.php" 
+                                                               style="text-decoration:none;font-weight:bold;">Manage Your Account</a>
                                                         </li>
                                                     <?php endif; ?>
-                                                    <div id="modalOverlay" class='overlayPanelModalBackground'></div>
-                                                    <div id="searchPanel" class="overlayPanel overlayPanelCurEvts">
+                                                    <div id="modalOverlay" class="overlayPanelModalBackground"></div>
+                                                    <div id="searchPanel" class="overlayPanel overlayPanelOrangeBackground">
                                                         <form name="searchForm" method="POST" action="">
                                                             <div class="overlayPanelFixedHeightScrollableContainer">
 								<?php if($objUser->IsPremiumMember): ?>
@@ -169,7 +173,7 @@ by => Stephen Giles and Paul Morrell
                                                                     </div>
                                                                 </div>
                                                                 <div id="gameTitleFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
-                                                                    <div id="gameTitleFilterStart" class="overlayPanelFilterSubGroup">
+                                                                    <div class="overlayPanelFilterSubGroup">
 									<?php if($objUser->IsPremiumMember): ?>
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Game Titles:</label><br />
@@ -199,7 +203,7 @@ by => Stephen Giles and Paul Morrell
                                                                     </div>
                                                                 </div>
                                                                 <div id="eventCreatorFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter">
-                                                                    <div id="eventCreatorFilterStart" class="overlayPanelFilterSubGroup">
+                                                                    <div class="overlayPanelFilterSubGroup">
 									<?php if($objUser->IsPremiumMember): ?>
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Users:</label><br />
@@ -229,7 +233,7 @@ by => Stephen Giles and Paul Morrell
                                                                     </div>
                                                                 </div>
                                                                 <div id="joinedUserFilterDiv" class="overlayPanelFilterGroup searchPanelEvtMgrFilter searchPanelCurEvtsFilter">
-                                                                    <div id="joinedUserFilterStart" class="overlayPanelFilterSubGroup">
+                                                                    <div class="overlayPanelFilterSubGroup">
 									<?php if($objUser->IsPremiumMember): ?>
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Users:</label><br />
@@ -253,13 +257,13 @@ by => Stephen Giles and Paul Morrell
                                                                            onclick="return ToggleSearchDivDisplay('#platformFilterDiv', this);">&nbsp;&nbsp;Console Type</a>
                                                                     </div>
                                                                     <div class="overlayPanelToggleChkboxWrap">
-                                                                        <input id="gameTitleFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
+                                                                        <input id="platformFilterActiveToggle" class="overlayPanelToggleActiveChk" linkId="platformFilterLink" 
                                                                                groupId="platformFilterDiv" lblId="platformFilterActiveToggleLabel" type="checkbox">
                                                                         <label id="platformFilterActiveToggleLabel" class="overlayPanelToggleActiveLbl">Activate Filter</label>
                                                                     </div>
                                                                 </div>
                                                                 <div id="platformFilterDiv" class="overlayPanelFilterGroup searchPanelCurEvtsFilter searchPanelEvtMgrFilter">
-                                                                    <div id="platformFilterStart" class="overlayPanelFilterSubGroup">
+                                                                    <div class="overlayPanelFilterSubGroup">
 									<?php if($objUser->IsPremiumMember): ?>
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Consoles:</label><br />
@@ -279,7 +283,7 @@ by => Stephen Giles and Paul Morrell
                                                                 </div>
                                                                 <br />
                                                                 <div id="joinStatusFilterDiv" class="overlayPanelFilterGroup overlayPanelGroupBorder">
-                                                                    <div id="joinStatusFilterStart" class="overlayPanelFilterSubGroup">
+                                                                    <div class="overlayPanelFilterSubGroup">
                                                                         <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
                                                                             <div><label class="overlayPanelLabel">Show My Joined Events</label></div>
                                                                             <div><input type="checkbox" id="evtStatusJoined" name="evtStatus[]" 
@@ -318,7 +322,7 @@ by => Stephen Giles and Paul Morrell
                                                     </div>
 						</ul>
                                             </section>
-					</section>				
+					</section>
                                     </div>
 				</div>
 				<div id="currentEventsDiv" class="9u jTableContainer">
@@ -331,19 +335,19 @@ by => Stephen Giles and Paul Morrell
 				</div>
 				<div id="manageEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
-                                    <h2>Manage Your Events</h2>
-                                    <div id="mobileEvtMgrToolbar" class="mobileButtonToolbarContainer">
-                                        <button type="button" class="memberHomeBtn" id="btnMobileRefresh">Refresh
-                                            <br /><img src="images/refresh.png" /></button>
-					<button type="button" class="memberHomeBtn" id="btnMobileActivate">Activate
-                                            <br /><img src="images/activate.png" /></button>
-					<button type="button" class="memberHomeBtn" id="btnMobileHide">Hide
-                                            <br /><img src="images/deactivate.png" /></button>
-					<button type="button" class="memberHomeBtn" id="btnMobileDelete">Delete
-                                            <br /><img src="images/delete.png" /></button>
-                                    </div>
-                                    <div id="manageEventsContent">
-                                    </div>
+                                        <h2>Manage Your Events</h2>
+                                        <div id="mobileEvtMgrToolbar" class="mobileButtonToolbarContainer">
+                                            <button type="button" class="memberHomeBtn" id="btnMobileRefresh">Refresh
+                                                <br /><img src="images/refresh.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileActivate">Activate
+                                                <br /><img src="images/activate.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileHide">Hide
+                                                <br /><img src="images/deactivate.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileDelete">Delete
+                                                <br /><img src="images/delete.png" /></button>
+                                        </div>
+                                        <div id="manageEventsContent">
+                                        </div>
                                     </section>
 				</div>
                             </div>

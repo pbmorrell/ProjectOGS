@@ -101,8 +101,7 @@
         width: 95% !important;
         height: 8%;
         float: left;
-        margin-left: 2%;
-        margin-right: 2%;
+        margin: 2%;
     }
     
     .overlayPanelControlElement {

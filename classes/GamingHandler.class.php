@@ -102,7 +102,7 @@ class GamingHandler
 	$orderByClause = "ORDER BY " . $this->TranslateOrderByToUserQueryOrderByClause($orderBy);
 	$filterWhereClause = $this->BuildWhereClauseForFriendListQuery($userID, $queryParms, $searchParms, $forAvailableFriendList);
 		
-        $getAvailableUserQuery = "SELECT u.`ID` as UserID, u.`FirstName`, u.`LastName`, u.`UserName`, u.`Gender`, " . 
+        $getAvailableUserQuery = "SELECT DISTINCT u.`ID` as UserID, u.`FirstName`, u.`LastName`, u.`UserName`, u.`Gender`, " . 
 				 "(CASE WHEN ufiInvitee.`ID` IS NOT NULL THEN 'Yes' ELSE 'No' END) as InviteFromMe, (CASE WHEN ufiInviter.`ID` IS NOT NULL THEN 'Yes' ELSE 'No' END) as InviteToMe, " .
 				 "(CASE WHEN ufiInvitee.`ID` IS NOT NULL THEN ufiInvitee.`FK_User_ID_Invitee` ELSE -1 END) as InviteeID, " .
 				 "(CASE WHEN ufiInviter.`ID` IS NOT NULL THEN ufiInviter.`FK_User_ID_Inviter` ELSE -1 END) as InviterID, " .
@@ -115,7 +115,7 @@ class GamingHandler
                                  $filterWhereClause . $orderByClause . $limitClause;
         
 	$userFriends = array();
-        
+        $logger->LogInfo("LoadFriendListQuery (forAvailableFriendList = " . $forAvailableFriendList . "): Query = " . $getAvailableUserQuery);
         if($dataAccess->BuildQuery($getAvailableUserQuery)) {
             $results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
 
@@ -633,6 +633,7 @@ class GamingHandler
                 "ID" => $game->EventID,
 		"TotalGamesToJoinCount" => $totalGameCntNotJoined,
 		"UserName" => $game->EventCreatorUserName,
+                "UserID" => $game->EventCreatorUserID,
                 "GameTitle" => $game->Name,
                 "Platform" => $game->SelectedPlatformText,
                 "DisplayDate" => $game->ScheduledDate,
@@ -1453,16 +1454,21 @@ class GamingHandler
     public function BuildWhereClauseForFriendListQuery($userID, &$queryParms, $searchParms = null, $forAvailableFriendList = true)
     {
 	// Want to exclude current user from displayed user list, no matter what
+        $userLeftJoinClause = "";
         $userWhereClause = "WHERE (u.`ID` <> ?) ";
 	array_push($queryParms, $userID);
 		
 	// Only show premium members: basic members are not allowed to have a friends list, or to be on someone else's friend list
         $userWhereClause .= "AND (u.`IsPremiumMember` = 1) ";
         
-	if(($forAvailableFriendList) || ((!$forAvailableFriendList) && (!$searchParms->ShowCurrentFriendsForUser))) {
+	if($forAvailableFriendList) {
             $userWhereClause .= "AND (uf.`FK_User_ID_ThisUser` IS NULL) ";
 	}
         else {
+            if (!$searchParms->ShowCurrentFriendsForUser) {
+		$userWhereClause .= "AND (uf.`FK_User_ID_ThisUser` IS NULL) ";
+            }
+			
             $userWhereClause .= ("AND ((IFNULL(uf.`FK_User_ID_ThisUser`, -1) = ?) OR " . 
                                 "(ufiInviter.`FK_User_ID_Invitee` IS NOT NULL) OR (ufiInvitee.`FK_User_ID_Inviter` IS NOT NULL)) ");
             array_push($queryParms, $userID);
@@ -1473,9 +1479,15 @@ class GamingHandler
             if(!$searchParms->ShowInvitesForUser) {
 		$userWhereClause .= "AND (ufiInviter.`FK_User_ID_Invitee` IS NULL) ";
             }
-		
+            else if(!$searchParms->ShowRejectedInvites) {
+                $userWhereClause .= "AND ((IFNULL(ufiInviter.`IsRejected`, 0)) = 0) ";
+            }
+            
             if(!$searchParms->ShowInvitesSentByUser) {
 		$userWhereClause .= "AND (ufiInvitee.`FK_User_ID_Inviter` IS NULL) ";
+            }
+            else if(!$searchParms->ShowRejectedInvites) {
+                $userWhereClause .= "AND ((IFNULL(ufiInvitee.`IsRejected`, 0)) = 0) ";
             }
 	}
 	else {
@@ -1484,16 +1496,45 @@ class GamingHandler
 	}
         
 	// Filter by users who have the specified platforms on their profile
-        // Filter on platforms, if any
         if((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0)) {
+            $userLeftJoinClause .= "LEFT JOIN `Gaming.UserPlatforms` AS upl ON upl.`FK_User_ID` = u.`ID` ";
             $platformListForQuery = (str_repeat("?,", count($searchParms->Platforms) - 1)) . "?";
-            $userWhereClause .= "AND ((p.`ID` IN (" . $platformListForQuery . ")) ";
+            $userWhereClause .= "AND ((IFNULL(upl.`FK_Platform_ID`, -1)) IN (" . $platformListForQuery . ")) ";
             $queryParms = array_merge($queryParms, $searchParms->Platforms);
         }
         
+        // Filter by users who have the specified text in their username
+        if(strlen($searchParms->UserName) > 0) {
+            $userWhereClause .= "AND (u.`UserName` LIKE ?) ";
+            array_push($queryParms, "%" . $searchParms->UserName . "%");
+        }
         
+        // Filter by users who have the specified text in their first name
+        if(strlen($searchParms->FirstName) > 0) {
+            $userWhereClause .= "AND (u.`FirstName` LIKE ?) ";
+            array_push($queryParms, "%" . $searchParms->FirstName . "%");
+        }
+
+        // Filter by users who have the specified text in their last name
+        if(strlen($searchParms->LastName) > 0) {
+            $userWhereClause .= "AND (u.`LastName` LIKE ?) ";
+            array_push($queryParms, "%" . $searchParms->LastName . "%");
+        }
+        
+        // Filter by users who have the specified text in at least one of their gamer tags
+        if(strlen($searchParms->GamerTag) > 0) {
+            $userLeftJoinClause .= "LEFT JOIN `Gaming.UserGamerTags` AS ugt ON ugt.`FK_User_ID` = u.`ID` ";
+            $userWhereClause .= "AND (ugt.`GamerTagName` LIKE ?) ";
+            array_push($queryParms, "%" . $searchParms->GamerTag . "%");
+        }
+        
+        // Filter by users who have the specified gender
+        if(strlen($searchParms->Gender) > 0) {
+            $userWhereClause .= "AND (u.`Gender` = ?) ";
+            array_push($queryParms, $searchParms->Gender);
+        }
 		
-        return $userWhereClause;
+        return ($userLeftJoinClause . $userWhereClause);
     }
     
     public function BuildWhereClauseForScheduledGameQuery($userID, &$queryParms, $eventId = -1, $excludeEventsForUser = false, 
@@ -1659,7 +1700,7 @@ class GamingHandler
         $getUserGamesQuery = "SELECT e.`ID`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle, COALESCE(tz.`Abbreviation`, tz.`Description`) AS TimeZone, " .
                              "e.`EventScheduledForDate`, e.`DisplayDate`, e.`DisplayTime`, e.`RequiredMemberCount`, p.`Name` AS Platform, e.`Notes`, " . 
                              "e.`FK_Game_ID` AS GameID, tz.`ID` AS TimezoneID, p.`ID` AS PlatformID, e.`IsActive`, " .
-                             "u.`UserName` AS EventCreatorUserName, ".
+                             "u.`UserName` AS EventCreatorUserName, u.`ID` AS EventCreatorUserID, ".
                              "(CASE WHEN em2.`ID` IS NULL THEN 0 ELSE 1 END) AS thisUserIsJoined " .
                              "FROM `Gaming.Events` AS e ".
                              "INNER JOIN `Configuration.TimeZones` AS tz ON tz.`ID` = e.`FK_Timezone_ID` ".
@@ -1696,7 +1737,8 @@ class GamingHandler
 
                         $userGame = Game::ConstructGameForEvent($row['GameID'], $row['DisplayDate'], $displayTime, $row['RequiredMemberCount'], $row['Notes'], $eventAllowedFriends, 
                                                                 false, $row['TimezoneID'], $row['PlatformID'], $row['GameTitle'], $row['EventScheduledForDate'], $row['Platform'], 
-                                                                $row['TimeZone'], $row['ID'], $row['IsActive'] == '1' ? true : false, $row['EventCreatorUserName']);
+                                                                $row['TimeZone'], $row['ID'], $row['IsActive'] == '1' ? true : false, $row['EventCreatorUserName'],
+                                                                $row['EventCreatorUserID']);
                         $userGame->EventMembers = $evtMembers;
                         $this->SetEventJoinStatus($userGame, $evtMembers, $row['RequiredMemberCount'], $row['thisUserIsJoined'], $row['EventScheduledForDate']);
                         array_push($userGames, $userGame);
@@ -1739,7 +1781,7 @@ class GamingHandler
 	$queryParms = [$userID, $userID, $userID];
 	$filterWhereClause = $this->BuildWhereClauseForFriendListQuery($userID, $queryParms, $searchParms, $forAvailableFriendList);
 		
-        $getAvailableUserQuery = "SELECT COUNT(u.`ID`) AS Cnt " .
+        $getAvailableUserQuery = "SELECT COUNT(DISTINCT u.`ID`) AS Cnt " .
                                  "FROM `Security.Users` as u " .
 				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) AND (uf.`FK_User_ID_ThisUser` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInviter ON (u.`ID` = ufiInviter.`FK_User_ID_Inviter`) AND (ufiInviter.`FK_User_ID_Invitee` = ?) " .
@@ -2028,47 +2070,44 @@ class GamingHandler
     public function SendFriendInviteToUsers($dataAccess, $logger, $userID, $userIds)
     {
 	// Remove any existing invitations between current user and the current set of invitees
-        if(!$this->DeleteInvitationsBetweenUsers($dataAccess, $userID, $userIds)) {
-            $logger->LogError(sprintf("SendFriendInviteToUsers(): Could not remove invitations for invitees [%s], inviter [%d]. %s", 
-                                        implode(',', $userIds), $userID, $dataAccess->CheckErrors()));
-            return 'SYSTEM ERROR: Could not send invitation to selected users. Please try again later.';
-        }
-		
-	// Insert current friend invitations
-        $sendInviteToUsersQuery = "INSERT INTO `Gaming.UserFriendInvitations` (`FK_User_ID_Invitee`,`FK_User_ID_Inviter`) VALUES ";
-		
-        $valuesClauseFormat = "(%s, %s)";
-        $inviteeParmNameFormat = ":userIdInvitee%d";
-        $inviterParmNameFormat = ":userIdInviter%d";
-        $queryParms = [];
+        if($this->DeleteInvitationsBetweenUsers($dataAccess, $userID, $userIds)) {
+            // Insert current friend invitations
+            $sendInviteToUsersQuery = "INSERT INTO `Gaming.UserFriendInvitations` (`FK_User_ID_Invitee`,`FK_User_ID_Inviter`) VALUES ";
 
-        // Build insert statement
-        for($i = 0; $i < count($userIds); $i++) {
-            $valuesClauseSuffix = ", ";
-            if($i === (count($userIds) - 1)) {
-                $valuesClauseSuffix = ";";
+            $valuesClauseFormat = "(%s, %s)";
+            $inviteeParmNameFormat = ":userIdInvitee%d";
+            $inviterParmNameFormat = ":userIdInviter%d";
+            $queryParms = [];
+
+            // Build insert statement
+            for($i = 0; $i < count($userIds); $i++) {
+                $valuesClauseSuffix = ", ";
+                if($i === (count($userIds) - 1)) {
+                    $valuesClauseSuffix = ";";
+                }
+
+                $inviteeParmName = sprintf($inviteeParmNameFormat, $i);
+                $inviterParmName = sprintf($inviterParmNameFormat, $i);
+                $sendInviteToUsersQuery .= (sprintf($valuesClauseFormat, $inviteeParmName, $inviterParmName) . $valuesClauseSuffix);
+
+                $parmInviteeUserId = new QueryParameter($inviteeParmName, $userIds[$i], PDO::PARAM_INT);
+                $parmInviterUserId = new QueryParameter($inviterParmName, $userID, PDO::PARAM_INT);
+                array_push($queryParms, $parmInviteeUserId, $parmInviterUserId);
             }
 
-            $inviteeParmName = sprintf($inviteeParmNameFormat, $i);
-            $inviterParmName = sprintf($inviterParmNameFormat, $i);
-            $sendInviteToUsersQuery .= (sprintf($valuesClauseFormat, $inviteeParmName, $inviterParmName) . $valuesClauseSuffix);
+            if($dataAccess->BuildQuery($sendInviteToUsersQuery, $queryParms)){
+                $dataAccess->ExecuteNonQuery();
+            }
 
-            $parmInviteeUserId = new QueryParameter($inviteeParmName, $userIds[$i], PDO::PARAM_INT);
-            $parmInviterUserId = new QueryParameter($inviterParmName, $userID, PDO::PARAM_INT);
-            array_push($queryParms, $parmInviteeUserId, $parmInviterUserId);
+            $errors = $dataAccess->CheckErrors();
+
+            if(strlen($errors) == 0) {
+                return 'SUCCESS: All selected users have been sent a friend invitation.';
+            }
         }
-		
-	if($dataAccess->BuildQuery($sendInviteToUsersQuery, $queryParms)){
-            $dataAccess->ExecuteNonQuery();
-	}
-			
-	$errors = $dataAccess->CheckErrors();
-
-	if(strlen($errors) == 0) {
-            return 'SUCCESS: All selected users have been sent a friend invitation.';
-	}
 	
-        $logger->LogError(sprintf("Could not send invite to user IDs [%s] for current user ID [%d]. %s", implode(',', $userIds), $userID, $errors));
+        $logger->LogError(sprintf("SendFriendInviteToUsers(): Could not send invite to user IDs [%s] for current user ID [%d]. %s", 
+                                    implode(',', $userIds), $userID, $errors));
 	return 'SYSTEM ERROR: Could not send invitation to selected users. Please try again later.';
     }
     
@@ -2085,22 +2124,33 @@ class GamingHandler
         if($dataAccess->BuildQuery($rejectPendingInvitesQuery)){
             $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
         }
-
+        
+        // Cancel any pending invitations to selected users from current user
         $errors = $dataAccess->CheckErrors();
-        if(strlen($errors) == 0) {
-            // Remove any of the selected users who are currently friends of the logged-in user
-            $deleteQuery = "DELETE FROM `Gaming.UserFriends` WHERE " . 
-                           "((`FK_User_ID_Friend` IN (" . $userIdParamList . ")) AND (`FK_User_ID_ThisUser` = ?)) OR " .
-                           "((`FK_User_ID_ThisUser` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Friend` = ?));";
+        if(strlen($errors) == 0) {        
+            $deleteQuery = "DELETE FROM `Gaming.UserFriendInvitations` WHERE " . 
+                           "(`FK_User_ID_Invitee` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Inviter` = ?) AND (`IsRejected` = 0);";
 
-            $queryParms = array_merge($queryParms, $userIds);
-            array_push($queryParms, $userID);
             if($dataAccess->BuildQuery($deleteQuery)){
                 $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
-                
+
+                // Remove any of the selected users who are currently friends of the logged-in user
                 $errors = $dataAccess->CheckErrors();
                 if(strlen($errors) == 0) {
-                    return 'SUCCESS: Removed all selected users from friends list, including any pending invitations.';
+                    $deleteQuery = "DELETE FROM `Gaming.UserFriends` WHERE " . 
+                                   "((`FK_User_ID_Friend` IN (" . $userIdParamList . ")) AND (`FK_User_ID_ThisUser` = ?)) OR " .
+                                   "((`FK_User_ID_ThisUser` IN (" . $userIdParamList . ")) AND (`FK_User_ID_Friend` = ?));";
+
+                    $queryParms = array_merge($queryParms, $userIds);
+                    array_push($queryParms, $userID);
+                    if($dataAccess->BuildQuery($deleteQuery)){
+                        $dataAccess->ExecuteNonQueryWithPositionalParms($queryParms);
+
+                        $errors = $dataAccess->CheckErrors();
+                        if(strlen($errors) == 0) {
+                            return 'SUCCESS: Removed all selected users from friends list, including any pending invitations.';
+                        }
+                    }
                 }
             }
         }

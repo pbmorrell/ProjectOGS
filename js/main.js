@@ -634,3 +634,24 @@ function DonateOnClick()
 	
     return true;
 }
+
+function OpenUserDetailsPopup(userId, userName)
+{
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 475;
+    
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
+    
+    displayJQueryDialog("dlgUserNameDetails" + userId, "USER PROFILE: " + userName, "top", displayContainerPosition, window, false, false, 
+                        "AJAXHandler.php?action=ShowUserProfileDetails&userId=" + userId, function() {}, dlgWidth, dlgHeight);
+}

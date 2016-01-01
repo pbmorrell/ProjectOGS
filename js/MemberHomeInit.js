@@ -614,7 +614,17 @@ function LoadCurrentEventViewer()
             UserName: {
                 title: 'User',
                 width: '8%',
-                sorting: true				
+                sorting: true,
+                display: function (data) {
+                    var $userNameDetailsPopupLink = $('<a href="#" class="actionLink" id="unDetailsLink' + data.record.ID + '">' + data.record.UserName + '</a>');
+                    $userNameDetailsPopupLink.click(function () {
+                        OpenUserDetailsPopup(data.record.UserID, data.record.UserName);
+                        return false;
+                    });
+                    
+                    // Return link for display in jTable
+                    return $userNameDetailsPopupLink;
+                }
             },
             GameTitle: {
                 title: 'Game',
@@ -1183,7 +1193,17 @@ function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
                 PlayerName: {
                     title: 'Player Name',
                     width: '55%',
-                    sorting: true
+                    sorting: true,
+                    display: function (data) {
+                        var $userNameDetailsPopupLink = $('<a href="#" class="actionLink" id="unDetailsLink' + data.record.ID + '">' + data.record.PlayerName + '</a>');
+                        $userNameDetailsPopupLink.click(function () {
+                            OpenUserDetailsPopup(data.record.UserID, data.record.PlayerName);
+                            return false;
+                        });
+
+                        // Return link for display in jTable
+                        return $userNameDetailsPopupLink;
+                    }
                 },
                 GamerTags: {
                     title: 'View Gamer Tags',
@@ -1708,7 +1728,7 @@ function DisplaySearchFiltersByCurrentView()
     
     if(activePanel === panelEnum.CurrentEventFeed) {
 	// Change search panel style to reflect current view
-	$('#searchPanel').removeClass('overlayPanelEvtMgr').addClass('overlayPanelCurEvts');
+	$('#searchPanel').removeClass('overlayPanelGreenBackground').addClass('overlayPanelOrangeBackground');
 			
 	// Hide any search filters that are not associated with this particular view
 	$exclusivelyEvtMgrFilters.hide();
@@ -1720,7 +1740,7 @@ function DisplaySearchFiltersByCurrentView()
     }
     else {
 	// Change search panel style to reflect current view
-	$('#searchPanel').removeClass('overlayPanelCurEvts').addClass('overlayPanelEvtMgr');
+	$('#searchPanel').removeClass('overlayPanelOrangeBackground').addClass('overlayPanelGreenBackground');
 				
 	// Hide any search filter fields that are not associated with this particular view
 	$exclusivelyCurEvtFilters.hide();

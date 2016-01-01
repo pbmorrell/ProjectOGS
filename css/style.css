@@ -648,11 +648,11 @@
 	z-index: 100001;
     }
 
-    .overlayPanelEvtMgr {
+    .overlayPanelGreenBackground {
 	background-color:#84c9b6;
     }
 
-    .overlayPanelCurEvts {
+    .overlayPanelOrangeBackground {
 	background-color:#cf9c30;
     }
     
@@ -758,16 +758,14 @@
         width: 25% !important;
         height: 8%;
         float: left;
-        margin-left: 2%;
-        margin-right: 2%;
+        margin: 2%;
     }
 
     .overlayPanelElementContainerCheckboxListSiblingWide {
         width: 95% !important;
         height: 8%;
         float: left;
-        margin-left: 2%;
-        margin-right: 2%;
+        margin: 2%;
     }
 
     .overlayPanelElement {
@@ -818,10 +816,20 @@
 
     .searchPanelCurEvtsFilter {}
     .searchPanelEvtMgrFilter {}
+    .searchPanelAvailUsersFilter {}
+    .searchPanelCurFriendsFilter {}
     .filterFieldActive {}
     
     .fixedHeightScrollableContainer  {
         border:2px solid #ccc;
+        box-sizing: border-box;
+        padding: 0.5em;
+        width: 300px;
+        height: 100px;
+        overflow-y: auto;
+    }
+    
+    .fixedHeightScrollableContainerNoBorder  {
         box-sizing: border-box;
         padding: 0.5em;
         width: 300px;
