@@ -160,12 +160,28 @@ function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, 
 {
     HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition);
     HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass);
+    
+    if((curWidthClass == "desktop") && (curHeightClass == "desktop")) {
+        // Adjust padding for filter div to account for Skel's removal of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "2%");
+        
+        // Show search panel button div toggle icon
+        $('.overlayPanelControlElementGroup').children('button').show();
+        $('.swipeHoverIconContainer').hide();
+    }
+    else {           
+        // Adjust padding for filter div to account for Skel's addition of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "8%");
+        
+        // Show search panel button div toggle icon
+        $('.swipeHoverIconContainer').show();
+    }
 }
 
 function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition)
 {
     var isWidthTransition = false;
-    var searchPanelWidth = Math.round(curWindowWidth * 0.5);
+    var searchPanelWidth = Math.round(curWindowWidth * 0.65);
     
     // Begin logic flow for viewport width changes that result in a class change
     if(((lastWidthClass == 'desktop')  || initTransition) && ((curWidthClass == 'mobile') || (curWidthClass == 'xtraSmall'))) {
@@ -181,20 +197,10 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         // Adjust width of search panel
         if(curWidthClass == 'mobile')  searchPanelWidth = Math.round(curWindowWidth * 0.8);
         else                           searchPanelWidth = Math.round(curWindowWidth * 0.95);
-
-        // Adjust padding for filter div to account for Skel's addition of mobile header/toolbar
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "10%");
-        
-        // Show search panel button div toggle icon
-        $('.swipeHoverIconContainer').show();
         
         // Change text of toggle checkboxes to be shorter, for mobile view
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate Filter" }).text('Activate');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
-		
-	// Hide event manager mobile control panel if mobile view, or show it if in xtraSmall view
-	//if(curWidthClass == 'mobile') 		$('.mobileButtonToolbarContainer').hide();
-	//else if(curWidthClass == 'xtraSmall')   $('.mobileButtonToolbarContainer').show();
         
         // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
         if(!initTransition) {
@@ -214,19 +220,9 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
             $('#' + gamerTagViewerDlg).dialog('option', 'width', (curWindowWidth < 600) ? (curWindowWidth - 25) : 600);
         }
         
-        // Adjust padding for filter div to account for Skel's removal of mobile header/toolbar
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "2%");
-        
-        // Show search panel button div toggle icon
-        $('.overlayPanelControlElementGroup').children('button').show();
-        $('.swipeHoverIconContainer').hide();
-        
         // Change text of toggle checkboxes to full version, for desktop view
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate" }).text('Activate Filter');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
-		
-	// Hide event manager mobile control panel
-	//$('.mobileButtonToolbarContainer').hide();
 
         // Restore hidden or combined columns
         if(!initTransition) {
@@ -262,6 +258,10 @@ function HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass
 {
     // Do required adjustments for viewport height changes that don't result in a class change
     var filterDivHeightPct = 0.9;
+    if(curHeightClass != "desktop") {
+        filterDivHeightPct = 0.7;
+    }
+    
     var filterDivHeight = filterDivHeightPct * curWindowHeight;
     $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
     
@@ -357,8 +357,25 @@ function FormatCurFriendsTableForCurrentView(isMobile, curWidthClass)
 	// Temporarily remove fixed-width scrollable container, to allow for column combination to work properly in all cases
 	$(manageFriendsListJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
 		
-        // Hide First Name & Last Name columns, and reveal "Name" column (containing 'firstName lastName')
+        // Reveal "Full Name" column (containing 'firstName lastName')
+        $('.' + hiddenClass).removeClass(hiddenClass);
+                
+        // Hide First Name & Last Name columns
+        var firstNameColHdr = $(manageFriendsListJTableDiv + ' th:contains("First")');
+        var lastNameColHdr = $(manageFriendsListJTableDiv + ' th:contains("Last")');
         
+        var firstNameColIdx = $(firstNameColHdr).index();
+        var lastNameColIdx = $(lastNameColHdr).index();
+        
+        $(firstNameColHdr).addClass(hiddenClass);
+        $(lastNameColHdr).addClass(hiddenClass);
+                
+	$(manageFriendsListJTableDiv).children('.jtable-main-container').children('.jtable').children('tbody').children('tr').each(function() {
+            var firstNameCol = $(this).children('td').eq(firstNameColIdx);
+            var lastNameCol = $(this).children('td').eq(lastNameColIdx);
+            $(firstNameCol).addClass(hiddenClass);
+            $(lastNameCol).addClass(hiddenClass);
+        });
         
         // Change table header/toolbar to be more mobile-friendly		
         if(curWidthClass == 'mobile') {
@@ -392,16 +409,10 @@ function FormatCurFriendsTableForCurrentView(isMobile, curWidthClass)
         }
     }
     else {        
-        // Reveal First Name & Last Name columns again, and hide combined Name column
-        
-
         // Change table header and toolbar text to full-length versions
         $(manageFriendsListJTableDiv + ' .jtable-title-text').text('Current Friends');
         $(manageFriendsListJTableDiv + ' .jtable-toolbar-item-text:contains("Accept")').text('Accept Selected');
         $(manageFriendsListJTableDiv + ' .jtable-toolbar-item-text:contains("Remove")').text('Remove Selected');
-        
-        // Show hidden columns
-        $('.' + hiddenClass).removeClass(hiddenClass);
         
         // Display page size change area
         $(manageFriendsListJTableDiv + ' .jtable-page-size-change').show();
@@ -414,6 +425,19 @@ function FormatCurFriendsTableForCurrentView(isMobile, curWidthClass)
 		
 	// Remove fixed-width scrollable container
 	$(manageFriendsListJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
+        
+        // Show hidden columns
+        $('.' + hiddenClass).removeClass(hiddenClass);
+        
+        // Hide FullName column
+        var fullNameColHdr = $(manageFriendsListJTableDiv + ' th:contains("Full Name")');
+        var fullNameColIdx = $(fullNameColHdr).index();
+        $(fullNameColHdr).addClass(hiddenClass);
+                
+	$(manageFriendsListJTableDiv).children('.jtable-main-container').children('.jtable').children('tbody').children('tr').each(function() {
+            var fullNameCol = $(this).children('td').eq(fullNameColIdx);
+            $(fullNameCol).addClass(hiddenClass);
+        });
     }
 }
 
@@ -616,6 +640,11 @@ function LoadCurrentFriendListForUser()
             LastName: {
                 title: 'Last Name',
                 width: '21%',
+                sorting: true
+            },
+            FullName: {
+                title: 'Full Name',
+                width: '35%',
                 sorting: true
             },
             InviteType: {
@@ -1079,13 +1108,12 @@ function DisplaySearchFiltersByCurrentView()
 	);
 				
 	// Hide any search filter toggles that are not associated with this particular view
-	$exclusivelyCurFriendToggles.hide();
-	$exclusivelyAvailUserToggles.show();
-        $exclusivelyAvailUserToggles.css('display', '');
+        $exclusivelyCurFriendToggles.addClass('hidden');
+        $exclusivelyAvailUserToggles.removeClass('hidden');
 			
 	// Hide any fields within a search filter that are not associated with this particular view (when others in the same filter might be)
-	$exclusivelyCurFriendFilterFlds.hide();
-	$exclusivelyAvailUserFilterFlds.show();
+        $exclusivelyCurFriendFilterFlds.addClass('hidden');
+        $exclusivelyAvailUserFilterFlds.removeClass('hidden');
 		
 	// Reveal any filter input groups in new view that were previously expanded
 	var i;
@@ -1110,13 +1138,12 @@ function DisplaySearchFiltersByCurrentView()
 	});
 					
 	// Hide any search filter toggles that are not associated with this particular view
-	$exclusivelyAvailUserToggles.hide();
-	$exclusivelyCurFriendToggles.show();
-        $exclusivelyCurFriendToggles.css('display', '');
+        $exclusivelyAvailUserToggles.addClass('hidden');
+        $exclusivelyCurFriendToggles.removeClass('hidden');
 			
 	// Hide any fields within a search filter that are not associated with this particular view (when others in the same filter might be)
-	$exclusivelyAvailUserFilterFlds.hide();
-	$exclusivelyCurFriendFilterFlds.show();
+        $exclusivelyAvailUserFilterFlds.addClass('hidden');
+        $exclusivelyCurFriendFilterFlds.removeClass('hidden');
 		
 	// Reveal any filter input groups in new view that were previously expanded
 	var i;

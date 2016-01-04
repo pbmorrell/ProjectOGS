@@ -14,6 +14,9 @@ var currentEventViewerLoadAction = 'GetCurrentEventsForJTable';
 var gamerTagViewerDlg = "gamerTagViewerDlg";
 var gamerTagViewerJTableDiv = "#viewGamerTagsDiv";
 
+var expandedCurEventsFilterGroups = [];
+var expandedEvtMgrFilterGroups = [];
+
 var lastWindowWidth = -1;
 var lastWindowHeight = -1;
 
@@ -251,7 +254,7 @@ function CloseSearchPanel()
 function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition)
 {
     var isWidthTransition = false;
-    var searchPanelWidth = Math.round(curWindowWidth * 0.5);
+    var searchPanelWidth = Math.round(curWindowWidth * 0.65);
     
     // Begin logic flow for viewport width changes that result in a class change
     if(((lastWidthClass == 'desktop')  || initTransition) && ((curWidthClass == 'mobile') || (curWidthClass == 'xtraSmall'))) {
@@ -267,12 +270,6 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         // Adjust width of search panel
         if(curWidthClass == 'mobile')  searchPanelWidth = Math.round(curWindowWidth * 0.8);
         else                           searchPanelWidth = Math.round(curWindowWidth * 0.95);
-
-        // Adjust padding for filter div to account for Skel's addition of mobile header/toolbar
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "10%");
-        
-        // Show search panel button div toggle icon
-        $('.swipeHoverIconContainer').show();
 
         // Convert time pickers to plain select lists, for ease of use on mobile devices
         $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': false, 'useSelect' : true });
@@ -307,13 +304,6 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
             // Increase width of gamer tag viewer dialog
             $('#' + gamerTagViewerDlg).dialog('option', 'width', (curWindowWidth < 600) ? (curWindowWidth - 25) : 600);
         }
-        
-        // Adjust padding for filter div to account for Skel's removal of mobile header/toolbar
-        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "2%");
-        
-        // Show search panel button div toggle icon
-        $('.overlayPanelControlElementGroup').children('button').show();
-        $('.swipeHoverIconContainer').hide();
         
         // Convert time pickers back to normal selector type
         $('#gameFilterStartTime').timepicker('option', { 'selectOnBlur': true, 'useSelect' : false });
@@ -364,6 +354,10 @@ function HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass
 {
     // Do required adjustments for viewport height changes that don't result in a class change
     var filterDivHeightPct = 0.9;
+    if(curHeightClass != "desktop") {
+        filterDivHeightPct = 0.7;
+    }
+    
     var filterDivHeight = filterDivHeightPct * curWindowHeight;
     $('.overlayPanelFixedHeightScrollableContainer').css('height', filterDivHeight.toString() + 'px');
     
@@ -379,6 +373,22 @@ function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, 
 {
     HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, initTransition);
     HandleHeightTransition(curWindowHeight, lastHeightClass, curHeightClass);
+    
+    if((curWidthClass == "desktop") && (curHeightClass == "desktop")) {
+        // Adjust padding for filter div to account for Skel's removal of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "2%");
+        
+        // Show search panel button div toggle icon
+        $('.overlayPanelControlElementGroup').children('button').show();
+        $('.swipeHoverIconContainer').hide();
+    }
+    else {           
+        // Adjust padding for filter div to account for Skel's addition of mobile header/toolbar
+        $('.overlayPanelFixedHeightScrollableContainer').css('padding-top', "8%");
+        
+        // Show search panel button div toggle icon
+        $('.swipeHoverIconContainer').show();
+    }
 }
 
 function LoadEventManager()
@@ -1729,6 +1739,16 @@ function DisplaySearchFiltersByCurrentView()
     if(activePanel === panelEnum.CurrentEventFeed) {
 	// Change search panel style to reflect current view
 	$('#searchPanel').removeClass('overlayPanelGreenBackground').addClass('overlayPanelOrangeBackground');
+        
+	// Cache, then hide, any expanded filter input groups exclusively from old view
+	expandedEvtMgrFilterGroups = [];
+	$('#searchPanel .overlayPanelFilterGroup.searchPanelEvtMgrFilter.overlayPanelGroupExpanded').not('.searchPanelCurEvtsFilter').each(function() {
+            expandedEvtMgrFilterGroups.push($(this).attr('id'));
+            $(this).removeClass('overlayPanelGroupBorder');
+		$(this).removeClass('overlayPanelGroupExpanded');
+		$(this).slideUp('slow');
+            }
+	);
 			
 	// Hide any search filters that are not associated with this particular view
 	$exclusivelyEvtMgrFilters.hide();
@@ -1737,10 +1757,29 @@ function DisplaySearchFiltersByCurrentView()
         // Hide any fields within a search filter that are not associated with this particular view (when others in the same filter might be)
 	$exclusivelyEvtMgrFilterFlds.hide();
 	$exclusivelyCurEvtFilterFlds.show();
+        
+	// Reveal any filter input groups in new view that were previously expanded
+	var i;
+	for(i = 0; i < expandedCurEventsFilterGroups.length; i++) {
+            var $curDiv = $('#' + expandedCurEventsFilterGroups[i]);
+            $curDiv.removeClass('overlayPanelGroupBorder').addClass('overlayPanelGroupBorder');
+            $curDiv.removeClass('overlayPanelGroupExpanded').addClass('overlayPanelGroupExpanded');
+            $curDiv.slideDown('slow');
+	}
     }
     else {
 	// Change search panel style to reflect current view
 	$('#searchPanel').removeClass('overlayPanelOrangeBackground').addClass('overlayPanelGreenBackground');
+        
+	// Cache, then hide, any expanded filter input groups exclusively from old view
+	expandedCurEventsFilterGroups = [];
+	$('#searchPanel .overlayPanelFilterGroup.searchPanelCurEvtsFilter.overlayPanelGroupExpanded').not('.searchPanelEvtMgrFilter').each(function() {
+            expandedCurEventsFilterGroups.push($(this).attr('id'));
+            $(this).removeClass('overlayPanelGroupBorder');
+		$(this).removeClass('overlayPanelGroupExpanded');
+		$(this).slideUp('slow');
+            }
+	);
 				
 	// Hide any search filter fields that are not associated with this particular view
 	$exclusivelyCurEvtFilters.hide();
@@ -1749,6 +1788,15 @@ function DisplaySearchFiltersByCurrentView()
         // Hide any fields within a search filter that are not associated with this particular view (when others in the same filter might be)
 	$exclusivelyCurEvtFilterFlds.hide();
 	$exclusivelyEvtMgrFilterFlds.show();
+        
+	// Reveal any filter input groups in new view that were previously expanded
+	var i;
+	for(i = 0; i < expandedEvtMgrFilterGroups.length; i++) {
+            var $curDiv = $('#' + expandedEvtMgrFilterGroups[i]);
+            $curDiv.removeClass('overlayPanelGroupBorder').addClass('overlayPanelGroupBorder');
+            $curDiv.removeClass('overlayPanelGroupExpanded').addClass('overlayPanelGroupExpanded');
+            $curDiv.slideDown('slow');
+	}
     }
 }
 

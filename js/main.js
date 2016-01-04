@@ -22,6 +22,11 @@ function GlobalStartupActions()
         });
     }
     
+    // If page has Accordian widget, initialize now
+    if($("#accordion").length) {
+        $("#accordion").accordion();
+    }
+    
     // Display in desktop mode any ads whose position/size is dependent on
     // viewport size, if site not being used on mobile device
     displayHiddenAdsByBrowsingDevice();

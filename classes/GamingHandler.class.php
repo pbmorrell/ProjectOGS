@@ -115,7 +115,7 @@ class GamingHandler
                                  $filterWhereClause . $orderByClause . $limitClause;
         
 	$userFriends = array();
-        $logger->LogInfo("LoadFriendListQuery (forAvailableFriendList = " . $forAvailableFriendList . "): Query = " . $getAvailableUserQuery);
+        
         if($dataAccess->BuildQuery($getAvailableUserQuery)) {
             $results = $dataAccess->GetResultSetWithPositionalParms($queryParms);
 
@@ -495,6 +495,7 @@ class GamingHandler
                 "UserName" => $user->UserName,
                 "FirstName" => $user->FirstName,
 		"LastName" => $user->LastName,
+                "FullName" => $user->FirstName . " " . $user->LastName,
 		"InviteType" => ($user->UserInviteInfo->InviteFromLoggedInUser ? 'From Me' : 
                                     ($user->UserInviteInfo->InviteToLoggedInUser ? 'To Me' : 'No')),
                 "InviteReply" => ($user->UserInviteInfo->InviteFromLoggedInUser ? $user->UserInviteInfo->SentInviteReply : 
@@ -1392,6 +1393,9 @@ class GamingHandler
                 break;
             case "LastName":
                 $queryOrderByClause = "IFNULL(u.`LastName`, '') " . $orderByDirection . ", u.`UserName`";
+                break;
+            case "FullName":
+                $queryOrderByClause = "((IFNULL(u.`FirstName`, '')) + ' ' + (IFNULL(u.`LastName`, ''))) " . $orderByDirection . ", u.`UserName`";
                 break;
             case "Gender":
                 $queryOrderByClause = "u.`Gender` " . $orderByDirection . ", u.`UserName`";
