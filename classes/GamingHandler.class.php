@@ -1395,7 +1395,7 @@ class GamingHandler
                 $queryOrderByClause = "IFNULL(u.`LastName`, '') " . $orderByDirection . ", u.`UserName`";
                 break;
             case "FullName":
-                $queryOrderByClause = "((IFNULL(u.`FirstName`, '')) + ' ' + (IFNULL(u.`LastName`, ''))) " . $orderByDirection . ", u.`UserName`";
+                $queryOrderByClause = "(CONCAT((IFNULL(u.`FirstName`, '')), ' ', (IFNULL(u.`LastName`, '')))) " . $orderByDirection . ", u.`UserName`";
                 break;
             case "Gender":
                 $queryOrderByClause = "u.`Gender` " . $orderByDirection . ", u.`UserName`";
