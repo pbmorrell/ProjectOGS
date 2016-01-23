@@ -64,7 +64,7 @@
                                         <a href="mailto:playerunite@gmail.com?subject=General Support" style="text-decoration:none;">&nbsp;Email</a>
                                     </li>
                                     <li class="icon fa-twitter">
-                                        <a href="https://twitter.com/PlayerUnite" style="text-decoration:none;">&nbsp;Twitter</a>
+                                        <a href="https://twitter.com/PlayerUnite" target="_blank" style="text-decoration:none;">&nbsp;Twitter</a>
                                     </li>
                                 </ul>
                             </section>
