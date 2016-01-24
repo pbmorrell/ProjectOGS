@@ -24,6 +24,7 @@ class PayPalTxnMsg
     public $UserSubscriptionCancelledImmediate = false;
     public $IsValidBusiness = true;
     public $IsValidated = false;
+    public $IsTxnLogged = false;
     public $UpdateUserMembershipStatus = false;
 	
     public function __construct($tid, $tt, $pid, $uid, $nt, $ps, $sso, $ssp, $sst, $smd, $um, $nd, $pdto, $sid)

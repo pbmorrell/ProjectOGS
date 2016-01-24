@@ -56,7 +56,7 @@ function CancelOnClick(event)
             // Show cancel message
             sweetAlert("Membership Not Changed", "You are still a premium member!", "info");
         }
-        else {            
+        else {
             // Make AJAX call to PayPal API to cancel this user's recurring subscription
             $.ajax({
                 type: "POST",
@@ -68,6 +68,7 @@ function CancelOnClick(event)
                     }
                     else {
                         sweetAlert("Subscription Cancelled", response, "success");
+			RefreshMembershipInfo();
                     }
                 },
                 error: function() {
@@ -83,5 +84,42 @@ function CancelOnClick(event)
 //                imageUrl: "images/underConstruction.gif"
 //            });
           }
+    });
+}
+
+function RefreshMembershipInfo()
+{   
+    // Get current PayPal user information, and display to user
+    $.ajax({
+        type: "POST",
+        url: "AJAXHandler.php",
+        data: "action=GetPayPalUserExtendedMembershipDays",
+        success: function(response){            
+            if(response.length) {
+                // Change bill date label to expiration date label
+                $('#expDateLabel').text("Your membership will expire on:");
+
+                // Display updated membership exp. date
+                var nextBillDate = $('#expDateSpan').text().trim();
+                var membershipExpDateLocal = moment(nextBillDate, "MMM Do, YYYY");
+                
+                var extMembershipDays = parseInt(response);
+                if(!isNaN(extMembershipDays)) {
+                    membershipExpDateLocal.add(extMembershipDays, 'days');
+                }
+                
+                $('#expDateSpan').text(membershipExpDateLocal.format("MMM Do, YYYY"));    
+
+                // Update memberActionsArticle to permit re-subscribe action rather than cancel action
+                $('#memberActionsArticleRecurring').addClass('hidden');
+                $('#memberActionsArticleExtend').removeClass('hidden');
+            }
+            else {
+                sweetAlert("Reload Page", "Unable to retrieve updated user info - please reload the page", "info");
+            }
+        },
+        error: function() {
+            sweetAlert("Reload Page", "Unable to retrieve updated user info - please reload the page", "info");
+        }
     });
 }

@@ -520,6 +520,11 @@
                 $payPalMsgHandler = new PayPalMsgHandler();
                 echo $payPalMsgHandler->CancelSubscriptionForUser($dataAccess, $logger, $objUser->UserID);
                 break;
+            case "GetPayPalUserExtendedMembershipDays":
+                $payPalMsgHandler = new PayPalMsgHandler();
+                $payPalUser = $payPalMsgHandler->LookUpPayPalUserByUserId($dataAccess, $logger, $objUser->UserID);
+                echo $payPalUser->ExtendedMembershipDays;
+                break;
             case "GetFriendInviteAvailUsersForJTable":
                 $orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "UserName ASC";
                 $startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";

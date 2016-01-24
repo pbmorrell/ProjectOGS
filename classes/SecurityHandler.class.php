@@ -25,11 +25,15 @@ class SecurityHandler
         $objUser = User::constructDefaultUser();
 
         $authenticateUserQuery = "SELECT u.`ID`, u.`Password`, r.`SecurityLevel`, u.`FK_Timezone_ID`, u.`FirstName`, u.`LastName`, " .
-                                 "u.`EmailAddress`, u.`IsPremiumMember`, u.`Gender`, u.`Birthdate`, u.`Autobiography` " .
+                                 "u.`EmailAddress`, u.`IsPremiumMember`, u.`Gender`, u.`Birthdate`, u.`Autobiography`, " .
+				 "(IFNULL(ppu.`MembershipExpirationDate`, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY))) as MembershipExpirationDate, " .
+				 "(IFNULL(ppu.`IsActive`, 0)) as IsActiveMember " .
                                  "FROM `Security.Users` as u " .
                                  "INNER JOIN `Security.UserRoles` ur ON ur.`FK_User_ID` = u.`ID` " .
                                  "INNER JOIN `Security.Roles` as r ON r.`ID` = ur.`FK_Role_ID` " .
-                                 "WHERE (u.`UserName` = :userName);";
+				 "LEFT JOIN `Payments.PayPalUsers` as ppu ON ppu.`FK_User_ID` = u.`ID` " .
+                                 "WHERE (u.`UserName` = :userName) " .
+				 "ORDER BY IFNULL(ppu.`IsActive`, 0) DESC LIMIT 0, 1;";
 		
 	$parmUserName = new QueryParameter(':userName', $userName, PDO::PARAM_STR);
 	$queryParms = array($parmUserName);
@@ -45,8 +49,23 @@ class SecurityHandler
                     if($this->ValidatePassword($password, $results['Password'])) {
                         $userPlatforms = $this->LoadUserPlatforms($dataAccess, $logger, $results['ID']);
 						
+			// Check user's membership expiration date in conjunction with IsPremiumMember -- 
+			//  if IsPremiumMember is true, and membership exp. date is still future for an active account, user is premium...otherwise, basic membership
+			$isPremiumMember = $results['IsPremiumMember'];
+			$isActiveMember = $results['IsActiveMember'];
+						
+			sscanf($results['MembershipExpirationDate'], "%s %s", $dateStr, $timeStr);
+			$membershipExpDateUTC = date_create_from_format("Y-m-d", $dateStr, new DateTimeZone("UTC"));
+			$curDatetimeUTC = new DateTime(null, new DateTimeZone("UTC"));
+			$curDateUTC = date_create_from_format("Y-m-d", $curDatetimeUTC->format("Y-m-d"), new DateTimeZone("UTC"));
+						
+			if(($isActiveMember != 1) || ($curDateUTC > $membershipExpDateUTC) || ($isPremiumMember != 1)) {
+                            $isPremiumMember = 0;
+			}
+						
+						
 			$objUser = new User($results['ID'], $results['SecurityLevel'], $results['FK_Timezone_ID'], $userName, 
-                                            $results['FirstName'], $results['LastName'], $results['EmailAddress'], $results['IsPremiumMember'], 
+                                            $results['FirstName'], $results['LastName'], $results['EmailAddress'], $isPremiumMember, 
                                             $results['Gender'], $results['Birthdate'], $results['Autobiography'], $userPlatforms);
                         $success = true;
                     }
@@ -60,6 +79,33 @@ class SecurityHandler
         }
         
         return $objUser;
+    }
+	
+    public function LoadUserPlatformNames($dataAccess, $logger, $userID)
+    {
+        $getUserPlatformsQuery = "SELECT p.`Name` FROM `Gaming.UserPlatforms` as upl " .
+                                 "INNER JOIN `Configuration.Platforms` as p ON p.`ID` = upl.`FK_Platform_ID` " .
+                                 "WHERE upl.`FK_User_ID` = :userID;";
+        
+        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
+        $queryParms = array($parmUserId);
+		$userPlatforms = array();
+        
+        if($dataAccess->BuildQuery($getUserPlatformsQuery, $queryParms)){
+            $results = $dataAccess->GetResultSet();
+            if($results != null){
+                foreach($results as $row) {
+                    array_push($userPlatforms, $row['Name']);
+                }
+            }
+        }
+        
+        $errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve user platforms. " . $errors);
+	}
+        
+        return $userPlatforms;
     }
 	
     public function LoadUserPlatforms($dataAccess, $logger, $userID)
@@ -84,34 +130,6 @@ class SecurityHandler
 		}
             }
 	}
-        
-        $errors = $dataAccess->CheckErrors();
-	if(strlen($errors) > 0) {
-            $logger->LogError("Could not retrieve user platforms. " . $errors);
-	}
-        
-        return $userPlatforms;
-    }
-    
-    public function LoadUserPlatformNames($dataAccess, $logger, $userID)
-    {
-        $getUserPlatformsQuery = "SELECT p.`Name` FROM `Gaming.UserPlatforms` as upl " .
-                                 "INNER JOIN `Configuration.Platforms` as p ON p.`ID` = upl.`FK_Platform_ID` " .
-                                 "WHERE upl.`FK_User_ID` = :userID;";
-        
-        $parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
-        $queryParms = array($parmUserId);
-	$userPlatforms = array();
-        
-        if($dataAccess->BuildQuery($getUserPlatformsQuery, $queryParms)){
-            $results = $dataAccess->GetResultSet();
-
-            if($results != null){
-                foreach($results as $row) {
-                    array_push($userPlatforms, $row['Name']);
-                }
-            }
-        }
         
         $errors = $dataAccess->CheckErrors();
 	if(strlen($errors) > 0) {
@@ -762,11 +780,10 @@ class SecurityHandler
 				
 	return $count == 0;
     }
-    
+	
     public function ShowUserProfileDetails($dataAccess, $logger, $userId)
     {
         $objUser = User::constructDefaultUser();
-
         $getUserProfileDetailsQuery = "SELECT u.`UserName`, t.`Abbreviation`, u.`FirstName`, u.`LastName`, u.`Gender`, u.`Autobiography` " .
                                       "FROM `Security.Users` as u " .
                                       "INNER JOIN `Configuration.TimeZones` as t ON t.`ID` = u.`FK_Timezone_ID`" .
@@ -779,10 +796,8 @@ class SecurityHandler
         
         if($dataAccess->BuildQuery($getUserProfileDetailsQuery, $queryParms)){
             $results = $dataAccess->GetSingleResult();
-
             if($results != null){
                 $userPlatforms = $this->LoadUserPlatformNames($dataAccess, $logger, $userId);
-
                 $objUser = new User($userId, -1, -1, $results['UserName'], 
                                     $results['FirstName'], $results['LastName'], '', 1, 
                                     $results['Gender'], '', $results['Autobiography'], $userPlatforms);
@@ -835,7 +850,7 @@ class SecurityHandler
                         '<div class="detailsTableCol">' .
                             '<div class="fixedHeightScrollableContainerNoBorder">' . $platformList . '</div>' .
                         '</div>' .
-                    '</div>' .                
+                    '</div>' .
                 '</div>' .
             '</article>';
     }

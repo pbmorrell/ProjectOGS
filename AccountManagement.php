@@ -7,14 +7,26 @@
     include_once "classes/PayPalMsgHandler.class.php";
     include_once "classes/PayPalUser.class.php";
 
+    // If redirected to this page from PDTHandler after error, set error message
+    $errMsg = "";
+    if(isset($_GET['error'])) {
+	if($_GET['error'] == "PDTError") {
+            $errMsg = "There was a problem retrieving your completed transaction details -- please log out, then log in again, to check your current membership status. ";
+	}
+    }
+	
     // Retrieve PayPal transaction details, if redirected to this page from a PayPal message handler
     $replyMsg = PayPalTxnMsg::ConstructDefaultMsg();
     $payPalUser = PayPalUser::constructDefaultPayPalUser();
     $numDaysTillNextCycle = 0;
+    $isRecurringArticleClass = "";
+    $extendArticleClass = "";
+    
     if((isset($customSessionVars)) && (count($customSessionVars) > 0)) {
 	// Get transaction details
 	$replyMsg = $customSessionVars["PayPalTxnDetails"];
         $replyMsg->SubscriptionIsRecurring = true; // If new signup, we can assume subscription is recurring
+        $extendArticleClass = "hidden";
 		
 	// Look up PayPal user info for this user
 	$payPalMsgHandler = new PayPalMsgHandler();
@@ -36,6 +48,9 @@
 	$payPalUser = $payPalMsgHandler->LookUpPayPalUserByUserId($dataAccess, $logger, $objUser->UserID);
 	$replyMsg->SelectedSubscriptionOption = $payPalUser->SubscriptionType;
 	$replyMsg->SubscriptionIsRecurring = $payPalUser->IsRecurring;
+        
+        if($replyMsg->SubscriptionIsRecurring)  $extendArticleClass = "hidden";
+        else                                    $isRecurringArticleClass = "hidden";
     }
 ?>
 <!DOCTYPE HTML>
@@ -62,7 +77,7 @@
     <body class="">
         <?php echo $headerHTML; ?>
         <!-- Main Wrapper -->
-		<div id="main-wrapper">
+	<div id="main-wrapper">
             <div class="container">
 		<div class="row">
                     <div class="12u">
@@ -76,7 +91,7 @@
 						<?php if($replyMsg->IsValidated): ?>
                                                     <p style="color:#00dd92; font-weight: 700;"><?php echo $replyMsg->UserMessage; ?></p>
 						<?php else: ?>
-                                                    <p style="color:#FC4753; font-weight: 700;"><?php echo $replyMsg->UserMessage; ?></p>
+                                                    <p style="color:#FC4753; font-weight: 700;"><?php echo $errMsg . $replyMsg->UserMessage; ?></p>
 						<?php endif; ?>
                                                 <div id="txnDetailsTable" class="detailsTable">
                                                     <div class="detailsTableRow">
@@ -126,12 +141,12 @@
                                                     </div>
                                                     <div>
                                                         <?php if($replyMsg->SubscriptionIsRecurring): ?>
-                                                            Next automatic bill date:&nbsp;
+                                                            <label id="expDateLabel">Next automatic bill date:</label>&nbsp;
                                                             <span id="expDateSpan" style="font-style:italic;">
                                                                 <?php echo $payPalUser->MembershipExpDate; ?>
                                                             </span>
                                                         <?php else: ?>
-                                                            Your membership will expire on:&nbsp;
+                                                            <label id="expDateLabel">Your membership will expire on:</label>&nbsp;
                                                             <span id="expDateSpan" style="font-style:italic;">
                                                                 <?php echo $payPalUser->MembershipExpDate; ?>
                                                             </span>
@@ -139,34 +154,31 @@
                                                     </div>
 						</p>
                                             </article>
-                                            <?php if($replyMsg->SubscriptionIsRecurring): ?>
-						<article  class="box style1">
-                                                    <h2>Cancel Your Membership</h2>
-                                                    <div style="padding-top: 1em;">
-							<a id="btnCancelMembership" href="#">
-                                                            <img src="<?php echo $payPalUnsubscribeButtonImgUrl; ?>" border="0" width="125" height="25">
-							</a>
-                                                    </div>
-						</article>
-                                            <?php else: ?>
-                                                <article  class="box style1">
-                                                    <h2>Extend Your Membership</h2>
-                                                    <p>Your premium membership will only be active until the end of the current cycle. Click&nbsp;&nbsp;<span style="font-weight: 700;">Subscribe</span>
-							&nbsp;to extend your membership, and don't miss a beat!</p>
-                                                    <article>
-							<h3>Recurring Membership Plan: Only $6.50 per month!</h3>
-                                                        <p>When you re-subscribe, your new billing cycle will begin immediately, but the unused days from your current cycle will be credited to your account if you should cancel again.</p>
-                                                        <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
-                                                            <input type="hidden" name="cmd" value="_s-xclick">
-                                                            <input type="hidden" name="hosted_button_id" value="<?php echo $payPalMakeSubscriptionButtonId; ?>">
-                                                            <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|SubscribePremium"); ?>">
-                                                            <input style="width: 150px; background:#0066CC;" type="image" src="<?php echo $payPalSubscribeButtonImgUrl; ?>" border="0" name="submit" height="30" 
-                                                                   alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe" onclick="return SubscribeOnClick('<?php echo $action; ?>');">
-                                                            <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
-                                                        </form>
-                                                    </article>
-						</article>
-                                            <?php endif; ?>
+                                            <article id="memberActionsArticleRecurring" class="box style1 <?php echo $isRecurringArticleClass; ?>">
+                                                <h2>Cancel Your Membership</h2>
+                                                <div style="padding-top: 1em;">
+                                                    <a id="btnCancelMembership" href="#">
+                                                        <img src="<?php echo $payPalUnsubscribeButtonImgUrl; ?>" border="0" width="125" height="25">
+                                                    </a>
+                                                </div>
+                                            </article>
+                                            <article id="memberActionsArticleExtend" class="box style1 <?php echo $extendArticleClass; ?>">
+                                                <h2>Extend Your Membership</h2>
+                                                <p>Your premium membership will only be active until the end of the current cycle. Click&nbsp;&nbsp;<span style="font-weight: 700;">Subscribe</span>
+                                                    &nbsp;to extend your membership, and don't miss a beat!</p>
+                                                <article>
+                                                    <h3>Recurring Membership Plan: Only $6.50 per month!</h3>
+                                                    <p>When you re-subscribe, your new billing cycle will begin immediately, but the unused days from your current cycle will be credited to your account if you should cancel again.</p>
+                                                    <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
+                                                        <input type="hidden" name="cmd" value="_s-xclick">
+                                                        <input type="hidden" name="hosted_button_id" value="<?php echo $payPalMakeSubscriptionButtonId; ?>">
+                                                        <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|SubscribePremium"); ?>">
+                                                        <input style="width: 150px; background:#0066CC;" type="image" src="<?php echo $payPalSubscribeButtonImgUrl; ?>" border="0" name="submit" height="30" 
+                                                               alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe" onclick="return SubscribeOnClick('<?php echo $action; ?>');">
+                                                        <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
+                                                    </form>
+                                                </article>
+                                            </article>
 					<?php else: ?>
                                             <article class="box style1">
                                                 <h2>Become a Member</h2>

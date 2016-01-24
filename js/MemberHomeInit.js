@@ -1332,8 +1332,19 @@ function ToggleEventVisibility(selectedEventIds, isActive)
     if(isActive === '1') {
         confirmMsg = 'Are you sure you want to make ' + eventText + ' visible?';
     }
-	
-    if(confirm(confirmMsg)) {
+    
+    sweetAlert({
+      title: "Confirm Event Change",
+      text: confirmMsg,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, do it!",
+      closeOnConfirm: false,
+      closeOnCancel: false,
+      showLoaderOnConfirm: true
+   },
+   function(isConfirm) {
+      if(isConfirm) {
         // Serialize array of selected event IDs for POST Ajax call
 	var eventIdsForPost = [];
 	for(var i = 0; i < selectedEventIds.length; i++) {
@@ -1346,15 +1357,27 @@ function ToggleEventVisibility(selectedEventIds, isActive)
             url: "AJAXHandler.php",
             data: "action=EventEditorToggleEventVisibility&" + $.param({'eventIds': selectedEventIds}) + "&isActive=" + isActive,
             success: function(response){
-                ReloadUserHostedEventsTable(true);
-		sweetAlert(response);
-		return true;
+                var fullRefresh = false;
+                ReloadUserHostedEventsTable(fullRefresh);
+                
+                if(response.match("^SYSTEM ERROR")) {
+                    sweetAlert("Events Not Changed", response, "error");
+                }
+                else {
+                    // Show success message
+                    sweetAlert("Events Changed!", response, "success");
+                }
+            },
+            error: function() {
+		sweetAlert("Events Not Changed", "Unable to change visibility for selected events: server error. Please try again later.", "error");
             }
         });
-    }
-    else {
-        return false;
-    }
+      }
+      else {
+         // Show cancel message
+         sweetAlert("Event Change Canceled", "Your events' visibility has not been changed", "info");
+      }
+   });
 }
 
 function DeleteEvents(selectedEventIds)

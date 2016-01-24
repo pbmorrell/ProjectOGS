@@ -112,6 +112,7 @@ class GamingHandler
 				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) AND (uf.`FK_User_ID_ThisUser` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInviter ON (u.`ID` = ufiInviter.`FK_User_ID_Inviter`) AND (ufiInviter.`FK_User_ID_Invitee` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInvitee ON (u.`ID` = ufiInvitee.`FK_User_ID_Invitee`) AND (ufiInvitee.`FK_User_ID_Inviter` = ?) " .
+				 "LEFT JOIN `Payments.PayPalUsers` as ppu ON ppu.`FK_User_ID` = u.`ID` " .
                                  $filterWhereClause . $orderByClause . $limitClause;
         
 	$userFriends = array();
@@ -1463,7 +1464,13 @@ class GamingHandler
 	array_push($queryParms, $userID);
 		
 	// Only show premium members: basic members are not allowed to have a friends list, or to be on someone else's friend list
-        $userWhereClause .= "AND (u.`IsPremiumMember` = 1) ";
+	if(Constants::$isPayPalTest) {
+            $userWhereClause .= "AND (u.`IsPremiumMember` = 1) AND (IFNULL(ppu.`IsActive`, 1) = 1) ";
+	}
+	else {
+            $userWhereClause .= ("AND ((u.`IsPremiumMember` = 1) AND (IFNULL(ppu.`MembershipExpirationDate`, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY)) > UTC_TIMESTAMP()) " .
+                                 "AND (IFNULL(ppu.`IsActive`, 0) = 1)) ");
+	}
         
 	if($forAvailableFriendList) {
             $userWhereClause .= "AND (uf.`FK_User_ID_ThisUser` IS NULL) ";
@@ -1790,6 +1797,7 @@ class GamingHandler
 				 "LEFT JOIN `Gaming.UserFriends` as uf ON (uf.`FK_User_ID_Friend` = u.`ID`) AND (uf.`FK_User_ID_ThisUser` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInviter ON (u.`ID` = ufiInviter.`FK_User_ID_Inviter`) AND (ufiInviter.`FK_User_ID_Invitee` = ?) " .
 				 "LEFT JOIN `Gaming.UserFriendInvitations` ufiInvitee ON (u.`ID` = ufiInvitee.`FK_User_ID_Invitee`) AND (ufiInvitee.`FK_User_ID_Inviter` = ?) " .
+				 "LEFT JOIN `Payments.PayPalUsers` as ppu ON ppu.`FK_User_ID` = u.`ID` " .
                                  $filterWhereClause;
         
         if($dataAccess->BuildQuery($getAvailableUserQuery)) {
@@ -1934,12 +1942,12 @@ class GamingHandler
                              "AND (e.`EventScheduledForDate` > UTC_TIMESTAMP()) ". // Only show future events
                              "AND (e.`RequiredMemberCount` > (SELECT COUNT(`ID`) FROM `Gaming.EventMembers` WHERE `FK_Event_ID` = e.`ID`)) ".
                              "AND ((e.`IsPublic` = 1) OR (e.`ID` IN ".
-							"(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
-							" WHERE (`FK_User_ID` = :userID2) AND (`FK_Event_ID` = e.`ID`))".
-							")) ".
+				"(SELECT `FK_Event_ID` FROM `Gaming.EventAllowedMembers`".
+				" WHERE (`FK_User_ID` = :userID2) AND (`FK_Event_ID` = e.`ID`))".
+				")) ".
                              "AND (e.`ID` NOT IN ".
-							"(SELECT `FK_Event_ID` FROM `Gaming.EventMembers`".
-							" WHERE (`FK_User_ID` = :userID3))".
+				"(SELECT `FK_Event_ID` FROM `Gaming.EventMembers`".
+				" WHERE (`FK_User_ID` = :userID3))".
                              ");";
 		
 	$parmUserId = new QueryParameter(':userID', $userID, PDO::PARAM_INT);
