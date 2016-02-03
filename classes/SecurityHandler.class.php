@@ -1,8 +1,10 @@
 <?php
+include_once 'classes/Constants.class.php';
 include_once 'classes/DataAccess.class.php';
 include_once 'classes/Logger.class.php';
 include_once 'classes/User.class.php';
 include_once 'classes/password.php';
+include_once 'classes/Utils.class.php';
 
 class SecurityHandler
 {    
@@ -20,9 +22,21 @@ class SecurityHandler
     }
     
     // Returns security level of authenticated user, or -1 if user not authenticated
-    public function AuthenticateUser($dataAccess, $logger, $userName, $password)
+    public function AuthenticateUser($dataAccess, $logger, $userName, $password, $userId = -1)
     {
         $objUser = User::constructDefaultUser();
+        $queryParms = [];
+        $whereClause = "";
+        if($userId > -1) {
+            $whereClause = "WHERE (u.`ID` = :userId) ";
+            $parmUserId = new QueryParameter(':userId', $userId, PDO::PARAM_INT);
+            array_push($queryParms, $parmUserId);
+        }
+        else {
+            $whereClause = "WHERE (u.`UserName` = :userName) ";
+            $parmUserName = new QueryParameter(':userName', $userName, PDO::PARAM_STR);
+            array_push($queryParms, $parmUserName);
+        }
 
         $authenticateUserQuery = "SELECT u.`ID`, u.`Password`, r.`SecurityLevel`, u.`FK_Timezone_ID`, u.`FirstName`, u.`LastName`, " .
                                  "u.`EmailAddress`, u.`IsPremiumMember`, u.`Gender`, u.`Birthdate`, u.`Autobiography`, " .
@@ -31,12 +45,9 @@ class SecurityHandler
                                  "FROM `Security.Users` as u " .
                                  "INNER JOIN `Security.UserRoles` ur ON ur.`FK_User_ID` = u.`ID` " .
                                  "INNER JOIN `Security.Roles` as r ON r.`ID` = ur.`FK_Role_ID` " .
-				 "LEFT JOIN `Payments.PayPalUsers` as ppu ON ppu.`FK_User_ID` = u.`ID` " .
-                                 "WHERE (u.`UserName` = :userName) " .
+				 "LEFT JOIN `Payments.PayPalUsers` as ppu ON ppu.`FK_User_ID` = u.`ID` " . $whereClause .
 				 "ORDER BY IFNULL(ppu.`IsActive`, 0) DESC LIMIT 0, 1;";
 		
-	$parmUserName = new QueryParameter(':userName', $userName, PDO::PARAM_STR);
-	$queryParms = array($parmUserName);
 	
 	$errors = $dataAccess->CheckErrors();
         $success = false;
@@ -853,5 +864,198 @@ class SecurityHandler
                     '</div>' .
                 '</div>' .
             '</article>';
+    }
+    
+    public function PasswordRecoveryDialogLoad()
+    {
+	// Return Password Recovery Dialog HTML
+	return
+            '<section class="box main" style="padding-top: 1em; padding-bottom: 1em;">'.
+		'<form id="frmPasswdRecovery" name="frmPasswdRecovery" method="POST" action="">'.
+                    '<div style="margin-left: 25px;">'.
+                        '<p>'.
+                            "<label>Find Account By Username:</label><br />" .
+                            '<input id="recoverByUserName" name="recoverByUserName" type="text" maxlength="50" placeholder=" Username">' .
+                        '</p>'.
+                        '<p>'.
+                            '<label>Forgot Your User ID? Find Account By Email:</label><br />' .
+                            '<input id="recoverByEmail" name="recoverByEmail" type="text" maxlength="100" placeholder=" Email Address">' .
+                        '</p>'.
+			'<div id="pwdRecoveryDialogToolbar" class="dlgToolbarContainer">'.
+                            '<button type="submit" class="memberHomeBtn" id="sendRecoveryEmailBtn">Send Email' . 
+                                '<br /><span class="icon fa-mail-forward" /></button>'.
+                            '<button class="memberHomeBtn" id="cancelBtn">Cancel<br /><span class="icon fa-thumbs-o-down" /></button>'.
+			'</div>'.
+                    '</div>'.
+		'</form>'.
+            '</section>';
+    }
+	
+    public function ProcessPasswordResetRequest($dataAccess, $logger, $userName, $email)
+    {
+	$user = $this->LookUpUserAccountByProvidedInfo($dataAccess, $logger, $userName, $email);
+	if($user->UserID > -1) {
+            $recoverySessId = $this->CreatePasswordRecoverySession($dataAccess, $logger, $user->UserID);
+			
+            if((strlen($recoverySessId) > 0) && 
+               ($this->SendPasswordRecoveryEmailToUser($user->EmailAddress, $recoverySessId))) {
+		return "true";
+            }
+            else {
+		return "System error: unable to send password reset email. Please try again later.";
+            }
+	}
+	else {
+            $errorMsg = "Could not find your account: please enter the user ID or email you used to sign up";
+            return $errorMsg;
+	}
+    }
+	
+    private function LookUpUserAccountByProvidedInfo($dataAccess, $logger, $userName, $email)
+    {
+	$user = User::constructDefaultUser();
+	$parmUserName = new QueryParameter(':userName', $userName, PDO::PARAM_STR);
+	$parmEmail = new QueryParameter(':emailAddress', $email, PDO::PARAM_STR);
+	$queryParms = [];
+		
+        $lookUpUserAccountByUserNameQuery = "SELECT `ID`, `EmailAddress` FROM `Security.Users` WHERE ((`UserName` = :userName) OR (`EmailAddress` = :emailAddress)) AND (`IsActive` = 1);";
+	if(strlen($userName) == 0) {
+            $lookUpUserAccountByUserNameQuery = "SELECT `ID`, `EmailAddress` FROM `Security.Users` WHERE (`EmailAddress` = :emailAddress) AND (`IsActive` = 1);";
+            array_push($queryParms, $parmEmail);
+	}
+	else if(strlen($email) == 0) {
+            $lookUpUserAccountByUserNameQuery = "SELECT `ID`, `EmailAddress` FROM `Security.Users` WHERE (`UserName` = :userName) AND (`IsActive` = 1);";
+            array_push($queryParms, $parmUserName);
+	}
+	else {
+            array_push($queryParms, $parmUserName, $parmEmail);
+	}
+        
+        if($dataAccess->BuildQuery($lookUpUserAccountByUserNameQuery, $queryParms)){
+            $results = $dataAccess->GetSingleResult();
+            if($results != null){
+		$user->UserID = $results['ID'];
+                $user->EmailAddress = $results['EmailAddress'];
+            }
+        }
+        
+        if($user->UserID == -1) {
+            $errors = $dataAccess->CheckErrors();
+            $logger->LogError("ProcessPasswordResetRequest(): Could not find user profile for username '" . $userName . "' or email '" . $email . "'. " . $errors);
+        }
+		
+	return $user;
+    }
+	
+    private function SendPasswordRecoveryEmailToUser($emailToUse, $recoverySessId)
+    {
+	$headers = "From: " . Constants::$pwdRecoveryEmailSenderEmail . "\r\n".
+		   "Reply-To: " . Constants::$pwdRecoveryEmailSenderEmail . "\r\n" .
+		   "MIME-Version: 1.0\r\n" .
+                   "X-Mailer: PHP/" . phpversion() . "\r\n" .
+		   "Content-Type: text/html; charset=iso-8859-1\r\n";
+				   
+	$message = "<html><body>" .
+		   "<h2>To reset your password, click on the link below (or copy and paste it into your browser)</h2>".
+		   "<h3>Please note: this link will only remain active for 10 minutes from the time of this email.</h3><br />" .
+		   "<a href='" . Constants::$pwdRecoveryPage . "?sessID=" . $recoverySessId . "'>Reset Password</a>" .
+		   "</body></html>";
+
+	// Send email
+	return mail($emailToUse, 'PlayerUnite Password Reset Instructions', $message, $headers);
+    }
+	
+    private function CreatePasswordRecoverySession($dataAccess, $logger, $userID)
+    {
+	$sessID = Utils::GenerateUniqueGuid(10);
+	$createSessionQuery = "INSERT INTO `Security.PasswordRecoverySession` (`FK_User_ID`, `SessionId`, `ExpirationTimestamp`) ".
+                              "VALUES (:userId, :sessID, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ". Constants::$pwdRecoverySessionExpTimeInMinutes . 
+                              " MINUTE));";
+		
+	$parmUserId = new QueryParameter(':userId', $userID, PDO::PARAM_INT);
+	$parmSessId = new QueryParameter(':sessID', $sessID, PDO::PARAM_STR);
+	$queryParms = array($parmUserId, $parmSessId);
+				
+	if($dataAccess->BuildQuery($createSessionQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+	}
+			
+	$errors = $dataAccess->CheckErrors();
+
+	if(strlen($errors) == 0) {
+            return $sessID;
+	}
+	
+        $logger->LogError("Could not create password recovery session for user ID '" . $userID . "'. " . $errors);
+	return "";
+    }
+    
+    public function LookupPasswordRecoverySession($dataAccess, $logger, $sessId)
+    {
+	$userId = -1;
+        $pwdRecoverySessRecordId = -1;
+	$parmSessId = new QueryParameter(':sessionId', $sessId, PDO::PARAM_STR);
+	$queryParms = array($parmSessId);
+		
+        $lookUpPasswordRecoverySessionQuery = "SELECT `ID`, `FK_User_ID` FROM `Security.PasswordRecoverySession` " .
+                                              "WHERE (`SessionId` = :sessionId) AND (CURRENT_TIMESTAMP < `ExpirationTimestamp`);";
+        
+        if($dataAccess->BuildQuery($lookUpPasswordRecoverySessionQuery, $queryParms)){
+            $results = $dataAccess->GetSingleResult();
+            if($results != null){
+		$userId = $results['FK_User_ID'];
+                $pwdRecoverySessRecordId = $results['ID'];
+            }
+        }
+        
+        if($userId == -1) {
+            $errors = $dataAccess->CheckErrors();
+            $logger->LogError("LookupPasswordRecoverySession(): Could not find password recovery session for sess ID '" . $sessId . "'. " . $errors);
+        }
+	else  $this->DeleteOldPasswordRecoverySession($dataAccess, $logger, $pwdRecoverySessRecordId);
+        
+	return $userId;
+    }
+    
+    private function DeleteOldPasswordRecoverySession($dataAccess, $logger, $id)
+    {
+        $deleteOldPwdRecoverySessionQuery = "DELETE FROM `Security.PasswordRecoverySession` WHERE `ID` = :id;";
+		
+	$parmRecoverySessionId = new QueryParameter(':id', $id, PDO::PARAM_INT);
+        $queryParms = array($parmRecoverySessionId);
+        $errorMsg = "DeleteOldPasswordRecoverySession(): Could not delete old password recovery session. ";
+
+	if($dataAccess->BuildQuery($deleteOldPwdRecoverySessionQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+	}
+
+	$errors = $dataAccess->CheckErrors();
+        if(strlen($errors) > 0) {
+            $logger->LogError($errorMsg . $errors);
+        }
+    }
+    
+    public function ResetUserPassword($dataAccess, $logger, $userId, $resetPW)
+    {
+        $encryptedPassword = $this->EncryptPassword($resetPW);
+
+	$parmUserId = new QueryParameter(':userId', $userId, PDO::PARAM_INT);
+        $parmPassword = new QueryParameter(':password', $encryptedPassword, PDO::PARAM_STR);
+	$queryParms = array($parmUserId, $parmPassword);
+        
+	$updateUserQuery = "UPDATE `Security.Users` SET `Password` = :password " .
+                           "WHERE `ID` = :userId;";
+		
+        if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            return "true";
+        }
+
+        $logger->LogError("ResetUserPassword(): Could not update account for user ID '" . $userId . "' with new password. " . $errors);
+	return "System Error: Could not reset your password. Please try again later -- we apologize for the inconvenience!";
     }
 }

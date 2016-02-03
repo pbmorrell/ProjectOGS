@@ -30,4 +30,32 @@ function MobileLoginOnReady()
 
         return false;
     });
+	
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 400;
+    
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
+    
+    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+        dlgHeight = 375;
+    }
+        
+    $('#forgotPasswordLink').click(function() {
+    	displayJQueryDialog("dlgPasswordRecovery", "Forgot Password", "top", displayContainerPosition, window, false, true, 
+                            "AJAXHandler.php?action=PasswordRecoveryDialogLoad", function() {
+            PasswordRecoveryDialogOnReady($('#dlgPasswordRecovery').dialog());
+        }, dlgWidth, dlgHeight);
+		
+	return false;
+    });
 }

@@ -10,6 +10,9 @@ class Constants
 	
     // Security configuration
     public static $authFailureRedirectPage = "Index.php";
+    public static $pwdRecoveryPage = "http://www.morrellweb.com/ogs/PasswordRecovery.php";
+    public static $pwdRecoveryEmailSenderEmail = "admin@morrellweb.com";
+    public static $pwdRecoverySessionExpTimeInMinutes = "12";
 	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = true; // Change this to false when ready to move to production

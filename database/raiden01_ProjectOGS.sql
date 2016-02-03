@@ -472,7 +472,8 @@ INSERT INTO `Security.PageRoles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
 (7, 13, 3),
 (8, 14, 4),
 (9, 15, 4),
-(10, 16, 3);
+(10, 16, 3),
+(11, 17, 4);
 
 -- --------------------------------------------------------
 
@@ -499,7 +500,8 @@ INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
 (13, 'AccountManagement'),
 (14, 'DeveloperBlog'),
 (15, 'Faq'),
-(16, 'FindFriends');
+(16, 'FindFriends'),
+(17, 'PasswordRecovery');
 
 -- --------------------------------------------------------
 
@@ -555,6 +557,22 @@ CREATE TABLE IF NOT EXISTS `Security.Users` (
   `Autobiography` text,
   `IsActive` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Security.PasswordRecoverySession`
+--
+
+CREATE TABLE IF NOT EXISTS `Security.PasswordRecoverySession` (
+    `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+    `FK_User_ID` bigint(20) NOT NULL,
+    `SessionId` varchar(32) NOT NULL,
+    `ExpirationTimestamp` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`ID`),
+    KEY `IDX_PasswordRecoverySession_FK_User_ID` (`FK_User_ID`),
+    CONSTRAINT `FK_PasswordRecoverySession_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

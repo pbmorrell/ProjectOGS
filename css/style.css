@@ -28,6 +28,11 @@
     a.actionLink {
         color: blue;
     }
+    
+    a.actionLinkHeader {
+        font-weight: 600;
+        font-size: 0.4em !important;
+    }
 
     strong
     {

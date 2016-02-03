@@ -132,5 +132,11 @@ class Utils
             return 0;
 	});
     }
+	
+    public static function GenerateUniqueGuid($length)
+    {
+	$bytes = openssl_random_pseudo_bytes($length);
+	return bin2hex($bytes);
+    }
 }
 

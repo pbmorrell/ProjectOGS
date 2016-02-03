@@ -66,7 +66,80 @@ function GlobalStartupActions()
         $('#signupBtnLoginForm').click(function() {
             window.location.href = "Index.php?action=Signup";
         });
+		
+                
+        var curWidthClass = GetCurWidthClass();
+        var curHeightClass = GetCurHeightClass();
+        var displayContainerPosition = "top";
+        var dlgWidth = 600;
+        var dlgHeight = 350;
+
+        if(curWidthClass == 'mobile') {
+            dlgWidth = 400;
+            displayContainerPosition = "top+10%";
+        }
+        if(curWidthClass == 'xtraSmall') {
+            dlgWidth = 275;
+            displayContainerPosition = "top+10%";
+        }
+
+        if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+            dlgHeight = 300;
+        }
+    
+        $('#forgotPasswordLink').click(function() {
+            displayJQueryDialog("dlgPasswordRecovery", "Forgot Password", "top", displayContainerPosition, window, false, true, 
+                                "AJAXHandler.php?action=PasswordRecoveryDialogLoad", function() {
+            	PasswordRecoveryDialogOnReady($('#dlgPasswordRecovery').dialog());
+            }, dlgWidth, dlgHeight);
+			
+            return false;
+        });
     }
+}
+
+function PasswordRecoveryDialogOnReady($dialog)
+{
+    // Attach event handlers to form buttons
+    $('#sendRecoveryEmailBtn').click(function() {
+	var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+	var userName = $('#recoverByUserName').val();
+	var email = $('#recoverByEmail').val();
+		
+	if((userName.trim().length === 0) && (email.trim().length === 0)) {
+            sweetAlert("Oops...", "You must enter either a user ID or email address, so we can look up your account", "error");
+	} else if ((userName.trim().length === 0) && (validEmailRegEx.test(email) === false)) {
+            sweetAlert("Oops...", "Please enter a valid email address", "error");
+	} else {
+            // Make AJAX call to look up user account and send them a recovery email, if found
+            var postData = "userName=" + userName.trim() + "&email=" + email.trim();
+			
+            if(userName.trim().length === 0)  	postData = "email=" + email.trim();
+            else if(email.trim().length === 0)  postData = "userName=" + userName.trim();
+			
+            $.ajax({
+		type: "POST",
+		url: "AJAXHandler.php",
+		data: "action=SendPasswordRecoveryEmailToUser&" + postData,
+		success: function(response){
+                    if(response === 'true') {
+			sweetAlert("Email Sent", "Check your inbox, and follow the instructions in the email we sent you to reset your password.", "info");
+			$dialog.dialog('destroy').remove();
+                    }
+                    else {
+			sweetAlert("Oops...", response, "error");
+                    }
+		}
+            });
+	}
+		
+        return false;
+    });	
+	
+    $('#cancelBtn').click(function() {
+        $dialog.dialog('destroy').remove();
+        return false;
+    });
 }
 
 function GetCurWidthClass()
@@ -337,6 +410,9 @@ function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayCo
     
     var height = dlgHeight || 700;
     
+	var loadFnParms = dialogLoadOnLoadedParms;
+	if(!dialogLoadOnLoadedParms)  loadFnParms = [];
+	
     var $dialog = $(dialogHTML).dialog({
         autoOpen: autoOpen,
         title: title,
@@ -344,7 +420,7 @@ function displayJQueryDialogFromDiv(dialogHTML, title, dialogPosition, displayCo
         height: height,
         modal: isModal,
         dialogClass: 'customDialogStyle',
-	open: dialogLoadOnLoaded ? (function() { dialogLoadOnLoaded(dialogLoadOnLoadedParms); }) : (function() {}),
+		open: dialogLoadOnLoaded ? (function() { dialogLoadOnLoaded(loadFnParms); }) : (function() {}),
         close: function(event, ui) {
             if(destroyDlgOnClose) {
                 $dialog.dialog('destroy').remove();
@@ -619,13 +695,30 @@ function SaveCurrentJTableContentsToClipboard(jTableDiv, title, tableTitle)
     displayJQueryDialogFromDiv(dialogHTML, title, 'top', window, false, false, 'auto', true, SelectAllTextInTextArea);
 }
 
-function SelectAllTextInTextArea()
+function SelectAllTextInTextArea(parms)
 {
-    $(this).children('textarea').each(function() {
-        var $this = $(this).get(0);
-        $this.focus();
-        $this.setSelectionRange(0, 9999);
-    });
+	$('.autoSelectTextArea').each(function() {
+        var $this = $(this);
+		
+		$this.select();
+
+		window.setTimeout(function() {
+			$this.select();
+		}, 1);
+
+		function mouseUpHandler() {
+			// Prevent further mouseup intervention
+			$this.off("mouseup", mouseUpHandler);
+			return false;
+		}
+
+		$this.mouseup(mouseUpHandler);
+	});
+    //$(this).find('.autoSelectTextArea').each(function() {
+    //    var $this = $(this);
+    //    $this.focus();
+    //    $this.setSelectionRange(0, 9999);
+    //});
 }
 
 function DonateOnClick()

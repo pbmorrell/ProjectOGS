@@ -21,7 +21,8 @@
     
     if(isset($action)) {
         // Only proceed if this page is accessed due to signup/login, or from a logged-in user
-        if(($action != "Login") && ($action != "Signup")) {
+        if(($action != "Login") && ($action != "Signup") && ($action != "PasswordRecoveryDialogLoad") && 
+           ($action != "SendPasswordRecoveryEmailToUser") && ($action != "ResetUserPassword")) {
             $sessionDataAccess = new DataAccess();
             $sessionHandler = new DBSessionHandler($sessionDataAccess);
             session_set_save_handler($sessionHandler, true);
@@ -508,7 +509,7 @@
 		$gamerTagID = isset($_POST['ID']) ? filter_var($_POST['ID'], FILTER_SANITIZE_STRING) : "";
 		$platformID = isset($_POST['PlatformName']) ? filter_var($_POST['PlatformName'], FILTER_SANITIZE_STRING) : "";
 		$tagName = isset($_POST['GamerTagName']) ? filter_var($_POST['GamerTagName'], FILTER_SANITIZE_STRING) : "";
-				
+						
 		echo $securityHandler->UpdateGamerTagForUser($dataAccess, $logger, $objUser->UserID, $gamerTagID, $platformID, $tagName);
                 break;
             case "DeleteGamerTagsForUser":
@@ -596,6 +597,50 @@
 
 		echo $securityHandler->ShowUserProfileDetails($dataAccess, $logger, $userId);
 		break;
+            case "PasswordRecoveryDialogLoad":
+		echo $securityHandler->PasswordRecoveryDialogLoad();
+                break;
+            case "SendPasswordRecoveryEmailToUser":
+		$userName = '';
+		$email = '';
+		if(isset($_POST['userName'])) {
+                    $userName = filter_var(trim($_POST['userName']), FILTER_SANITIZE_STRING);
+		}
+		if(isset($_POST['email'])) {
+                    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_STRING);
+		}
+				
+		echo $securityHandler->ProcessPasswordResetRequest($dataAccess, $logger, $userName, $email);
+                break;
+            case "ResetUserPassword":
+		$userId = '';
+                $resetPW = '';
+		if(isset($_POST['userId'])) {
+                    $userId = filter_var(trim($_POST['userId']), FILTER_SANITIZE_STRING);
+		}
+		if(isset($_POST['resetPW'])) {
+                    $resetPW = filter_var(trim($_POST['resetPW']), FILTER_SANITIZE_STRING);
+		}
+                
+                $resetResult = $securityHandler->ResetUserPassword($dataAccess, $logger, $userId, $resetPW);
+                
+                // Automatically log user in with new credentials
+                $objUser = $securityHandler->AuthenticateUser($dataAccess, $logger, "", $resetPW, $userId);
+
+                if($objUser->UserID > 0) {
+                    // Create session
+                    $sessionDataAccess = new DataAccess();
+                    $sessionHandler = new DBSessionHandler($sessionDataAccess);
+                    session_set_save_handler($sessionHandler, true);
+                    session_start();
+
+                    // Set session variables
+                    $_SESSION['WebUser'] = $objUser;
+                    $_SESSION['lastActivity'] = time();
+                }
+                
+                echo $resetResult;
+                break;
         }
     }
     else {

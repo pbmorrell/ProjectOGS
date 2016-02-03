@@ -32,7 +32,8 @@
                                                             <form id="mobileLoginForm" name="mobileLoginForm" method="POST" action="">
                                                                 <input id="loginUsername" name="loginUsername" type="text" maxlength="50" placeholder=" Username"><br/>
                                                                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password"><br/><br/>
-                                                                <a href="#" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</a>&nbsp;
+                                                                <a href="#" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</a><br /><br />
+								<a href="#" class="actionLinkHeader" id="forgotPasswordLink">Forgot Password?</a>
                                                             </form>
                                                         </div>
                                                         <br/>

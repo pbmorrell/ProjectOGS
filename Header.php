@@ -36,6 +36,7 @@
                 <input id="loginUsername" name="loginUsername" type="text" maxlength="100" placeholder=" Username">
                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password">
                 <button type="submit" class="button icon fa-sign-in" id="loginBtn">Log In</button>&nbsp;' . $signupBtn .
+                '&nbsp;&nbsp;<a href="#" class="actionLinkHeader" id="forgotPasswordLink">Forgot&nbsp;&nbsp;Password?</a>' .
             '</form>
         </div>';
     
