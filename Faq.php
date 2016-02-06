@@ -47,6 +47,14 @@
                                                             Subscribing members (Premium Members) gain access to additional search tools, a friends list,
                                                             and the ability to keep your gaming events private.
                                                         </p>
+                                                    </div> 
+                                                    <h3>Where do my donations go?</h3>
+                                                    <div>
+							<p>
+                                                        All donations go towards the future of Player Unite. Your money gifts are 
+							reinvested into the server hosting cost, additional future features, improved integration,
+							marketing, and website maintenance.
+							</p>
                                                     </div>
                                                     <h3>How do I become a member of Player Unite?</h3>
                                                     <div>
@@ -56,15 +64,41 @@
                                                         After logging in, you'll be asked to agree to the terms and conditions of the PlayerUnite subscription.
                                                         If you do, you'll then be automatically sent back to the PlayerUnite site, and the completed transaction
                                                         details will be displayed. If all went well, you will now have full Premium Member access!
+                                                        </p>
+                                                        <p>
+                                                        You can cancel your membership at anytime with ease. From the "Home" page, click on "Manage Your Account"
+                                                        from within the Control Panel on the left. Click "Unsubscribe" from the Cancel Your Membership tab and confirm
+                                                        your request from the pop up dialog box.
 							</p>
                                                     </div>
-                                                    <h3>Where do my donations go?</h3>
+                                                    <h3>How do I manage my friends list</h3>
                                                     <div>
-							<p>
-                                                        All donations go towards the future of Player Unite. Your money gifts are 
-							reinvested into the server hosting cost, additional future features, improved integration,
-							marketing, and website maintenance.
-							</p>
+                                                        <p>
+                                                         Please keep in mind, the Friends feature is for premium members. Sign up to gain access!
+                                                        </p>
+                                                        <p>
+                                                         Once a premium member, you can click on a user's name anywhere in the site to view their profile. 
+                                                        </p>
+                                                        <p>
+                                                         Start by clicking on your user name at the top right of the screen. Select "Find Friends". This
+                                                         will take you to the Friends section where you can search for friends and manage all current friends.
+                                                        </p>
+                                                        <p>
+                                                         Click on "User Search" within the control panel on the left. This will bring up a table with all of the site's
+                                                         active users. From here you can organize the users by clicking the appropriate field, i.e. First Name, Last Name,
+                                                         Gender, etc. Click the envelope to send the user a "Friend Request". The selected user now has the option to
+                                                         accept or decline your invitation.
+                                                        </p>
+                                                        <p>
+                                                         Click on "Manage Friend List" to see your current friends. From here you can remove any unwanted friends. You
+                                                         also have the option to remove pending invitations. 
+                                                        </p>
+                                                        <p>
+                                                         Click on "Filter User List". This brings up the search tools. Click on the desired filter and be sure to click 
+                                                         "Activate Filter". Once you have finished with your desired filters, click "Search" then "Close". Your 
+                                                         search results will be displayed. If you would like to reverse the search, simply reclick "Filter User List",
+                                                         click "Deactivate Filter(s)", "Search", and then finish by clicking "Close".
+                                                        </p>
                                                     </div>
                                                     <h3>How do I edit my profile?</h3>
                                                     <div>

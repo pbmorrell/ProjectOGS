@@ -3,7 +3,7 @@
     $sessionRequired = false;
     $sessionAllowed = true;
     include "Header.php";
-    $updateDate = "10/16/2015";
+    $updateDate = "2/7/2016";
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -55,7 +55,7 @@
                                                 <p>We may collect the following information:</p>
                                                 <ul class="style4">
                                                     <li>Contact information including email address.</li>
-                                                    <li>Gamer tags associated with psn (playstation network), XBox Live, Steam, etc.</li>
+                                                    <li>Gamer tags associated with PSN (Playstation Network), Xbox Live, Steam, Nintendo, etc.</li>
                                                     <li>Demographic information such as timezone, preferences, and interests.</li>
                                                     <li>Other information relevant to customer surveys and/or offers.</li>
                                                 </ul>
