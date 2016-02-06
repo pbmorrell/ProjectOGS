@@ -5,6 +5,8 @@ include_once 'classes/Logger.class.php';
 include_once 'classes/User.class.php';
 include_once 'classes/password.php';
 include_once 'classes/Utils.class.php';
+include_once 'classes/PHPMailer/class.phpmailer.php';
+include_once 'classes/PHPMailer/class.smtp.php';
 
 class SecurityHandler
 {    
@@ -948,21 +950,30 @@ class SecurityHandler
     }
 	
     private function SendPasswordRecoveryEmailToUser($emailToUse, $recoverySessId)
-    {
-	$headers = "From: " . Constants::$pwdRecoveryEmailSenderEmail . "\r\n".
-		   "Reply-To: " . Constants::$pwdRecoveryEmailSenderEmail . "\r\n" .
-		   "MIME-Version: 1.0\r\n" .
-                   "X-Mailer: PHP/" . phpversion() . "\r\n" .
-		   "Content-Type: text/html; charset=iso-8859-1\r\n";
-				   
+    {				   
 	$message = "<html><body>" .
 		   "<h2>To reset your password, click on the link below (or copy and paste it into your browser)</h2>".
 		   "<h3>Please note: this link will only remain active for 10 minutes from the time of this email.</h3><br />" .
 		   "<a href='" . Constants::$pwdRecoveryPage . "?sessID=" . $recoverySessId . "'>Reset Password</a>" .
 		   "</body></html>";
 
-	// Send email
-	return mail($emailToUse, 'PlayerUnite Password Reset Instructions', $message, $headers);
+	// Configure email sender
+        $mailer = new PHPMailer();
+        $mailer->isSMTP();
+        $mailer->SMTPAuth = true;
+        $mailer->Host = Constants::$emailSMTPServer;
+        $mailer->Port = Constants::$emailSMTPPort;
+        $mailer->Username = Constants::$emailSMTPUser;
+        $mailer->Password = Constants::$emailSMTPPassword;
+        
+        // Set forgot password email data
+        $mailer->setFrom(Constants::$pwdRecoveryEmailSenderEmail, Constants::$pwdRecoveryEmailSenderFriendlyName);
+        $mailer->Subject = Constants::$pwdRecoverySessionEmailSubject;
+        $mailer->msgHTML($message);
+        $mailer->addAddress($emailToUse);
+        
+        // Send email
+        return $mailer->send();
     }
 	
     private function CreatePasswordRecoverySession($dataAccess, $logger, $userID)

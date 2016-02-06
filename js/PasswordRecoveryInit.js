@@ -2,6 +2,7 @@ function PasswordRecoveryOnReady()
 {
     if($("#resetPasswordFormDiv").length) {
         $('#forgotPasswordLink').hide();
+	$('#forgotPasswordLinkMobile').hide();
         $('#togglePassword').hide();
         $('#togglePasswordConfirm').hide();
 
@@ -22,6 +23,17 @@ function PasswordRecoveryOnReady()
                                          '#passwordMatch', '#passwordStrength', '#togglePassword', '#togglePasswordConfirm', userId);
         });
     }
+	
+    // On startup, we want to simulate a viewport size transition, in order to format and size
+    // the current layout to best fit the current browser dimensions...we initialized everything
+    // as if it was in desktop view, so now we run a transition from 'desktop' to whatever the current view class is
+    var curWindowHeight = $(window).height();
+    lastWindowHeight = curWindowHeight;
+    var curWindowWidth = $(window).width();
+    lastWindowWidth = curWindowWidth;
+    var initTransition = true;
+    
+    OnViewportSizeChanged(curWindowWidth, curWindowHeight, 'desktop', GetCurWidthClass(), 'desktop', GetCurHeightClass(), initTransition);
 }
 
 function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pwField, pwConfirmField, pwMatchField, 
@@ -68,4 +80,14 @@ function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pw
     }
 
     return false;    
+}
+
+function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, curWidthClass, lastHeightClass, curHeightClass, initTransition)
+{   
+    if((curWidthClass == "desktop") || ($("#resetPasswordFormDiv").length)) {
+        $('#forgotPasswordLinkMobile').hide();
+    }
+    else {           
+        $('#forgotPasswordLinkMobile').show();
+    }
 }

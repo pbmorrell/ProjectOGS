@@ -5,6 +5,7 @@ class EventSearchParameters
     public $StartDateTime = "";
     public $EndDateTime = "";
     public $GameTitles = [];
+	public $CustomGameTitle = "";
     public $EventCreators = [];
     public $CustomEventCreatorName = "";
     public $JoinedUsers = [];
@@ -19,7 +20,7 @@ class EventSearchParameters
 	
     public function __construct($sh = false, $sdt = "", $edt = "", $gt = [], $ec = [], $ju = [], 
 				$p = [], $sje = false, $soe = true, $sfeo = false, $nsd = false, 
-				$cecn = "", $cjeu = "", $cpn = "", $soeo = false)
+				$cecn = "", $cjeu = "", $cpn = "", $soeo = false, $cgt = "")
     {
         $this->ShowHiddenEvents = $sh;
         $this->StartDateTime = $sdt;
@@ -36,5 +37,6 @@ class EventSearchParameters
         $this->NoStartDateRestriction = $nsd;
         $this->CustomEventCreatorName = $cecn;
         $this->CustomJoinedUserName = $cjeu;
+		$this->CustomGameTitle = $cgt;
     }
 }

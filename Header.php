@@ -67,8 +67,8 @@
                                     '<li><a href="Index.php?action=Signup">Sign Up</a></li>'.
                                 '</ul>'.
                             '</nav>'.
-                        '</header>' . $loginErrorDiv.
-                    '</div>'.
+                        '</header>' .
+                    '</div>'. $loginErrorDiv.
                 '</div>'.
             '</div>'.
         '</div>';

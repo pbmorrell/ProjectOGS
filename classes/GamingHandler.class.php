@@ -1602,9 +1602,9 @@ class GamingHandler
                 $eventCreatorListForQuery = (str_repeat("?,", count($searchParms->EventCreators) - 1)) . "?";
                 $eventWhereClause .= "AND ((e.`FK_User_ID_EventCreator` IN (" . $eventCreatorListForQuery . ")) ";
                 $queryParms = array_merge($queryParms, $searchParms->EventCreators);
-
-                $eventWhereClause .= "OR (LOWER(u.`UserName`) = ?)) ";
-                array_push($queryParms, strtolower($searchParms->CustomEventCreatorName));
+				
+                $eventWhereClause .= "OR (u.`UserName` LIKE ?)) ";
+                array_push($queryParms, "%" . $searchParms->CustomEventCreatorName . "%");
             }
             else if(((is_array($searchParms->EventCreators)) && (count($searchParms->EventCreators) > 0)) || (strlen($searchParms->CustomEventCreatorName) > 0)) {
                 if(((is_array($searchParms->EventCreators)) && (count($searchParms->EventCreators) > 0))) {
@@ -1613,8 +1613,8 @@ class GamingHandler
                     $queryParms = array_merge($queryParms, $searchParms->EventCreators);
                 }
                 if(strlen($searchParms->CustomEventCreatorName) > 0) {
-                    $eventWhereClause .= "AND (LOWER(u.`UserName`) = ?) ";
-                    array_push($queryParms, strtolower($searchParms->CustomEventCreatorName));
+                    $eventWhereClause .= "AND (u.`UserName` LIKE ?) ";
+                    array_push($queryParms, "%" . $searchParms->CustomEventCreatorName . "%");
                 }
             }
 
@@ -1657,10 +1657,24 @@ class GamingHandler
 	}
         
         // Filter on game titles, if any
-        if((is_array($searchParms->GameTitles)) && (count($searchParms->GameTitles) > 0)) {
+        if(((is_array($searchParms->GameTitles)) && (count($searchParms->GameTitles) > 0)) && (strlen($searchParms->CustomGameTitle) > 0)) {
             $gameTitleListForQuery = (str_repeat("?,", count($searchParms->GameTitles) - 1)) . "?";
-            $eventWhereClause .= "AND (COALESCE(cg.`Name`, ug.`Name`) IN (" . $gameTitleListForQuery . ")) ";
+            $eventWhereClause .= "AND ((COALESCE(cg.`Name`, ug.`Name`) IN (" . $gameTitleListForQuery . ")) ";
             $queryParms = array_merge($queryParms, $searchParms->GameTitles);
+			
+            $eventWhereClause .= "OR (COALESCE(cg.`Name`, ug.`Name`) LIKE ?)) ";
+            array_push($queryParms, "%" . $searchParms->CustomGameTitle . "%");
+        }
+        else if(((is_array($searchParms->GameTitles)) && (count($searchParms->GameTitles) > 0)) || (strlen($searchParms->CustomGameTitle) > 0)) {
+            if(((is_array($searchParms->GameTitles)) && (count($searchParms->GameTitles) > 0))) {
+                $gameTitleListForQuery = (str_repeat("?,", count($searchParms->GameTitles) - 1)) . "?";
+                $eventWhereClause .= "AND (COALESCE(cg.`Name`, ug.`Name`) IN (" . $gameTitleListForQuery . ")) ";
+                $queryParms = array_merge($queryParms, $searchParms->GameTitles);
+            }
+            if(strlen($searchParms->CustomGameTitle) > 0) {
+                $eventWhereClause .= "AND (COALESCE(cg.`Name`, ug.`Name`) LIKE ?) ";
+                array_push($queryParms, "%" . $searchParms->CustomGameTitle . "%");
+            }
         }
 
         // Filter on platforms, if any
@@ -1668,9 +1682,9 @@ class GamingHandler
             $platformListForQuery = (str_repeat("?,", count($searchParms->Platforms) - 1)) . "?";
             $eventWhereClause .= "AND ((p.`ID` IN (" . $platformListForQuery . ")) ";
             $queryParms = array_merge($queryParms, $searchParms->Platforms);
-
-            $eventWhereClause .= "OR (LOWER(p.`Name`) = ?)) ";
-            array_push($queryParms, strtolower($searchParms->CustomPlatformName));
+			
+            $eventWhereClause .= "OR (p.`Name` LIKE ?)) ";
+            array_push($queryParms, "%" . $searchParms->CustomPlatformName . "%");
         }
         else if(((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0)) || (strlen($searchParms->CustomPlatformName) > 0)) {
             if(((is_array($searchParms->Platforms)) && (count($searchParms->Platforms) > 0))) {
@@ -1679,8 +1693,8 @@ class GamingHandler
                 $queryParms = array_merge($queryParms, $searchParms->Platforms);
             }
             if(strlen($searchParms->CustomPlatformName) > 0) {
-                $eventWhereClause .= "AND (LOWER(p.`Name`) = ?) ";
-                array_push($queryParms, strtolower($searchParms->CustomPlatformName));
+                $eventWhereClause .= "AND (p.`Name` LIKE ?) ";
+                array_push($queryParms, "%" . $searchParms->CustomPlatformName . "%");
             }
         }
 
@@ -2038,8 +2052,8 @@ class GamingHandler
             $whereClause .= "AND ((em.`FK_User_ID` IN (" . $joinedUserListForQuery . ")) ";
             $queryParms = array_merge($queryParms, $filterUsers);
 
-            $whereClause .= "OR (LOWER(u.`UserName`) = ?)) ";
-            array_push($queryParms, strtolower($filterUserCustomName));
+            $whereClause .= "OR (u.`UserName` LIKE ?)) ";
+            array_push($queryParms, "%" . $filterUserCustomName . "%");
 	}
 	else if(((is_array($filterUsers)) && (count($filterUsers) > 0)) || (strlen($filterUserCustomName) > 0)) {
             if(((is_array($filterUsers)) && (count($filterUsers) > 0))) {
@@ -2048,8 +2062,8 @@ class GamingHandler
 		$queryParms = array_merge($queryParms, $filterUsers);
             }
             if(strlen($filterUserCustomName) > 0) {
-		$whereClause .= "AND (LOWER(u.`UserName`) = ?) ";
-		array_push($queryParms, strtolower($filterUserCustomName));
+		$whereClause .= "AND (u.`UserName` LIKE ?) ";
+		array_push($queryParms, "%" . $filterUserCustomName . "%");
             }
 	}
         

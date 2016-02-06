@@ -66,28 +66,39 @@ function GlobalStartupActions()
         $('#signupBtnLoginForm').click(function() {
             window.location.href = "Index.php?action=Signup";
         });
-		
-                
-        var curWidthClass = GetCurWidthClass();
-        var curHeightClass = GetCurHeightClass();
-        var displayContainerPosition = "top";
-        var dlgWidth = 600;
-        var dlgHeight = 350;
+    }
+	
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 350;
 
-        if(curWidthClass == 'mobile') {
-            dlgWidth = 400;
-            displayContainerPosition = "top+10%";
-        }
-        if(curWidthClass == 'xtraSmall') {
-            dlgWidth = 275;
-            displayContainerPosition = "top+10%";
-        }
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
 
-        if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
-            dlgHeight = 300;
-        }
-    
+    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+        dlgHeight = 375;
+    }
+	
+    if($("#forgotPasswordLink").length) {
         $('#forgotPasswordLink').click(function() {
+            displayJQueryDialog("dlgPasswordRecovery", "Forgot Password", "top", displayContainerPosition, window, false, true, 
+                                "AJAXHandler.php?action=PasswordRecoveryDialogLoad", function() {
+            	PasswordRecoveryDialogOnReady($('#dlgPasswordRecovery').dialog());
+            }, dlgWidth, dlgHeight);
+			
+            return false;
+        });
+    }
+    if($("#forgotPasswordLinkMobile").length) {
+        $('#forgotPasswordLinkMobile').click(function() {
             displayJQueryDialog("dlgPasswordRecovery", "Forgot Password", "top", displayContainerPosition, window, false, true, 
                                 "AJAXHandler.php?action=PasswordRecoveryDialogLoad", function() {
             	PasswordRecoveryDialogOnReady($('#dlgPasswordRecovery').dialog());

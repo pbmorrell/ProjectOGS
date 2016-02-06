@@ -46,6 +46,7 @@
                                                     <header>
                                                         <?php echo $headerMessage; ?>
                                                     </header><br/>
+                                                    <a href="#" class="actionLinkHeader" id="forgotPasswordLinkMobile">Forgot Password?</a>
                                                     <?php if($userId > -1): ?>
                                                         <div id="resetPasswordFormDiv" class="signupInp">
                                                             <form name="resetPasswordForm" method="POST" action="">
@@ -79,7 +80,7 @@
                 </div>
             </div>
 	</div>
-	<!-- Footer Wrapper -->			
+	<!-- Footer Wrapper -->
         <?php include 'Footer.php'; ?>
         <!-- Footer Wrapper -->
     </body>

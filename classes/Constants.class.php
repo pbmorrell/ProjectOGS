@@ -11,8 +11,14 @@ class Constants
     // Security configuration
     public static $authFailureRedirectPage = "Index.php";
     public static $pwdRecoveryPage = "http://www.morrellweb.com/ogs/PasswordRecovery.php";
-    public static $pwdRecoveryEmailSenderEmail = "admin@morrellweb.com";
+    public static $pwdRecoveryEmailSenderEmail = "playerunite.donotreply@gmail.com";
+    public static $pwdRecoveryEmailSenderFriendlyName = "PlayerUnite - DoNotReply";
     public static $pwdRecoverySessionExpTimeInMinutes = "12";
+    public static $pwdRecoverySessionEmailSubject = "PlayerUnite Password Reset Instructions";
+    public static $emailSMTPServer = "smtp.gmail.com";
+    public static $emailSMTPPort = 587;
+    public static $emailSMTPUser = "playerunite.donotreply@gmail.com";
+    public static $emailSMTPPassword = "t3\$t*useR";
 	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = true; // Change this to false when ready to move to production
