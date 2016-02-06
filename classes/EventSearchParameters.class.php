@@ -5,7 +5,7 @@ class EventSearchParameters
     public $StartDateTime = "";
     public $EndDateTime = "";
     public $GameTitles = [];
-	public $CustomGameTitle = "";
+    public $CustomGameTitle = "";
     public $EventCreators = [];
     public $CustomEventCreatorName = "";
     public $JoinedUsers = [];
@@ -37,6 +37,6 @@ class EventSearchParameters
         $this->NoStartDateRestriction = $nsd;
         $this->CustomEventCreatorName = $cecn;
         $this->CustomJoinedUserName = $cjeu;
-		$this->CustomGameTitle = $cgt;
+	$this->CustomGameTitle = $cgt;
     }
 }

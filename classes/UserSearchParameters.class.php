@@ -16,13 +16,13 @@ class UserSearchParameters
     {
         $this->GamerTag = $gt;
         $this->UserName = $un;
-		$this->FirstName = $fn;
-		$this->LastName = $ln;
+	$this->FirstName = $fn;
+	$this->LastName = $ln;
         $this->Platforms = $p;
-		$this->Gender = $g;
-		$this->ShowInvitesForUser = $sifu;
-		$this->ShowInvitesSentByUser = $sibu;
-		$this->ShowRejectedInvites = $sri;
-		$this->ShowCurrentFriendsForUser = $scf;
+	$this->Gender = $g;
+	$this->ShowInvitesForUser = $sifu;
+	$this->ShowInvitesSentByUser = $sibu;
+	$this->ShowRejectedInvites = $sri;
+	$this->ShowCurrentFriendsForUser = $scf;
     }
 }
