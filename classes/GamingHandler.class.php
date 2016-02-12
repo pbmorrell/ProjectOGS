@@ -1447,6 +1447,11 @@ class GamingHandler
             case "UserName":
                 $queryOrderByClause = "u.`UserName` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
+            case "Actions":
+                $queryOrderByClause = "(CASE WHEN em2.`ID` IS NOT NULL THEN (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) THEN 'JOINED' ELSE 'LEAVE' END) ELSE " .
+                                      "(CASE WHEN membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount` THEN 'FULL' ELSE (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) " .
+                                        "THEN 'UNJOINED' ELSE 'JOIN' END) END) END) " . 
+                                      $orderByDirection . ", e.`EventScheduledForDate`";
             case "EventCreator":
                 $queryOrderByClause = "(CASE WHEN ((em2.`ID` IS NOT NULL) AND (em2.`ID` = u.`ID`)) THEN 'ME' ELSE u.`UserName` END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";
