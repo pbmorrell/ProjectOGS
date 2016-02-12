@@ -130,9 +130,8 @@ function MemberHomeOnReady()
     $('#ddlTimeZonesEnd').addClass('overlayPanelElement');
     
     // Add event handlers to mobile control panel buttons
-    $('#btnMobileRefresh').click(function() {
-        var fullRefresh = false;
-        ReloadUserHostedEventsTable(fullRefresh);
+    $('#btnMobileLeave').click(function() {
+        LeaveSelectedEvents();
     });
 
     $('#btnMobileActivate').click(function() {
@@ -184,15 +183,15 @@ function MemberHomeOnReady()
     OnViewportSizeChanged(curWindowWidth, curWindowHeight, 'desktop', GetCurWidthClass(), 'desktop', GetCurHeightClass(), initTransition);
     
     // Initialize event status checkbox states
-    $('#evtStatusUnjoined').prop('checked', true);
+    $('#evtStatusCreated').prop('checked', true);
     
     // Force user to select at least one of (but possibly both of) "Show My Joined Events" and 
-    // "Show Events Open For Joining" search panel checkboxes
-    $('#evtStatusJoined,#evtStatusUnjoined').change(function() {        
+    // "Show My Created Events" search panel checkboxes
+    $('#evtStatusJoined,#evtStatusCreated').change(function() {        
         var joinedChkBoxIsChecked = $('#evtStatusJoined').is(':checked');
-        var unjoinedChkBoxIsChecked = $('#evtStatusUnjoined').is(':checked');
+        var createdChkBoxIsChecked = $('#evtStatusCreated').is(':checked');
         
-        if(!joinedChkBoxIsChecked && !unjoinedChkBoxIsChecked) {
+        if(!joinedChkBoxIsChecked && !createdChkBoxIsChecked) {
             $(this).prop('checked', true);
         }
     });
@@ -283,9 +282,8 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate Filter" }).text('Activate');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
 		
-	// Hide event manager mobile control panel if mobile view, or show it if in xtraSmall view
-	if(curWidthClass == 'mobile') 		$('.mobileButtonToolbarContainer').hide();
-	else if(curWidthClass == 'xtraSmall')   $('.mobileButtonToolbarContainer').show();
+	// Show event manager mobile control panel if in mobile view
+	$('.mobileButtonToolbarContainer').show();
         
         // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
         if(!initTransition) {
@@ -317,7 +315,7 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Activate" }).text('Activate Filter');
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
 		
-	// Hide event manager mobile control panel
+	// Hide event manager mobile control panel in desktop view
 	$('.mobileButtonToolbarContainer').hide();
 
         // Restore hidden or combined columns
@@ -395,7 +393,7 @@ function LoadEventManager()
 {    
     // Initialize jTable on manageEventsContent div
     $(eventManagerJTableDiv).jtable({
-        title: "Events Hosted By You",
+        title: "Your Events",
         paging: true,
         pageSize: 10,
         pageSizes: [5, 10, 15, 20, 25],
@@ -437,6 +435,14 @@ function LoadEventManager()
                     }
                 },
                 {
+                    text: 'Leave Selected',
+                    icon: 'images/cancelsignup.png',
+                    tooltip: 'Cancels enrollment for selected events',
+                    click: function(){
+                        LeaveSelectedEvents();
+                    }
+                },
+                {
                     text: 'Delete Selected',
                     icon: 'images/delete.png',
                     tooltip: 'Permanently deletes selected events',
@@ -456,7 +462,7 @@ function LoadEventManager()
             },
             GameTitle: {
                 title: 'Game',
-                width: '15%',
+                width: '11%',
                 sorting: true
             },
             Platform: {
@@ -476,12 +482,12 @@ function LoadEventManager()
             },
             Notes: {
                 title: 'Game Notes',
-                width: '25%',
+                width: '21%',
                 sorting: false
             },
             PlayersSignedUp: {
                 title: 'Players Joined',
-                width: '11%',
+                width: '10%',
                 display: function (data) {					
                     // Create PlayersSignedUp display object
                     var eventId = data.record.ID;
@@ -511,20 +517,58 @@ function LoadEventManager()
                 width: '7%',
                 sorting: true
             },
-            Edit: {
-                title: 'Edit',
-                width: '5%',
+            EventCreator: {
+                title: 'Creator',
+                width: '7%',
+                sorting: true,
                 display: function (data) {
-                    var $editImage = $('<img src="images/edit.png" />');
-                    $editImage.click(function () {
-                        DisplayEditEventDialog(data.record.ID);
-                    });
+                    if(data.record.EventCreator !== 'ME') {
+                        var $userNameDetailsPopupLink = $('<a href="#" class="actionLink" id="unDetailsLink' + data.record.ID + '">' + data.record.EventCreator + '</a>');
+                        $userNameDetailsPopupLink.click(function () {
+                            OpenUserDetailsPopup(data.record.EventCreatorUserID, data.record.EventCreator);
+                            return false;
+                        });
 
-                    // Return image for display in jTable
-                    return $editImage;
-                },
+                        // Return link for display in jTable
+                        return $userNameDetailsPopupLink;
+                    }
+                    else {
+			return $('<label>' + data.record.EventCreator + '</label>');
+                    }
+                }
+            },
+            Actions: {
+                title: 'Actions',
+                width: '7%',
                 sorting: false,
-                columnSelectable: false
+                columnSelectable: false,
+                display: function (data) {
+                    // Create EDIT or LEAVE link
+                    if((data.record.Actions == 'EDIT') || (data.record.Actions == 'LEAVE')) {
+			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Actions + '</a>');
+				
+			if(data.record.Actions === 'EDIT') {
+                            $expandLink = $('<img src="images/edit.png" />');
+                            
+                            $expandLink.click(function () {
+                                DisplayEditEventDialog(data.record.ID);
+                            });
+			}
+			else {
+                            $expandLink.click(function () {
+				var eventIds = [data.record.ID];
+				LeaveEvents(eventIds);
+				return false;
+                            });
+			}
+							
+			// Return image for display in jTable
+			return $expandLink;
+                    }
+                    else {
+			return $('<label>' + data.record.Actions + '</label>');
+                    }
+                }
             }
         },
 	recordsLoaded: function(event, data) {
@@ -541,11 +585,31 @@ function LoadEventManager()
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), eventManagerJTableDiv);
                 
-                // If an event is hidden, set forecolor to red
-                var isHidden = dataRecordArray[0].Hidden;
-                if(isHidden === 'Yes') {
+                // Set forecolor of event row, depending on its attributes
+                var isHidden = dataRecordArray[0].Hidden;                
+		var isJoined = dataRecordArray[0].Actions;
+                var eventCreator = dataRecordArray[0].EventCreator;
+                var isPastEvent = IsPastEvent(dataRecordArray[0].EventScheduledForDate);
+                
+                // If an event is joined by current user, set forecolor to green
+		if((isJoined === 'LEAVE') && (eventCreator !== 'ME') && !isPastEvent) {
+                    $(this).css('color', 'green');
+		}
+		// If all required players are signed up for a given event,
+		// such that it is "full", set forecolor to red
+		else if((eventCreator !== 'ME') && (isJoined === 'FULL') && !isPastEvent) {
                     $(this).css('color', 'red');
+		}
+                // If a future, non-hidden event is created by current user, set forecolor to blue
+                else if((eventCreator === 'ME') && (isHidden !== 'Yes') && !isPastEvent) {
+                    $(this).css('color', 'blue');
                 }
+		// If event occurred in the past, or is a hidden event created by current user, set forecolor to gray
+                // For all other cases (namely, other user's future events that are joinable by the current user),
+                //  forecolor will be regular black
+		else if((isHidden === 'Yes') || isPastEvent) {
+                    $(this).css('color', 'gray');
+		}
             });
 			
             var curWidthClass = GetCurWidthClass();
@@ -556,7 +620,8 @@ function LoadEventManager()
     // Load event list
     var postData = 
         {
-            action: eventManagerLoadAction
+            action: eventManagerLoadAction,
+            'evtStatus[]': 'showCreated'
         };
 		
     $(eventManagerJTableDiv).jtable('load', postData);
@@ -601,14 +666,6 @@ function LoadCurrentEventViewer()
                     tooltip: 'Signs you up for all selected events',
                     click: function(){
                         JoinSelectedEvents();
-                    }
-                },
-                {
-                    text: 'Leave Selected',
-                    icon: 'images/cancelsignup.png',
-                    tooltip: 'Cancels enrollment for selected events',
-                    click: function(){
-                        LeaveSelectedEvents();
                     }
                 }
             ]
@@ -661,35 +718,25 @@ function LoadCurrentEventViewer()
                 width: '22%',
                 sorting: false,
             },
-            Joined: {
-                title: 'Joined',
+            Actions: {
+                title: 'Actions',
                 width: '7%',
                 sorting: true,
                 display: function (data) {
-                    // Create JOIN or LEAVE link
-                    if((data.record.Joined == 'JOIN') || (data.record.Joined == 'LEAVE')) {
-			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Joined + '</a>');
-				
-			if(data.record.Joined === 'JOIN') {
-                            $expandLink.click(function () {
-                                var eventIds = [data.record.ID];
-				JoinEvents(eventIds);
-				return false;
-                            });
-			}
-			else {
-                            $expandLink.click(function () {
-				var eventIds = [data.record.ID];
-				LeaveEvents(eventIds);
-				return false;
-                            });
-			}
+                    // Create JOIN link
+                    if(data.record.Actions == 'JOIN') {
+			var $expandLink = $('<a href="#" class="actionLink" id="evtLink' + data.record.ID + '">' + data.record.Actions + '</a>');				
+                        $expandLink.click(function () {
+                            var eventIds = [data.record.ID];
+                            JoinEvents(eventIds);
+                            return false;
+                        });
 							
 			// Return image for display in jTable
 			return $expandLink;
                     }
                     else {
-			return $('<label>' + data.record.Joined + '</label>');
+			return $('<label>' + data.record.Actions + '</label>');
                     }
                 }
             },
@@ -746,14 +793,10 @@ function LoadCurrentEventViewer()
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
 							
-		// If an event is joined by current user, set forecolor to green
-		var isJoined = dataRecordArray[0].Joined;
-		if(isJoined === 'LEAVE') {
-                    $(this).css('color', 'green');
-		}
+		var isJoined = dataRecordArray[0].Actions;
 		// If all required players are signed up for a given event,
 		// such that it is "full", set forecolor to red
-		else if((isJoined === 'FULL') && (!IsPastEvent(dataRecordArray[0].EventScheduledForDate))) {
+		if((isJoined === 'FULL') && (!IsPastEvent(dataRecordArray[0].EventScheduledForDate))) {
                     $(this).css('color', 'red');
 		}
 		// If event occurred in the past, set forecolor to gray
@@ -770,8 +813,7 @@ function LoadCurrentEventViewer()
     // Load event list
     var postData = 
         {
-            action: currentEventViewerLoadAction,
-            'evtStatus[]': 'showUnjoined'
+            action: currentEventViewerLoadAction
         };
 		
     $(currentEventViewerJTableDiv).jtable('load', postData);
@@ -800,27 +842,15 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         colsToCombine = ["Date", "Time"];
         colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
         CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, eventManagerJTableDiv, hiddenClass);
-        
-        // Change table header/toolbar to be more mobile-friendly
-	if((curWidthClass == 'desktop') || (curWidthClass == 'mobile')) {
-            // Show toolbar items
-            $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
-	}
 		
-        if(curWidthClass == 'mobile') {
-            $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
-	}
-        else if(curWidthClass == 'xtraSmall') {
-            $(eventManagerJTableDiv + ' .jtable-title-text').text('Event List');
-			
-            // Hide toolbar items
-            $(eventManagerJTableDiv + ' .jtable-toolbar-item').hide();
-	}
-        
+        $(eventManagerJTableDiv + ' .jtable-title-text').text('Events');
+
+        // Hide all toolbar items except "Refresh"
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate Selected")').parent().hide();
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide Selected")').parent().hide();
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave Selected")').parent().hide();
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete Selected")').parent().hide();
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate Selected")').text('Activate');
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide Selected")').text('Hide');
-	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete Selected")').text('Delete');
         
         // Hide "Game Notes" and "Hidden" columns
         var gameNotesColHdr = $(eventManagerJTableDiv + ' th:contains("Game Notes")');
@@ -869,11 +899,8 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         ExpandTableColumn("Date", colsToExpand, eventManagerJTableDiv, hiddenClass);
 
         // Change table header and toolbar text to full-length versions
-        $(eventManagerJTableDiv + ' .jtable-title-text').text('Events Hosted By You');
+        $(eventManagerJTableDiv + ' .jtable-title-text').text('Your Events');
         $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate")').text('Activate Selected');
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide")').text('Hide Selected');
-	$(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete")').text('Delete Selected');
         
         // Show toolbar items
         $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
@@ -922,26 +949,25 @@ function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
         
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join Selected")').text('Join');
-        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave Selected")').text('Leave');
         
-        // Hide "Game Notes" and "Joined" columns
+        // Hide "Game Notes" and "Actions" columns
         var gameNotesColHdr = $(currentEventViewerJTableDiv + ' th:contains("Game Notes")');
         
-        var joinedColHdr = $(currentEventViewerJTableDiv + ' th').filter(function() {
-            return $(this).text() === "Joined";
+        var actionsColHdr = $(currentEventViewerJTableDiv + ' th').filter(function() {
+            return $(this).text() === "Actions";
         }).eq(0);
         
         var gameNotesColIdx = $(gameNotesColHdr).index();
-        var joinedColIdx = $(joinedColHdr).index();
+        var actionsColIdx = $(actionsColHdr).index();
         
         $(gameNotesColHdr).addClass(hiddenClass);
-        $(joinedColHdr).addClass(hiddenClass);
+        $(actionsColHdr).addClass(hiddenClass);
                 
 	$(currentEventViewerJTableDiv).children('.jtable-main-container').children('.jtable').children('tbody').children('tr').each(function() {
             var gameNotesCol = $(this).children('td').eq(gameNotesColIdx);
-            var joinedCol = $(this).children('td').eq(joinedColIdx);
+            var actionsCol = $(this).children('td').eq(actionsColIdx);
             $(gameNotesCol).addClass(hiddenClass);
-            $(joinedCol).addClass(hiddenClass);
+            $(actionsCol).addClass(hiddenClass);
         });
         
         // Hide page size change area
@@ -977,7 +1003,6 @@ function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
         $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse Events Hosted By Other Users');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join")').text('Join Selected');
-        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave")').text('Leave Selected');
         
         // Show hidden columns
         $('.' + hiddenClass).removeClass(hiddenClass);
@@ -1082,15 +1107,27 @@ function ToggleTableEventActivation(isActive)
         sweetAlert("No events selected");
         return;
     }
-
+    
     var selectedEventIds = [];
+    var eventsToDeselect = [];
     $selectedRows.each(function() {
-            var id = $(this).data('record').ID;
+        var id = $(this).data('record').ID;
+        var eventCreator = $(this).data('record').EventCreator;
+            
+        // Only try to toggle hidden status for events created by this user
+        if(eventCreator === 'ME') {
             selectedEventIds.push(id);
         }
-    );
+        else {
+            eventsToDeselect.push(id);
+        }
+    });
 
-    if(!ToggleEventVisibility(selectedEventIds, isActive)) {
+    if(selectedEventIds.length === 0) {
+        sweetAlert("ERROR", "No selected events may be edited: you can only change event status for events you own", "error");
+        DeselectJTableRowsByKey(eventManagerJTableDiv, eventsToDeselect);
+    }
+    else if(!ToggleEventVisibility(selectedEventIds, isActive)) {
         // Reject event activation request (de-select rows)
         DeselectAllJTableRows(eventManagerJTableDiv);
     }   
@@ -1105,13 +1142,25 @@ function DeleteTableEvents()
     }
 
     var selectedEventIds = [];
+    var eventsToDeselect = [];
     $selectedRows.each(function() {
-            var id = $(this).data('record').ID;
+        var id = $(this).data('record').ID;
+        var eventCreator = $(this).data('record').EventCreator;
+            
+        // Only try to delete events created by this user
+        if(eventCreator === 'ME') {
             selectedEventIds.push(id);
         }
-    );
+        else {
+            eventsToDeselect.push(id);
+        }
+    });
 
-    if(!DeleteEvents(selectedEventIds)) {
+    if(selectedEventIds.length === 0) {
+        sweetAlert("ERROR", "No selected events may be deleted: you can only delete events you have created", "error");
+        DeselectJTableRowsByKey(eventManagerJTableDiv, eventsToDeselect);
+    }
+    else if(!DeleteEvents(selectedEventIds)) {
         // Reject event deletion request (de-select rows)
         DeselectAllJTableRows(eventManagerJTableDiv);
     }
@@ -1126,7 +1175,6 @@ function JoinSelectedEvents()
     }
 
     var selectedEventIds = [];
-	var oldEvents = [];
     var eventsToDeselect = [];
     $selectedRows.each(function() {
         var id = $(this).data('record').ID;
@@ -1153,7 +1201,7 @@ function JoinSelectedEvents()
 
 function LeaveSelectedEvents()
 {
-    var $selectedRows = $(currentEventViewerJTableDiv).jtable('selectedRows');
+    var $selectedRows = $(eventManagerJTableDiv).jtable('selectedRows');
     if($selectedRows.length === 0) {
         sweetAlert("No events selected");
         return;
@@ -1163,10 +1211,10 @@ function LeaveSelectedEvents()
     var eventsToDeselect = [];
     $selectedRows.each(function() {
         var id = $(this).data('record').ID;
-        var isJoined = $(this).data('record').Joined;
+        var action = $(this).data('record').Actions;
             
         // Only try to leave events that this user has already joined
-        if(isJoined === 'LEAVE') {
+        if(action === 'LEAVE') {
             selectedEventIds.push(id);
         }
         else {
@@ -1176,11 +1224,11 @@ function LeaveSelectedEvents()
 
     if(selectedEventIds.length === 0) {
         sweetAlert("No selected events may be left: you can only leave events scheduled for the future, and which you have already joined");
-        DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
+        DeselectJTableRowsByKey(eventManagerJTableDiv, eventsToDeselect);
     }
     else if(!LeaveEvents(selectedEventIds)) {
         // De-select any rows for events for which the user is not a member
-        DeselectJTableRowsByKey(currentEventViewerJTableDiv, eventsToDeselect);
+        DeselectJTableRowsByKey(eventManagerJTableDiv, eventsToDeselect);
     }
 }
 
@@ -1445,6 +1493,7 @@ function JoinEvents(selectedEventIds)
             success: function(response){
 		var fullRefresh = false;
 		ReloadCurrentEventsTable(fullRefresh);
+                ReloadUserHostedEventsTable(fullRefresh);
 		
                 if(response.match("^SYSTEM ERROR")) {
                     sweetAlert("Events Not Joined", response, "error");
@@ -1487,7 +1536,8 @@ function LeaveEvents(selectedEventIds)
             data: "action=EventViewerLeaveEvents&" + $.param({'eventIds': selectedEventIds}),
             success: function(response){
 		var fullRefresh = false;
-                ReloadCurrentEventsTable(fullRefresh);
+		ReloadCurrentEventsTable(fullRefresh);
+                ReloadUserHostedEventsTable(fullRefresh);
                 
                 if(response.match("^SYSTEM ERROR")) {
                     sweetAlert("Events Not Left", response, "error");

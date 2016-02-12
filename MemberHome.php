@@ -84,12 +84,12 @@ by => Stephen Giles and Paul Morrell
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">Start Date:</label><br />
 										<input id="gameFilterStartDate" class="overlayPanelElement" name="gameFilterStartDate" type="text" 
-										   maxlength="50" placeholder=" Start Date">
+                                                                                    maxlength="50" placeholder=" Start Date">
                                                                             </div>
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">Start Time:</label><br />
 										<input id="gameFilterStartTime" class="overlayPanelElement" name="gameFilterStartTime" type="text" 
-										   maxlength="9" placeholder=" Start Time">
+											maxlength="9" placeholder=" Start Time">
                                                                             </div>
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">Time Zone:</label><br />
@@ -102,12 +102,12 @@ by => Stephen Giles and Paul Morrell
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">End Date:</label><br />
 										<input id="gameFilterEndDate" class="overlayPanelElement" name="gameFilterEndDate" type="text" 
-										   maxlength="50" placeholder=" End Date">
+											maxlength="50" placeholder=" End Date">
                                                                             </div>
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">End Time:</label><br />
 										<input id="gameFilterEndTime" class="overlayPanelElement" name="gameFilterEndTime" type="text" 
-										   maxlength="9" placeholder=" End Time">
+											maxlength="9" placeholder=" End Time">
                                                                             </div>
                                                                             <div class="overlayPanelElementContainer">
 										<label class="overlayPanelLabel">Time Zone:</label><br />
@@ -178,10 +178,10 @@ by => Stephen Giles and Paul Morrell
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Game Titles:</label><br />
 										<div class="fixedHeightScrollableContainerLarge">
-										<?php 
-										   echo $gamingHandler->ConstructGameTitleMultiSelector($dataAccess, $logger);
-										?>
-										</div>
+                                                                                    <?php 
+                                                                                        echo $gamingHandler->ConstructGameTitleMultiSelector($dataAccess, $logger);
+                                                                                    ?>
+                                                                                </div>
                                                                             </div>
 									<?php endif; ?>
                                                                         <div class="<?php echo $searchPanelTextboxWrapperClass; ?>">
@@ -207,10 +207,10 @@ by => Stephen Giles and Paul Morrell
 									<?php if($objUser->IsPremiumMember): ?>
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Users:</label><br />
-										<div class="fixedHeightScrollableContainerLarge">
-										<?php 
-										    echo $gamingHandler->ConstructUserMultiSelector($dataAccess, $logger, "filterActiveUsers[]", $objUser->UserID);
-										?>
+                                                                                <div class="fixedHeightScrollableContainerLarge">
+                                                                                    <?php 
+                                                                                        echo $gamingHandler->ConstructUserMultiSelector($dataAccess, $logger, "filterActiveUsers[]", $objUser->UserID);
+                                                                                    ?>
                                                                                 </div>
                                                                             </div>
 									<?php endif; ?>
@@ -238,9 +238,9 @@ by => Stephen Giles and Paul Morrell
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Users:</label><br />
                                                                                 <div class="fixedHeightScrollableContainerLarge">
-										<?php 
-										    echo $gamingHandler->ConstructUserMultiSelector($dataAccess, $logger, "filterActiveJoinedUsers[]", $objUser->UserID);
-										?>
+                                                                                    <?php 
+											echo $gamingHandler->ConstructUserMultiSelector($dataAccess, $logger, "filterActiveJoinedUsers[]", $objUser->UserID);
+                                                                                    ?>
 										</div>
                                                                             </div>
 									<?php endif; ?>
@@ -268,9 +268,9 @@ by => Stephen Giles and Paul Morrell
                                                                             <div class="overlayPanelElementContainerCheckboxList">
 										<label class="overlayPanelLabel">Select Consoles:</label><br />
                                                                                 <div class="fixedHeightScrollableContainerLarge">
-										<?php 
-										    echo $gamingHandler->GetPlatformCheckboxList($dataAccess, [], 'filterPlatforms[]', true);
-										?>
+                                                                                    <?php 
+											echo $gamingHandler->GetPlatformCheckboxList($dataAccess, [], 'filterPlatforms[]', true);
+                                                                                    ?>
 										</div>
                                                                             </div>
 									<?php endif; ?>
@@ -284,15 +284,15 @@ by => Stephen Giles and Paul Morrell
                                                                 <br />
                                                                 <div id="joinStatusFilterDiv" class="overlayPanelFilterGroup overlayPanelGroupBorder">
                                                                     <div class="overlayPanelFilterSubGroup">
-                                                                        <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
+                                                                        <div class="overlayPanelElementContainerWide searchPanelEvtMgrFilter">
                                                                             <div><label class="overlayPanelLabel">Show My Joined Events</label></div>
                                                                             <div><input type="checkbox" id="evtStatusJoined" name="evtStatus[]" 
                                                                                    class="overlayPanelElement filterFieldActive" value="showJoined"></div>
                                                                         </div>
-                                                                        <div class="overlayPanelElementContainerWide searchPanelCurEvtsFilter">
-                                                                            <div><label class="overlayPanelLabel">Show Un-Joined Events</label></div>
-                                                                            <div><input type="checkbox" id="evtStatusUnjoined" name="evtStatus[]" 
-                                                                                   class="overlayPanelElement filterFieldActive" value="showUnjoined"></div>
+                                                                        <div class="overlayPanelElementContainerWide searchPanelEvtMgrFilter">
+                                                                            <div><label class="overlayPanelLabel">Show My Created Events</label></div>
+                                                                            <div><input type="checkbox" id="evtStatusCreated" name="evtStatus[]" 
+                                                                                   class="overlayPanelElement filterFieldActive" value="showCreated"></div>
                                                                         </div>
                                                                         <div class="overlayPanelElementContainerWide searchPanelEvtMgrFilter">
                                                                             <div><label class="overlayPanelLabel">Show Full Events Only</label></div>
@@ -330,19 +330,19 @@ by => Stephen Giles and Paul Morrell
 					<h2>Current Events</h2>
 					<span id="totalGamesToJoin" class="byline"></span><br/><br/>
 					<div id="currentEventsContent">
-					</div>
+                                        </div>
                                     </section><br/>
 				</div>
 				<div id="manageEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
                                         <div id="mobileEvtMgrToolbar" class="mobileButtonToolbarContainer">
-                                            <button type="button" class="memberHomeBtn" id="btnMobileRefresh">Refresh
-                                                <br /><img src="images/refresh.png" /></button>
                                             <button type="button" class="memberHomeBtn" id="btnMobileActivate">Activate
                                                 <br /><img src="images/activate.png" /></button>
                                             <button type="button" class="memberHomeBtn" id="btnMobileHide">Hide
                                                 <br /><img src="images/deactivate.png" /></button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileLeave">Leave
+                                                <br /><img src="images/cancelsignup.png" /></button>
                                             <button type="button" class="memberHomeBtn" id="btnMobileDelete">Delete
                                                 <br /><img src="images/delete.png" /></button>
                                         </div>

@@ -13,13 +13,13 @@ class EventSearchParameters
     public $Platforms = [];
     public $CustomPlatformName = "";
     public $ShowJoinedEvents = false;
-    public $ShowOpenEvents = true;
+    public $ShowCreatedEvents = true;
     public $ShowFullEventsOnly = false;
     public $ShowOpenEventsOnly = false;
     public $NoStartDateRestriction = false;
 	
     public function __construct($sh = false, $sdt = "", $edt = "", $gt = [], $ec = [], $ju = [], 
-				$p = [], $sje = false, $soe = true, $sfeo = false, $nsd = false, 
+				$p = [], $sje = false, $sce = true, $sfeo = false, $nsd = false, 
 				$cecn = "", $cjeu = "", $cpn = "", $soeo = false, $cgt = "")
     {
         $this->ShowHiddenEvents = $sh;
@@ -31,7 +31,7 @@ class EventSearchParameters
         $this->Platforms = $p;
         $this->CustomPlatformName = $cpn;
         $this->ShowJoinedEvents = $sje;
-        $this->ShowOpenEvents = $soe;
+        $this->ShowCreatedEvents = $sce;
         $this->ShowFullEventsOnly = $sfeo;
         $this->ShowOpenEventsOnly = $soeo;
         $this->NoStartDateRestriction = $nsd;
