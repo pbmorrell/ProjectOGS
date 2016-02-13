@@ -283,6 +283,7 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate Filter" }).text('Deactivate');
 		
 	// Show event manager mobile control panel if in mobile view
+        $('.dashboardTitle').show();
 	$('.mobileButtonToolbarContainer').show();
         
         // Collapse events tables by combining text of certain columns and hiding other, unnecessary ones
@@ -316,6 +317,7 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
         $('.overlayPanelToggleActiveLbl').filter(function(index) { return $(this).text() === "Deactivate" }).text('Deactivate Filter');
 		
 	// Hide event manager mobile control panel in desktop view
+        $('.dashboardTitle').hide();
 	$('.mobileButtonToolbarContainer').hide();
 
         // Restore hidden or combined columns
@@ -410,12 +412,20 @@ function LoadEventManager()
             items:
             [
                 {
-                    text: 'Refresh Events',
+                    text: 'Refresh',
                     icon: 'images/refresh.png',
                     tooltip: 'Refreshes your event list',
                     click: function(){
 			var fullRefresh = false;
                         ReloadUserHostedEventsTable(fullRefresh);
+                    }
+                },
+                {
+                    text: 'Create',
+                    icon: 'images/calendar.png',
+                    tooltip: 'Create a new event',
+                    click: function(){
+			DisplayCreateEventDialog();
                     }
                 },
                 {
@@ -652,7 +662,7 @@ function LoadCurrentEventViewer()
             items:
             [
                 {
-                    text: 'Refresh Events',
+                    text: 'Refresh',
                     icon: 'images/refresh.png',
                     tooltip: 'Refreshes current event list',
                     click: function(){
@@ -789,10 +799,10 @@ function LoadCurrentEventViewer()
 										
 		var playerData = dataRecordArray[0].PlayersSignedUpData;
 		$(this).attr('data-playersSignedUp', playerData);
-															
+																
 		// Pre-load each child table, but do not show yet
 		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
-							
+									
 		var isJoined = dataRecordArray[0].Actions;
 		// If all required players are signed up for a given event,
 		// such that it is "full", set forecolor to red
@@ -843,14 +853,10 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         colsToCombineBlankSeparatorLine = {"Date": false, "Time": false};
         CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, eventManagerJTableDiv, hiddenClass);
 		
-        $(eventManagerJTableDiv + ' .jtable-title-text').text('Events');
+        $(eventManagerJTableDiv + ' .jtable-title-text').text('YOUR EVENTS');
 
-        // Hide all toolbar items except "Refresh"
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Activate Selected")').parent().hide();
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Hide Selected")').parent().hide();
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Leave Selected")').parent().hide();
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Delete Selected")').parent().hide();
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
+        // Hide all toolbar items (in preparation to show mobile dashboard)
+        $(eventManagerJTableDiv + ' .jtable-toolbar-item').hide();
         
         // Hide "Game Notes" and "Hidden" columns
         var gameNotesColHdr = $(eventManagerJTableDiv + ' th:contains("Game Notes")');
@@ -898,9 +904,8 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
         colsToExpand = ["Time"];
         ExpandTableColumn("Date", colsToExpand, eventManagerJTableDiv, hiddenClass);
 
-        // Change table header and toolbar text to full-length versions
+        // Change table header text to non-caps version
         $(eventManagerJTableDiv + ' .jtable-title-text').text('Your Events');
-        $(eventManagerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
         
         // Show toolbar items
         $(eventManagerJTableDiv + ' .jtable-toolbar-item').show();
@@ -944,10 +949,9 @@ function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
         CombineTableColumns(colsToCombine, colsToCombineBlankSeparatorLine, currentEventViewerJTableDiv, hiddenClass);
         
         // Change table header and toolbar text to shorter, mobile-friendly words
-        if(curWidthClass == 'mobile')           $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse User Events');
-        else if(curWidthClass == 'xtraSmall')   $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Event List');
+        if(curWidthClass == 'mobile')           $(currentEventViewerJTableDiv + ' .jtable-title-text').text('BROWSE USER EVENTS');
+        else if(curWidthClass == 'xtraSmall')   $(currentEventViewerJTableDiv + ' .jtable-title-text').text('EVENT LIST');
         
-        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh Events")').text('Refresh');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join Selected")').text('Join');
         
         // Hide "Game Notes" and "Actions" columns
@@ -1001,7 +1005,6 @@ function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
 
         // Change table header and toolbar text to full-length versions
         $(currentEventViewerJTableDiv + ' .jtable-title-text').text('Browse Events Hosted By Other Users');
-        $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Refresh")').text('Refresh Events');
         $(currentEventViewerJTableDiv + ' .jtable-toolbar-item-text:contains("Join")').text('Join Selected');
         
         // Show hidden columns

@@ -42,10 +42,6 @@ by => Stephen Giles and Paul Morrell
                                             <section>
                                                 <h2>Control Panel</h2>
 						<ul class="style3 contact">
-                                                    <li class="icon fa-calendar">
-							<a href="#" onclick="return DisplayCreateEventDialog();" 
-                                                           style="text-decoration:none;font-weight:bold;">Schedule Event</a>
-                                                    </li>
                                                     <li class="icon fa-gamepad">
 							<a href="#manageEventsDiv" onclick="ToggleControlPanelDisplay(panelEnum.MyEventViewer);" 
                                                            style="text-decoration:none;font-weight:bold;">Manage Your Events</a>
@@ -336,15 +332,20 @@ by => Stephen Giles and Paul Morrell
 				<div id="manageEventsDiv" class="9u jTableContainer">
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
-                                        <div id="mobileEvtMgrToolbar" class="mobileButtonToolbarContainer">
-                                            <button type="button" class="memberHomeBtn" id="btnMobileActivate">Activate
-                                                <br /><img src="images/activate.png" /></button>
-                                            <button type="button" class="memberHomeBtn" id="btnMobileHide">Hide
-                                                <br /><img src="images/deactivate.png" /></button>
-                                            <button type="button" class="memberHomeBtn" id="btnMobileLeave">Leave
-                                                <br /><img src="images/cancelsignup.png" /></button>
-                                            <button type="button" class="memberHomeBtn" id="btnMobileDelete">Delete
-                                                <br /><img src="images/delete.png" /></button>
+                                        <div class="dashboardTitle">Dashboard</div>
+                                        <div class="mobileButtonToolbarContainer">
+                                            <button type="button" class="memberHomeBtn" id="btnMobileActivate">
+                                                <img src="images/activate.png" />&nbsp;&nbsp;Activate</button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileHide">
+                                                <img src="images/deactivate.png" />&nbsp;&nbsp;Hide</button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileLeave">
+                                                <img src="images/cancelsignup.png" />&nbsp;&nbsp;Leave</button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileDelete">
+                                                <img src="images/delete.png" />&nbsp;&nbsp;Delete</button>
+                                            <button type="button" class="memberHomeBtn" onclick="return DisplayCreateEventDialog();" 
+                                                    id="btnMobileCreate"><img src="images/calendar.png" />&nbsp;&nbsp;Create</button>
+                                            <button type="button" class="memberHomeBtn" id="btnMobileRefresh">
+                                                <img src="images/refresh.png" />&nbsp;&nbsp;Refresh</button>
                                         </div>
                                         <div id="manageEventsContent">
                                         </div>

@@ -377,20 +377,20 @@
                 echo $gamingHandler->EventEditorDeleteEvents($dataAccess, $logger, $_POST['eventIds']);
                 break;
             case "ReloadGameTitleSelector":
-		echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID, '');
-		break;
+				echo $gamingHandler->ConstructGameTitleSelectorHTML($dataAccess, $logger, $objUser->UserID, '');
+				break;
             case "GetUserOwnedEventsForJTable":
-		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
-		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-		$paginationEnabled = ($startIndex === "-1") ? false : true;
+				$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
+				$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+				$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+				$paginationEnabled = ($startIndex === "-1") ? false : true;
 
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
-		$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
-		$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
+				$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
+				$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
 						
-		if(strlen($startDateRangeInDays) > 0) {
+				if(strlen($startDateRangeInDays) > 0) {
                     $curUTCStartDate = new DateTime(null, new DateTimeZone("UTC"));
                     $curUTCEndDate = new DateTime(null, new DateTimeZone("UTC"));
 					
@@ -399,12 +399,12 @@
                                                                       ($curUTCStartDate->sub(new DateInterval(sprintf("P%sD", $startDateRangeInDays)))->format(DateTime::ATOM));
                     $endDateTime = ($endDateRangeInDays == "0") ? ($curUTCEndDate->format(DateTime::ATOM)) : 
 								  ($curUTCEndDate->add(new DateInterval(sprintf("P%sD", $endDateRangeInDays)))->format(DateTime::ATOM));
-		}
+				}
 				
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
                 $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? trim(filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-		$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
                 $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
                 
                 $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
@@ -417,25 +417,25 @@
                 $showFullEventsOnly = in_array('showFull', $evtStatusFilters);
                 $showHiddenEvents = in_array('showHidden', $evtStatusFilters);
                 
-		$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
+				$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, [], $activeJoinedUsers, $platforms, 
                                                          $showJoinedEvents, $showCreatedEvents, $showFullEventsOnly, false, "", $customJoinedUserEntry, $customPlatformEntry, 
 							 $showOpenEventsOnly, $customGameTitle);
-		echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
+				echo $gamingHandler->JTableEventManagerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, 
                                                             $startIndex, $pageSize, $searchParms);
                 break;
             case "GetCurrentEventsForJTable":
-		$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
-		$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
-		$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
-		$paginationEnabled = ($startIndex === "-1") ? false : true;
+				$orderBy = isset($_GET['jtSorting']) ? filter_var($_GET['jtSorting'], FILTER_SANITIZE_STRING) : "DisplayDate ASC";
+				$startIndex = isset($_GET['jtStartIndex']) ? filter_var($_GET['jtStartIndex'], FILTER_SANITIZE_STRING) : "-1";
+				$pageSize = isset($_GET['jtPageSize']) ? filter_var($_GET['jtPageSize'], FILTER_SANITIZE_STRING) : "-1";
+				$paginationEnabled = ($startIndex === "-1") ? false : true;
 
-		$showHiddenEvents = false;
+				$showHiddenEvents = false;
                 $startDateTime = isset($_POST['gameFilterStartDateTime']) ? filter_var($_POST['gameFilterStartDateTime'], FILTER_SANITIZE_STRING) : "";
                 $endDateTime = isset($_POST['gameFilterEndDateTime']) ? filter_var($_POST['gameFilterEndDateTime'], FILTER_SANITIZE_STRING) : "";
-		$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
-		$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
+				$startDateRangeInDays = isset($_POST['gameFilterDateRangeStart']) ? filter_var($_POST['gameFilterDateRangeStart'], FILTER_SANITIZE_STRING) : "";
+				$endDateRangeInDays = isset($_POST['gameFilterDateRangeEnd']) ? filter_var($_POST['gameFilterDateRangeEnd'], FILTER_SANITIZE_STRING) : "";
 								
-		if(strlen($startDateRangeInDays) > 0) {
+				if(strlen($startDateRangeInDays) > 0) {
                     $curUTCStartDate = new DateTime(null, new DateTimeZone("UTC"));
                     $curUTCEndDate = new DateTime(null, new DateTimeZone("UTC"));
 					
@@ -444,15 +444,15 @@
 								      ($curUTCStartDate->sub(new DateInterval(sprintf("P%sD", $startDateRangeInDays)))->format(DateTime::ATOM));
                     $endDateTime = ($endDateRangeInDays == "0") ? ($curUTCEndDate->format(DateTime::ATOM)) : 
 								  ($curUTCEndDate->add(new DateInterval(sprintf("P%sD", $endDateRangeInDays)))->format(DateTime::ATOM));
-		}
+				}
 				
                 $existingGameTitles = (isset($_POST['filterGameTitles'])) ? ($_POST['filterGameTitles']) : [];
                 $customGameTitle = isset($_POST['gameCustomTitleFilter']) ? trim(filter_var($_POST['gameCustomTitleFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-		$activeUsers = (isset($_POST['filterActiveUsers'])) ? ($_POST['filterActiveUsers']) : [];
+				$activeUsers = (isset($_POST['filterActiveUsers'])) ? ($_POST['filterActiveUsers']) : [];
                 $customUserEntry = isset($_POST['gameCustomUserFilter']) ? trim(filter_var($_POST['gameCustomUserFilter'], FILTER_SANITIZE_STRING)) : "";
 				
-		$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
+				$activeJoinedUsers = (isset($_POST['filterActiveJoinedUsers'])) ? ($_POST['filterActiveJoinedUsers']) : [];
                 $customJoinedUserEntry = isset($_POST['gameCustomJoinedUserFilter']) ? trim(filter_var($_POST['gameCustomJoinedUserFilter'], FILTER_SANITIZE_STRING)) : "";
                 
                 $platforms = (isset($_POST['filterPlatforms'])) ? ($_POST['filterPlatforms']) : [];
@@ -464,21 +464,21 @@
                 $showFullEventsOnly = false;
                 $showOpenEventsOnly = in_array('openOnly', $evtStatusFilters);
 				
-		$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, 
+				$searchParms = new EventSearchParameters($showHiddenEvents, $startDateTime, $endDateTime, $existingGameTitles, $activeUsers, $activeJoinedUsers, 
                                                          $platforms, $showJoinedEvents, $showCreatedEvents, $showFullEventsOnly, false, $customUserEntry, 
                                                          $customJoinedUserEntry, $customPlatformEntry, $showOpenEventsOnly, $customGameTitle);
-		echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
+				echo $gamingHandler->JTableCurrentEventViewerLoad($dataAccess, $logger, $objUser->UserID, $orderBy, $paginationEnabled, $startIndex, 
                                                                   $pageSize, $searchParms);
                 break;
             case "EventViewerJoinEvents":
-		echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+				echo $gamingHandler->AddUserToEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
                 break;
             case "EventViewerLeaveEvents":
-		echo $gamingHandler->RemoveUserFromEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
+				echo $gamingHandler->RemoveUserFromEvents($dataAccess, $logger, $objUser->UserID, $_POST['eventIds']);
                 break;
             case "GetJoinedPlayersForEvent":
-		echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
-		break;
+				echo $gamingHandler->LoadJoinedPlayersForEvent($dataAccess, $logger, $_GET['eventId']);
+				break;
             case "GetPlatformDropdownListForEditor":
                 $selectorFieldName = isset($_POST['selectorFieldName']) ? filter_var($_POST['selectorFieldName'], FILTER_SANITIZE_STRING) : "";
                 echo $gamingHandler->GetPlatformDropdownList($dataAccess, -1, '', $selectorFieldName);

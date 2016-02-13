@@ -1438,7 +1438,7 @@ class GamingHandler
                 $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "Hidden":
-		// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
+				// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
                 $queryOrderByClause = "(CASE WHEN e.`IsActive` = 0 THEN 1 ELSE 0 END) " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "DisplayDate":
@@ -1452,6 +1452,7 @@ class GamingHandler
                                       "(CASE WHEN membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount` THEN 'FULL' ELSE (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) " .
                                         "THEN 'UNJOINED' ELSE 'JOIN' END) END) END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";
+				break;
             case "EventCreator":
                 $queryOrderByClause = "(CASE WHEN ((em2.`ID` IS NOT NULL) AND (em2.`ID` = u.`ID`)) THEN 'ME' ELSE u.`UserName` END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";
@@ -1562,7 +1563,7 @@ class GamingHandler
         $eventMemberLeftJoinClause = "LEFT JOIN `Gaming.EventMembers` AS em2 ON (em2.`FK_Event_ID` = e.`ID`) AND (em2.`FK_User_ID` = ?) ";
         array_push($queryParms, $userID);
         
-        if($searchParms->ShowFullEventsOnly || $searchParms->ShowOpenEventsOnly) {
+        if($searchParms->ShowFullEventsOnly || $searchParms->ShowOpenEventsOnly || (strripos($orderBy, "Actions") !== false)) {
             // Get count of members joined to each event
             $eventMemberLeftJoinClause .= "LEFT JOIN (SELECT COUNT(`ID`) AS JoinedCnt, `FK_Event_ID` FROM `Gaming.EventMembers` " . 
                                           "GROUP BY `FK_Event_ID`) AS membersByEvent ON membersByEvent.`FK_Event_ID` = e.`ID` ";            

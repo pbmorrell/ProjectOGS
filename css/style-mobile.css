@@ -166,9 +166,9 @@
     }
     
     .dlgToolbarContainer {
-        width: 95%;
+        width: 100%;
         height: auto;
-        border:2px solid red;
+        border:2px groove gray;
         box-sizing: border-box;
         overflow-y: auto;
     }
@@ -180,7 +180,6 @@
         margin-top: 0.5em;
         margin-bottom: 0.5em;
         margin-left: 2%;
-        margin-right: 2%;
         padding: 1.5em 1em 1em 0.75em !important;
     }
         
