@@ -1438,7 +1438,7 @@ class GamingHandler
                 $queryOrderByClause = "p.`Name` " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "Hidden":
-				// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
+		// If sorting by "Hidden", need to reverse requested sort direction because "IsActive" is the opposite of "Hidden"
                 $queryOrderByClause = "(CASE WHEN e.`IsActive` = 0 THEN 1 ELSE 0 END) " . $orderByDirection . ", e.`EventScheduledForDate`";
                 break;
             case "DisplayDate":
