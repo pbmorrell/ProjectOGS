@@ -42,7 +42,7 @@
 													to providing a simple way to unite video game players everywhere.</p>
 												<p>Sign up is quick and easy. Did we mention a standard account is free? <a href="Index.php" style="text-decoration:none;">
 													What are you waiting for?</a></p>
-												<p>Have questions? Be sure to check out our <a href="Faq.php" style="text-decoration:none;">FAQ</a> for additinal information.</p>
+												<p>Have questions? Be sure to check out our <a href="Faq.php" style="text-decoration:none;">FAQ</a> for additional information.</p>
 										</article>
 										</div>
 									</div>
@@ -63,12 +63,12 @@
 												<h2>The Team</h2>
 												<h3>Stephen Giles</h3>
 													<p>Stephen is well versed in multiple programming languages such as .NET, PHP, AJAX, and JS. 
-														When not stiching together backend databases, he enjoys a wide range of activties. Which include ping-pong, football, studying the Bible, 
-														playing the Halo series, and endless nights with Forza</p>
+														When not stitching together back end databases, he enjoys a wide range of activities, including ping-pong, football, studying the Bible, 
+														playing the Halo series, and endless nights with Forza.</p>
 												<h3>Paul Morrell</h3>
 													<p>During the day Paul is an Automotive Consultant for a number of body shops across the United States. 
 													In his free time he enjoys coding front end websites and gaming on the PS4 and Steam. He enjoys all types 
-													of video games. From the FPS genre, to an involving RPG, and lets not forget the indies! Have you played Axiom Verge?!
+													of video games from the FPS genre, to an involving RPG, and lets not forget the indies! Have you played Axiom Verge?!
 													Paul is currently falling prey to the people of Yharnam in Bloodborne.
 													Follow Paul on Twitter <a href="https://twitter.com/pbmorrell" target="_blank" style="text-decoration:none;">@pbmorrell</a></p>
 											</section>
