@@ -239,7 +239,11 @@
         '<script src="js/jquery-ui-1.10.4.custom.js"></script>'.
         '<script src="js/jquery.maskedinput.min.js"></script>'.
         '<script src="js/jquery.timepicker.min.js"></script>'.
-        '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->'.   
+        '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->'.
+            
+        '<!-- For Favicon Icon -->'.
+        '<link rel="icon" type="image/png" href="images/FaviconPU.png"/>'.
+	'<link rel="apple-touch-icon" href="images/FaviconPU.png">'.
             
         '<script>'.
             '$(document).ready(function($) { '.
