@@ -33,7 +33,7 @@
                                                     <div>
 							<p>Player Unite is a "Looking for Group" message board. We have a simple-to-use interface that allows
 							you to find other players to game with.</p>
-							<p>Sign up is quick and simple.&nbsp;<a href="Index.php">Get Started Today!</a></p>
+							<p>Sign up is quick and simple.&nbsp;<a href="index.php">Get Started Today!</a></p>
                                                     </div>
                                                     <h3>Is it free?</h3>
                                                     <div>
