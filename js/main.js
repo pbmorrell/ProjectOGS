@@ -23,9 +23,12 @@ function GlobalStartupActions()
     }
     
     // If page has Accordian widget, initialize now
-    if($("#accordion").length) {
-        $("#accordion").accordion();
-    }
+    $("#accordion").accordion({
+	    header: "h3",
+	    collapsible: true,
+	    heightStyle: content,
+	    navigation: true 
+	});
     
     // Display in desktop mode any ads whose position/size is dependent on
     // viewport size, if site not being used on mobile device

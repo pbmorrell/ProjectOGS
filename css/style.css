@@ -1203,12 +1203,15 @@
 	{
 		background: #0066CC;
 		color: #fff;
+                font-weight: bold;
+                border: none;
 	}
 	
 	#accordion div
 	{
 		background: #0066CC;
 		color: #fff;
+                border: none;
 	}
     
 /*********************************************************************************/
