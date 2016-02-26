@@ -185,8 +185,8 @@
                                                 <p>By upgrading your free account to a membership, you are helping us cover our hosting cost and paving a way for future expansions of the site!</p>
                                                 <br />
                                                 <h2>What is included in the membership?</h2>
-                                                <ul><li class="icon fa-search">&nbsp;&nbsp;Additional search tools for quickly pinpointing the information you need</li></ul>
-                                                <ul><li class="icon fa-user">&nbsp;&nbsp;A dedicated friends section that allows you to see other users information.</li></ul>
+                                                <ul><li class="icon fa-search">&nbsp;&nbsp;Enhanced search tools for quickly pinpointing the information you need</li></ul>
+                                                <ul><li class="icon fa-user">&nbsp;&nbsp;A dedicated friends section that allows you to create a closed network of friends.</li></ul>
                                                 <ul><li class="icon fa-flask">&nbsp;&nbsp;The ability to keep your events open to only your friends, keeping random users out.</li></ul>
 						<br />
                                                 <article>

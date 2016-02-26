@@ -77,9 +77,6 @@
                                                          Please keep in mind, the Friends feature is for premium members. Sign up to gain access!
                                                         </p>
                                                         <p>
-                                                         Once a premium member, you can click on a user's name anywhere in the site to view their profile. 
-                                                        </p>
-                                                        <p>
                                                          Start by clicking on your user name at the top right of the screen. Select "Find Friends". This
                                                          will take you to the Friends section where you can search for friends and manage all current friends.
                                                         </p>
@@ -109,6 +106,9 @@
                                                     </div>
                                                     <h3>How do I add gamer tags to my profile?</h3>
                                                     <div>
+                                                        <p>
+                                                        Gamer Tags are used to help players identify you online. Simply use your console/pc account name for your gamer tag.
+                                                        </p>
                                                         <p>
 							Click on your User Name at the top right of the screen, then select "Edit Profile".
                                                         Click the "Update Gamer Tags" button on the upper right of the screen. In the popup window,
@@ -145,8 +145,8 @@
                                                     <h3>How do I see my joined events?</h3>
                                                     <div>
                                                         <p>
-							Click on "Filter Events". Scroll down to the bottom of the screen and click "Show My Joined Events". 
-							Click the "Search" button and then close the Search box. Your joined events will be listed under Current Events.
+							Click on "Manage Your Events". Click on "Filter Events". Scroll down to the bottom of the screen and click "Show My Joined Events". 
+							Click the "Search" button and then close the Search box. Your joined events will be listed under "Manage Your Events".
 							</p>
                                                     </div>
                                                     <h3>How do I see events for a specific game title or console?</h3>
