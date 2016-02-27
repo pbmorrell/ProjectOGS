@@ -9,8 +9,8 @@ class Constants
     public static $dbName = "raiden01_ProjectOGS";
 	
     // Security configuration
-    public static $authFailureRedirectPage = "Index.php";
-    public static $pwdRecoveryPage = "http://www.morrellweb.com/ogs/PasswordRecovery.php";
+    public static $authFailureRedirectPage = "index.php";
+    public static $pwdRecoveryPage = "https://www.playerunite.com/PasswordRecovery.php";
     public static $pwdRecoveryEmailSenderEmail = "playerunite.donotreply@gmail.com";
     public static $pwdRecoveryEmailSenderFriendlyName = "PlayerUnite - DoNotReply";
     public static $pwdRecoverySessionExpTimeInMinutes = "12";
@@ -34,7 +34,7 @@ class Constants
     public static $payPalTestDonationButtonId = "CR9CAS34T5BZ2";
     public static $payPalTestSubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalTestUnsubscribeButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_unsubscribe_LG.gif";
-    public static $payPalTestDonationButtonImgUrl = "https://www.sandbox.paypal.com/en_US/i/btn/btn_paynow_LG.gif";
+    public static $payPalTestDonationButtonImgUrl = "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png";
     public static $payPalTestPixelImgUrl = "https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif";
     public static $payPalTestPostIdentityToken = "NyoAhK2wqNWZZ53U4B96QvQhBwxqEGAeiyhxTRPbAS4HEvyP-28LUC51zMe";
     public static $payPalTestAPIURL = "https://api-3t.sandbox.paypal.com/nvp";
@@ -49,7 +49,7 @@ class Constants
     public static $payPalProdDonationButtonId = "KPJMEYCDVH4XW";
     public static $payPalProdSubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif";
     public static $payPalProdUnsubscribeButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_unsubscribe_LG.gif";
-    public static $payPalProdDonationButtonImgUrl = "https://www.paypalobjects.com/en_US/i/btn/btn_paynow_LG.gif";
+    public static $payPalProdDonationButtonImgUrl = "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png";
     public static $payPalProdPixelImgUrl = "https://www.paypalobjects.com/en_US/i/scr/pixel.gif";
     public static $payPalProdPostIdentityToken = "YJ0q__STdxwVpTQg5X6-JMLqZnppTTEMBRmg6Iao0kyqSQEsYOjDoxoyv3e";
     public static $payPalProdAPIURL = "https://api-3t.paypal.com/nvp";

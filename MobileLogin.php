@@ -25,7 +25,7 @@
                                     <div id="content">
                                         <article class="box main">
                                             <div class="row double">
-												<section class="6u">
+						<section class="6u">
                                                     <header>
                                                         <h2>Log In</h2>
                                                         <div id="mobileLogin">
@@ -33,16 +33,16 @@
                                                                 <input id="loginUsername" name="loginUsername" type="text" maxlength="50" placeholder=" Username"><br/>
                                                                 <input id="loginPassword" name="loginPassword" type="password" maxlength="50" placeholder=" Password"><br/><br/>
                                                                 <a href="#" class="button icon fa-sign-in" id="mobileLoginBtn">Log In</a><br /><br />
-																<a href="#" class="actionLinkHeader" id="forgotPasswordLinkMobile">Forgot Password?</a>
+								<a href="#" class="actionLinkHeader" id="forgotPasswordLinkMobile">Forgot Password?</a>
                                                             </form>
                                                         </div>
                                                         <br/>
                                                         <h2>First Time User?</h2>
-                                                        <a href="Index.php?action=Signup" class="button icon fa-cogs">Sign Up</a>
+                                                        <a href="index.php?action=Signup" class="button icon fa-cogs">Sign Up</a>
                                                         <br />
                                                         <div id="loginErr" class="mobilePreLogin">&nbsp;</div>
                                                     </header>
-												</section>
+						</section>
                                             </div>
                                         </article>
                                     </div>						

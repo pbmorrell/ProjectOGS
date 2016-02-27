@@ -97,7 +97,7 @@
 		session_start();
 			
 		$securityHandler->LogoutUser();
-                header("Location: Index.php");
+                header("Location: index.php");
                 exit();
             case "Signup":
                 $securImage = new Securimage();

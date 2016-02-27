@@ -16,6 +16,9 @@ if($payPalMsgHandler->GetResponseValByKey($ipnData, 'test_ipn') == "1") {
     $url = Constants::$payPalTestButtonFormUrl;
 }
 
+// Debugging: log what we received
+//$logger->LogInfo("IPN Received. Post Data: " . $payPalMsgHandler->ConvertIPNPostDataToRawString($ipnData));
+
 // For all instant notifications, must acknowledge as per PayPal requirement by sending a POST request containing the same data back to PayPal, 
 //  but only need to take further action for subscription creation, subscription renewal, and subscription cancellation.
 $response = $payPalMsgHandler->SendIPNPostRequest($ipnData, $url, $status);

@@ -23,10 +23,13 @@ class PayPalMsgHandler
                         'at' => $identityToken
                     )
                 ),
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_HEADER => FALSE
-                //CURLOPT_SSL_VERIFYPEER => FALSE,
-                //CURLOPT_SSL_VERIFYHOST => FALSE
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSLVERSION => 6,
+                CURLOPT_HTTPHEADER => array('Connection: Close'),
+				CURLOPT_FORBID_REUSE => 1,
+                CURLOPT_SSL_VERIFYPEER => 1,
+                CURLOPT_SSL_VERIFYHOST => 2
             )
         );
         
@@ -237,22 +240,27 @@ class PayPalMsgHandler
     public function SendIPNPostRequest($ipnData, $url, &$status)
     {
         $status = 200;
+        
         $request = curl_init();
         curl_setopt_array($request, array
             (
                 CURLOPT_URL => $url,
-                CURLOPT_POST => TRUE,
+                CURLOPT_POST => 1,
                 CURLOPT_POSTFIELDS => http_build_query(array('cmd' => '_notify-validate') + $ipnData),
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_HEADER => FALSE
-                //CURLOPT_SSL_VERIFYPEER => FALSE,
-                //CURLOPT_SSL_VERIFYHOST => FALSE
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSLVERSION => 6,
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_HTTPHEADER => array('Connection: Close'),
+		CURLOPT_FORBID_REUSE => 1,
+                CURLOPT_SSL_VERIFYPEER => 1,
+                CURLOPT_SSL_VERIFYHOST => 2
             )
         );
         
         $response = curl_exec($request);
         $status = curl_getinfo($request, CURLINFO_HTTP_CODE);
         curl_close($request);
+        
         return $response;
     }
     
@@ -263,7 +271,7 @@ class PayPalMsgHandler
         curl_setopt_array($request, array
             (
                 CURLOPT_URL => $payPalAPIURL,
-                CURLOPT_POST => TRUE,
+                CURLOPT_POST => 1,
                 CURLOPT_POSTFIELDS => http_build_query(array(
                         'USER' => $payPalAPIUsername,
                         'PWD' => $payPalAPIPassword,
@@ -275,9 +283,14 @@ class PayPalMsgHandler
                         'NOTE' => 'Subscription cancelled by user request'
                     )
                 ),
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_HEADER => FALSE,
-                CURLOPT_VERBOSE => TRUE
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSLVERSION => 6,
+                CURLOPT_HTTPHEADER => array('Connection: Close'),
+				CURLOPT_FORBID_REUSE => 1,
+                CURLOPT_SSL_VERIFYPEER => 1,
+                CURLOPT_SSL_VERIFYHOST => 2,
+				CURLOPT_VERBOSE => TRUE
             )
         );
         

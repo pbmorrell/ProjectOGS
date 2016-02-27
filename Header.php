@@ -17,7 +17,7 @@
     
     $onloadPopupJSCode = "";
     if(isset($_GET['redirectMsg'])){
-        $onloadPopupJSCode = "window.history.pushState('Index', '', 'Index.php'); alert('" . filter_var($_GET['redirectMsg'], FILTER_SANITIZE_STRING) . "');";
+        $onloadPopupJSCode = "window.history.pushState('index', '', 'index.php'); alert('" . filter_var($_GET['redirectMsg'], FILTER_SANITIZE_STRING) . "');";
         unset($_GET['redirectMsg']);
     }
     
@@ -57,14 +57,14 @@
                         '<header id="header">'.
                             '<!-- Logo -->'.
                             '<h1>'.
-                                '<a href="Index.php" id="logo">Player Unite</a>'.
+                                '<a href="index.php" id="logo">Player Unite</a>'.
                                 $pageHeaderLoginForm .
                             '</h1>'.
                             '<!-- Nav -->'.
                             '<nav id="nav" style="display:none;">'.
                                 '<ul>'.
                                     '<li><a href="MobileLogin.php">Log In</a></li>'.
-                                    '<li><a href="Index.php?action=Signup">Sign Up</a></li>'.
+                                    '<li><a href="index.php?action=Signup">Sign Up</a></li>'.
                                 '</ul>'.
                             '</nav>'.
                         '</header>' .

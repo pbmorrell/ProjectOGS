@@ -254,6 +254,7 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
 {
     var isWidthTransition = false;
     var searchPanelWidth = Math.round(curWindowWidth * 0.65);
+    if(curWindowWidth > 1000)  searchPanelWidth = Math.round(curWindowWidth * 0.45);
     
     // Begin logic flow for viewport width changes that result in a class change
     if(((lastWidthClass == 'desktop')  || initTransition) && ((curWidthClass == 'mobile') || (curWidthClass == 'xtraSmall'))) {

@@ -491,7 +491,7 @@ CREATE TABLE IF NOT EXISTS `Security.Pages` (
 --
 
 INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
-(7, 'Index'),
+(7, 'index'),
 (8, 'MemberHome'),
 (9, 'EditProfile'),
 (10, 'MobileLogin'),

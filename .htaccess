@@ -1,0 +1,11 @@
+# Always use https for secure connections to PlayerUnite domain
+# Always use http for connections to MorrellWeb subdomain
+RewriteEngine On
+
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} ^(www\.)?morrellweb\.com$ [NC]
+RewriteRule .* - [L]
+
+RewriteCond %{HTTPS} off
+
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

@@ -308,7 +308,7 @@ class GamingHandler
 	$gamePlayersNeededSelect = '<select id="gamePlayersNeeded' . $eventId . '" name="gamePlayersNeeded' . $eventId . '" >';
 	$selected = '';
 		
-	for($i = 1; $i < 65; $i++) {
+	for($i = 2; $i < 65; $i++) {
             $selected = '';
             if($eventInfo != null) {
                 if($i == $eventInfo->RequiredPlayersCount)  $selected = 'selected="true"';
