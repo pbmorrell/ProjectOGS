@@ -27,7 +27,7 @@ class PayPalMsgHandler
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_SSLVERSION => 6,
                 CURLOPT_HTTPHEADER => array('Connection: Close'),
-				CURLOPT_FORBID_REUSE => 1,
+		CURLOPT_FORBID_REUSE => 1,
                 CURLOPT_SSL_VERIFYPEER => 1,
                 CURLOPT_SSL_VERIFYHOST => 2
             )
@@ -287,10 +287,10 @@ class PayPalMsgHandler
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_SSLVERSION => 6,
                 CURLOPT_HTTPHEADER => array('Connection: Close'),
-				CURLOPT_FORBID_REUSE => 1,
+		CURLOPT_FORBID_REUSE => 1,
                 CURLOPT_SSL_VERIFYPEER => 1,
                 CURLOPT_SSL_VERIFYHOST => 2,
-				CURLOPT_VERBOSE => TRUE
+		CURLOPT_VERBOSE => TRUE
             )
         );
         
