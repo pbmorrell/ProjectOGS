@@ -62,7 +62,7 @@
     <head>
         <?php 
             echo $pageHeaderHTML;
-            $action = $objUser->IsPremiumMember ? "upgrade" : "join";
+            $action = $objUser->IsPremiumMember ? "re-subscribe" : "join";
 			
             // PayPal config settings
             $payPalButtonFormUrl                = Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl                : Constants::$payPalProdButtonFormUrl;
@@ -167,14 +167,14 @@
                                                 <p>Your premium membership will only be active until the end of the current cycle. Click&nbsp;&nbsp;<span style="font-weight: 700;">Subscribe</span>
                                                     &nbsp;to extend your membership, and don't miss a beat!</p>
                                                 <article>
-                                                    <h3>Recurring Membership Plan: Only $6.50 per month!</h3>
+                                                    <h3>Recurring Membership Plan: Only <?php echo '$' . Constants::$subscriptionOptionNames["Trial"]; ?> for first two weeks, then <?php echo '$' . Constants::$subscriptionOptionNames["Monthly"]; ?> per month!</h3>
                                                     <p>When you re-subscribe, your new billing cycle will begin immediately, but the unused days from your current cycle will be credited to your account if you should cancel again.</p>
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
                                                         <input type="hidden" name="hosted_button_id" value="<?php echo $payPalMakeSubscriptionButtonId; ?>">
                                                         <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|SubscribePremium"); ?>">
                                                         <input style="width: 150px; background:#0066CC;" type="image" src="<?php echo $payPalSubscribeButtonImgUrl; ?>" border="0" name="submit" height="30" 
-                                                               alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe" onclick="return SubscribeOnClick('<?php echo $action; ?>');">
+                                                               alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe">
                                                         <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
                                                     </form>
                                                 </article>
@@ -190,13 +190,14 @@
                                                 <ul><li class="icon fa-flask">&nbsp;&nbsp;The ability to keep your events open to only your friends, keeping random users out.</li></ul>
 						<br />
                                                 <article>
-                                                    <h2>Recurring Membership Plan: Only $6.50 per month!</h2>
+                                                    <h2>Recurring Membership Plan: Only <?php echo '$' . Constants::$subscriptionOptionNames["Trial"]; ?> for first two weeks!</h2>
+                                                    <h3>Then your membership will continue for just <?php echo '$' . Constants::$subscriptionOptionNames["Monthly"]; ?> per month</h3>
                                                     <form action="<?php echo $payPalButtonFormUrl; ?>" method="post" target="_top">
                                                         <input type="hidden" name="cmd" value="_s-xclick">
                                                         <input type="hidden" name="hosted_button_id" value="<?php echo $payPalMakeSubscriptionButtonId; ?>">
                                                         <input type="hidden" name="custom" value="<?php echo ($objUser->UserID . "|SubscribePremium"); ?>">
                                                         <input style="width: 150px; background:#0066CC;" type="image" src="<?php echo $payPalSubscribeButtonImgUrl; ?>" border="0" name="submit" height="30" 
-                                                               alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe" onclick="return SubscribeOnClick('<?php echo $action; ?>');">
+                                                               alt="PayPal - The safer, easier way to pay online!" id="btnSubscribe">
                                                         <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
                                                     </form>
                                                 </article>

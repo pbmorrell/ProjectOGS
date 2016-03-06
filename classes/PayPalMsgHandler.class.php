@@ -93,7 +93,7 @@ class PayPalMsgHandler
             $action = $customVars[1];
         }
         
-        $replyMsg = $this->ValidatePayPalResponse($msgInAssocArray, $action, $notificationType);
+        $replyMsg = $this->ValidatePayPalResponse($msgInAssocArray, $action, $dataAccess, $logger, $notificationType);
 		
 	// If this notification is intended for another business, log error and take no further actions
 	if(!$replyMsg->IsValidBusiness) {
@@ -143,9 +143,24 @@ class PayPalMsgHandler
                     }
 		}
                 
+                // If this is an EOT notification, retrieve most recent PayPal user acct overall for this user
+                if($replyMsg->TxnType == "subscr_eot") {
+                    $payPalUserOldAcct = $this->LookUpPayPalUserByPayerId($dataAccess, $logger, $replyMsg->PayerId);
+                    if(($payPalUserOldAcct->ID > -1) && 
+                       ($payPalUserOldAcct->SubscriptionID != $replyMsg->SubscriptionID) &&
+                       (!$payPalUserOldAcct->IsActive)) {
+                        // If this EOT is for an older, inactive account, do not downgrade this user to basic membership
+                        $replyMsg->UpdateUserMembershipStatus = false;
+                    }
+                }
+                
 		// Determine if this is the first payment received for the current billing cycle
-		$billFrequency = str_replace(' ', '', $this->GetResponseValByKey($msgInAssocArray, "period3"));
-		if(strlen($billFrequency) == 0)  $billFrequency = "1M";
+		$billFrequency = str_replace(' ', '', $this->GetResponseValByKey($msgInAssocArray, "period1"));
+		if(strlen($billFrequency) == 0) {
+                    $billFrequency = str_replace(' ', '', $this->GetResponseValByKey($msgInAssocArray, "period3"));
+                    if($notificationType == "PDT")  $billFrequency = Constants::$subscriptionOptionLengths["Trial"];
+                    else                            $billFrequency = Constants::$subscriptionOptionLengths["Monthly"];
+                }
 										
 		$amtAlreadyPaid = $payPalUser->SubscriptionAmtPaidLastCycle;
 		$curPaymentAmt = floatval($replyMsg->SubscriptionAmtPaid);
@@ -196,7 +211,7 @@ class PayPalMsgHandler
                         $this->UpdateUserPayPalAccountInformation($replyMsg, $dataAccess, $logger, $notificationType, $isFirstPaymentOfThisCycle, 
 								  ($lastBillDateTime !== FALSE), $lastBillDateTime, $billingInterval, $extendedMembershipDays);
 
-                        // Only update user membership status when we receive a Completed payment or a membership expiration notice
+                        // Only update user membership status when we receive a Completed payment or a membership expiration notice for current, active account
                         if($replyMsg->UpdateUserMembershipStatus) {
                             // If this is a EOT IPN, downgrade user to basic membership only if they are not currently in extended membership
                             $extendedMember = false;
@@ -325,7 +340,7 @@ class PayPalMsgHandler
         return $responseMsg;
     }
     
-    private function ValidatePayPalResponse($msgInAssocArray, $action, $notificationType)
+    private function ValidatePayPalResponse($msgInAssocArray, $action, $dataAccess, $logger, $notificationType)
     {
         // Initialize response object
         $replyMsg = new PayPalTxnMsg($this->GetResponseValByKey($msgInAssocArray, "txn_id"),
@@ -333,7 +348,7 @@ class PayPalMsgHandler
                                      $this->GetResponseValByKey($msgInAssocArray, "payer_id"), 
                                      -1, $notificationType, $this->GetResponseValByKey($msgInAssocArray, "payment_status"),
                                      //$this->GetResponseValByKey($msgInAssocArray, "option_selection1"), "", 
-                                     "Monthly", "", "", "", "", gmdate('Y-m-d H:i:s'), $action, 
+                                     "", "", "", "", "", gmdate('Y-m-d H:i:s'), $action, 
                                      $this->GetResponseValByKey($msgInAssocArray, "subscr_id"));
 		
 	// If payment status is "Pending", store the pending reason
@@ -365,6 +380,20 @@ class PayPalMsgHandler
 			
             if($replyMsg->NotificationType == "PDT") {
 		$replyMsg->SubscriptionIsRecurring = ($this->GetResponseValByKey($msgInAssocArray, "recurring") == "1");
+                
+                // For PDT notifications, we know this is an initial payment, which corresponds to the trial period amount
+                $replyMsg->SelectedSubscriptionOption = "Trial";
+            }
+            else {
+                $payPalUser = $this->LookUpPayPalUser($replyMsg->PayerId, $replyMsg->SubscriptionID, $dataAccess, $logger, $notificationType);
+                
+                // If this subscription has not yet been added to our database (this payment IPN has arrived before the signup IPN), 
+                // or if this payment is the first one of the current subscription (payment IPN arrived after the signup IPN),
+                // this is the user's trial period payment. Otherwise, it is the regular monthly payment.
+                if(($payPalUser->ID == -1) || ($payPalUser->SubscriptionStartedDate == $payPalUser->SubscriptionModifiedDate)) {
+                    $replyMsg->SelectedSubscriptionOption = "Trial";
+                }
+                else  $replyMsg->SelectedSubscriptionOption = "Monthly";
             }
 			
             // Don't need to perform payment amount check until and unless payment status is Completed (funds added to business acct)
@@ -383,6 +412,7 @@ class PayPalMsgHandler
             }
         }
 	else if($replyMsg->TxnType == "subscr_cancel") {
+            $replyMsg->SubscriptionModifyDate = gmdate('Y-m-d H:i:s'); // Current UTC date
             $replyMsg->IsValidated = true; // Consider this a validated (requires additional handler action) message, since this is not a txn type that requires payment
             $replyMsg->PDTOperation = "";
             
@@ -774,9 +804,8 @@ class PayPalMsgHandler
 		
 	if(($replyMsg->TxnType == "subscr_signup") || ($replyMsg->TxnType == "subscr_modify") || 
 	   ($replyMsg->TxnType == "subscr_cancel") || ($replyMsg->TxnType == "subscr_eot")) {
-            $modifiedDate = gmdate('Y-m-d H:i:s');
             $varsToSet .= ", `SubscriptionModifiedDate` = :subscrModifyDate";
-            $parmSubscrModifiedDate = new QueryParameter(':subscrModifyDate', $modifiedDate, PDO::PARAM_STR);
+            $parmSubscrModifiedDate = new QueryParameter(':subscrModifyDate', $replyMsg->SubscriptionModifyDate, PDO::PARAM_STR);
             array_push($queryParms, $parmSubscrModifiedDate);
 	}
 		

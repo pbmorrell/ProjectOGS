@@ -23,7 +23,8 @@ class Constants
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = true; // Change this to false when ready to move to production
     //public static $subscriptionOptionNames = ["Monthly" => "6.50", "Yearly" => "39.95"];
-    public static $subscriptionOptionNames = ["Monthly" => "6.50"];
+    public static $subscriptionOptionNames = ["Trial" => "1.00", "Monthly" => "2.00"];
+    public static $subscriptionOptionLengths = ["Trial" => "2W", "Monthly" => "1M"];
     public static $premiumMemberRoleName = "PremiumMember";
     public static $basicMemberRoleName = "BasicMember";
 	
