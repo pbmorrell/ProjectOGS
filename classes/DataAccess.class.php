@@ -20,6 +20,7 @@ class DataAccess
     public function BuildQuery($query, $paramArray = null)
     {
         try{
+			$this->errorResult = '';
             $this->curStatement = $this->dbHandler->prepare($query);
         }
         catch(PDOException $e){
@@ -65,6 +66,7 @@ class DataAccess
     public function GetResultSet()
     {
         try{
+			$this->errorResult = '';
             if($this->curStatement->execute()){
                 return $this->curStatement->fetchAll(PDO::FETCH_ASSOC);
             }
@@ -81,6 +83,7 @@ class DataAccess
     public function GetResultSetWithPositionalParms($valArray)
     {
         try {
+			$this->errorResult = '';
             if($this->curStatement->execute($valArray)) {
                 return $this->curStatement->fetchAll(PDO::FETCH_ASSOC);
             }
@@ -97,6 +100,7 @@ class DataAccess
     public function GetSingleResult()
     {
         try{
+			$this->errorResult = '';
             if($this->curStatement->execute()){
                 return $this->curStatement->fetch(PDO::FETCH_ASSOC);
             }
@@ -113,6 +117,7 @@ class DataAccess
     public function GetSingleResultWithPositionalParms($valArray)
     {
         try{
+			$this->errorResult = '';
             if($this->curStatement->execute($valArray)){
                 return $this->curStatement->fetch(PDO::FETCH_ASSOC);
             }
@@ -129,6 +134,7 @@ class DataAccess
     public function ExecuteNonQuery()
     {
         try {
+			$this->errorResult = '';
             return $this->curStatement->execute();
         }
         catch(PDOException $e){
@@ -140,6 +146,7 @@ class DataAccess
     public function ExecuteNonQueryWithPositionalParms($valArray)
     {
         try {
+			$this->errorResult = '';
             return $this->curStatement->execute($valArray);
         }
         catch(PDOException $e){
@@ -151,6 +158,7 @@ class DataAccess
     public function RowCount()
     {
         try {
+			$this->errorResult = '';
             return $this->curStatement->rowCount();
         }
         catch(PDOException $e) {
@@ -162,6 +170,7 @@ class DataAccess
     public function GetLastInsertId()
     {
         try {
+			$this->errorResult = '';
             return $this->dbHandler->lastInsertId();
         }
         catch(PDOException $e) {
@@ -173,6 +182,7 @@ class DataAccess
     public function BeginTransaction()
     {
         try {
+			$this->errorResult = '';
             return $this->dbHandler->beginTransaction();
         }
         catch(PDOException $e) {
@@ -190,6 +200,7 @@ class DataAccess
     public function CommitTransaction()
     {
         try {
+			$this->errorResult = '';
             return $this->dbHandler->commit();
         }
         catch(PDOException $e) {
@@ -201,6 +212,7 @@ class DataAccess
     public function RollbackTransaction()
     {
         try {
+			$this->errorResult = '';
             return $this->dbHandler->rollBack();
         }
         catch(PDOException $e) {
@@ -212,6 +224,7 @@ class DataAccess
     public function DebugDumpParams()
     {
         try {
+			$this->errorResult = '';
             return $this->curStatement->debugDumpParams();
         }
         catch(PDOException $e) {

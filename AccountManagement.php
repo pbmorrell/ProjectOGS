@@ -62,7 +62,6 @@
     <head>
         <?php 
             echo $pageHeaderHTML;
-            $action = $objUser->IsPremiumMember ? "re-subscribe" : "join";
 			
             // PayPal config settings
             $payPalButtonFormUrl                = Constants::$isPayPalTest ? Constants::$payPalTestButtonFormUrl                : Constants::$payPalProdButtonFormUrl;

@@ -112,8 +112,8 @@ class PayPalMsgHandler
                 $replyMsg->UserId = $payPalUser->UserID;
                 
                 // If we have a user ID in this message, insert new record in Payments.PayPalUsers table to map this 
-                // user's PayPal payer_id to their user ID in our system, unless this user already in table
-                if(($replyMsg->UserId < 0) && ($userId > -1)) {
+                // user's PayPal payer_id to their user ID in our system, unless this user already in table or this is not a signup or payment notification
+                if(($replyMsg->UserId < 0) && ($userId > -1) && (($replyMsg->TxnType == "subscr_signup") || ($replyMsg->TxnType == "subscr_payment"))) {
                     $replyMsg->UserId = $userId;
 					
                     $insertedID = $this->InsertPayPalUser($replyMsg, $dataAccess, $logger, $notificationType, $payPalUser);
@@ -136,7 +136,7 @@ class PayPalMsgHandler
 			$membershipExpDateUTC = date_create_from_format("Y-m-d", $dateStr, new DateTimeZone("UTC"));
 			$curDatetimeUTC = new DateTime(null, new DateTimeZone("UTC"));
 			$curDateUTC = date_create_from_format("Y-m-d", $curDatetimeUTC->format("Y-m-d"), new DateTimeZone("UTC"));
-									
+												
 			if($curDateUTC < $membershipExpDateUTC) {
                             $extendedMembershipDays = $membershipExpDateUTC->diff($curDateUTC)->days;
 			}
@@ -147,62 +147,59 @@ class PayPalMsgHandler
                 if($replyMsg->TxnType == "subscr_eot") {
                     $payPalUserOldAcct = $this->LookUpPayPalUserByPayerId($dataAccess, $logger, $replyMsg->PayerId);
                     if(($payPalUserOldAcct->ID > -1) && 
-                       ($payPalUserOldAcct->SubscriptionID != $replyMsg->SubscriptionID) &&
-                       (!$payPalUserOldAcct->IsActive)) {
+                       ($payPalUserOldAcct->SubscriptionID != $replyMsg->SubscriptionID)) {
                         // If this EOT is for an older, inactive account, do not downgrade this user to basic membership
                         $replyMsg->UpdateUserMembershipStatus = false;
                     }
                 }
                 
-		// Determine if this is the first payment received for the current billing cycle
-		$billFrequency = str_replace(' ', '', $this->GetResponseValByKey($msgInAssocArray, "period1"));
-		if(strlen($billFrequency) == 0) {
-                    $billFrequency = str_replace(' ', '', $this->GetResponseValByKey($msgInAssocArray, "period3"));
-                    if($notificationType == "PDT")  $billFrequency = Constants::$subscriptionOptionLengths["Trial"];
-                    else                            $billFrequency = Constants::$subscriptionOptionLengths["Monthly"];
-                }
-										
-		$amtAlreadyPaid = $payPalUser->SubscriptionAmtPaidLastCycle;
-		$curPaymentAmt = floatval($replyMsg->SubscriptionAmtPaid);
-		$requiredPaymentAmt = floatval($replyMsg->SubscriptionAmtTotal);
-		$billingInterval = new DateInterval("P" . $billFrequency);
-		$curDate = gmdate('Y-m-d H:i:s');
-										
-		$isFirstPaymentOfThisCycle = false;
-                $lastBillDateTime = date_create_from_format('Y-m-d H:i:s', $payPalUser->LastBillDate, new DateTimeZone("UTC"));
-		if(($replyMsg->TxnType == "subscr_payment") && ((strlen($payPalUser->LastBillDate) == 0)  || 
-                                                                (date_add($lastBillDateTime, $billingInterval) >= $curDate))) {
-                    $isFirstPaymentOfThisCycle = true;
-                    $lastBillDateTime = date_create_from_format('Y-m-d H:i:s', $curDate, new DateTimeZone("UTC"));
-                    $amtAlreadyPaid = 0; // Reset amount already paid: this value does not count towards current cycle's required payment
-		}
-		else {
-                    $replyMsg->SubscriptionAmtPaid = strval($amtAlreadyPaid + $curPaymentAmt);
-		}
-				
-		// If txn was found invalid because current payment is less than expected amount for this subscription type,
-		//  check SubscriptionAmtPaid from current txn and combine with SubscriptionAmtPaidLastCycle...if combined they
-		//  are equal to SubscriptionAmtTotal, then this was a partial payment that finishes their payment obligation, 
-		//  and the user should be upgraded/renewed
-		if((!$replyMsg->IsValidated) && ($replyMsg->TxnType == "subscr_payment") && ($replyMsg->PaymentStatus == "Completed")) {
-                    if(($amtAlreadyPaid + $curPaymentAmt) >= $requiredPaymentAmt) {
-			$replyMsg->IsValidated = true;
-			$replyMsg->UpdateUserMembershipStatus = true;
-                    }
-		}
-				
-		if(($replyMsg->IsValidated) && ($replyMsg->TxnType == "subscr_payment")) {
-                    if(strlen($payPalUser->LastBillDate) == 0) {                            
-			// Upgrade user subscription status in DB...now a premium member
-			$replyMsg->UserMessage = "Subscription successfully created!";
-			$replyMsg->UserUpgradedPremium = true;
+                $lastBillDateTime = FALSE;
+                $billingInterval = "";
+                $isFirstPaymentOfThisCycle = false;
+                
+                // If this is a subscr_payment notification, determine if this is the first payment received for the current billing cycle
+		if($replyMsg->TxnType == "subscr_payment") {
+                    $billFrequency = Constants::$subscriptionOptionLengths[$payPalUser->SubscriptionType];
+                    $amtAlreadyPaid = $payPalUser->SubscriptionAmtPaidLastCycle;
+                    $curPaymentAmt = floatval($replyMsg->SubscriptionAmtPaid);
+                    $requiredPaymentAmt = floatval($replyMsg->SubscriptionAmtTotal);
+                    $billingInterval = new DateInterval("P" . $billFrequency);
+                    $curDate = gmdate('Y-m-d H:i:s');
+
+                    $lastBillDateTime = date_create_from_format('Y-m-d H:i:s', $payPalUser->LastBillDate, new DateTimeZone("UTC"));
+                    if((strlen($payPalUser->LastBillDate) == 0)  || (date_add($lastBillDateTime, $billingInterval) >= $curDate)) {
+                        $isFirstPaymentOfThisCycle = true;
+                        $lastBillDateTime = date_create_from_format('Y-m-d H:i:s', $curDate, new DateTimeZone("UTC"));
+                        $amtAlreadyPaid = 0; // Reset amount already paid: this value does not count towards current cycle's required payment
                     }
                     else {
-			// If user account for this subscription ID already exists, this must be an automatic recurring payment IPN
-			$replyMsg->UserMessage = "Subscription successfully renewed!";
-			$replyMsg->UserSubscriptionRenewed = true;
+                        $replyMsg->SubscriptionAmtPaid = strval($amtAlreadyPaid + $curPaymentAmt);
                     }
-		}
+
+                    // If txn was found invalid because current payment is less than expected amount for this subscription type,
+                    //  check SubscriptionAmtPaid from current txn and combine with SubscriptionAmtPaidLastCycle...if combined they
+                    //  are equal to SubscriptionAmtTotal, then this was a partial payment that finishes their payment obligation, 
+                    //  and the user should be upgraded/renewed
+                    if((!$replyMsg->IsValidated) && ($replyMsg->PaymentStatus == "Completed")) {
+                        if(($amtAlreadyPaid + $curPaymentAmt) >= $requiredPaymentAmt) {
+                            $replyMsg->IsValidated = true;
+                            $replyMsg->UpdateUserMembershipStatus = true;
+                        }
+                    }
+
+                    if($replyMsg->IsValidated) {
+                        if(strlen($payPalUser->LastBillDate) == 0) {                            
+                            // Upgrade user subscription status in DB...now a premium member
+                            $replyMsg->UserMessage = "Subscription successfully created!";
+                            $replyMsg->UserUpgradedPremium = true;
+                        }
+                        else {
+                            // If user account for this subscription ID already exists, this must be an automatic recurring payment IPN
+                            $replyMsg->UserMessage = "Subscription successfully renewed!";
+                            $replyMsg->UserSubscriptionRenewed = true;
+                        }
+                    }
+                }
 				
                 // If payment was completed and payment was made in full, proceed to update user information related to membership
                 if($replyMsg->IsValidated) {
@@ -628,9 +625,9 @@ class PayPalMsgHandler
 
             if($results != null){
 		$payPalUser = new PayPalUser($results['ID'], $results['FK_User_ID'], ($results['IsActive'] == 1), ($results['IsRecurring'] == 1), $results['LastBillDate'], 
-                                         $results['MembershipExpirationDate'], $payerID, $results['SubscriptionType'], $results['SubscriptionAmtTotal'], 
-                                         $results['SubscriptionAmtPaidLastCycle'], $results['SubscriptionStartedDate'], $results['SubscriptionModifiedDate'], 
-                                         $results['SubscriptionID']);
+                                             $results['MembershipExpirationDate'], $payerID, $results['SubscriptionType'], $results['SubscriptionAmtTotal'], 
+                                             $results['SubscriptionAmtPaidLastCycle'], $results['SubscriptionStartedDate'], $results['SubscriptionModifiedDate'], 
+                                             $results['SubscriptionID']);
             }
         }
         
@@ -727,7 +724,8 @@ class PayPalMsgHandler
 	$updateSuccess = false;
 	$queryParms = [];
 			
-	$varsToSet = "SET `MembershipExpirationDate` = NULL";
+	// Leave membership expiration date unchanged unless explicitly setting it to a new date, such as at the start of a new cycle, or when an EOT arrives
+	$varsToSet = "SET `MembershipExpirationDate` = `MembershipExpirationDate`";
 	$expDate = "";
 	if($replyMsg->UserSubscriptionCancelledImmediate) {
             $expDate = $replyMsg->SubscriptionModifyDate;
@@ -738,13 +736,7 @@ class PayPalMsgHandler
 	}
 		
 	if(strlen($expDate) > 0) {
-            if($replyMsg->UserSubscriptionCancelledPending) {
-                // If we are processing a cancel request, update user's membership expiration date by adding any unused billing cycle days from previous cycle(s)
-                $varsToSet = "SET `MembershipExpirationDate` = DATE_ADD(:expDate, INTERVAL `ExtendedMembershipDays` DAY)";
-                $parmMembershipExpDate = new QueryParameter(':expDate', $expDate, PDO::PARAM_STR);
-                array_push($queryParms, $parmMembershipExpDate);
-            }
-            else if($replyMsg->UserSubscriptionCancelledImmediate) {
+            if($replyMsg->UserSubscriptionCancelledImmediate) {
                 // If we are receiving a notification that the user's paid subscription has ended, apply extended (unused) membership days
                 // to user's membership expiration date, if have not already done so on a prior user-requested cancellation
                 $varsToSet = ("SET `MembershipExpirationDate` = (CASE WHEN ((`ExtendedMembershipDays` > 0) AND (`IsRecurring` = 1)) " .
@@ -766,7 +758,9 @@ class PayPalMsgHandler
 	}
 		
 	if($replyMsg->UserSubscriptionCancelledPending) {
-            $varsToSet .= ", `IsRecurring` = 0";
+            // If we are processing a cancel request, update user's membership expiration date by 
+            // adding any unused billing cycle days from previous cycle(s), and flag IsRecurring as false
+            $varsToSet = "SET `MembershipExpirationDate` = DATE_ADD(`MembershipExpirationDate`, INTERVAL `ExtendedMembershipDays` DAY), `IsRecurring` = 0";
 	}
 		
 	if(strlen($replyMsg->SelectedSubscriptionOption) > 0) {

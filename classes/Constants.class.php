@@ -21,7 +21,7 @@ class Constants
     public static $emailSMTPPassword = "t3\$t*useR";
 	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
-    public static $isPayPalTest = true; // Change this to false when ready to move to production
+    public static $isPayPalTest = false; // Change this to true to test code changes to PayPal handling logic
     //public static $subscriptionOptionNames = ["Monthly" => "6.50", "Yearly" => "39.95"];
     public static $subscriptionOptionNames = ["Trial" => "1.00", "Monthly" => "2.00"];
     public static $subscriptionOptionLengths = ["Trial" => "2W", "Monthly" => "1M"];
@@ -44,7 +44,7 @@ class Constants
     public static $payPalTestAPISignature = "An5ns1Kso7MWUdW4ErQKJJJ4qi4-AsiEpTILBNuocaRuASZDvMYMDNuB";
 
     // Production 
-    public static $payPalProdMerchantId = "admin@morrellweb.com";
+    public static $payPalProdMerchantId = "admin@playerunite.com";
     public static $payPalProdButtonFormUrl = "https://www.paypal.com/cgi-bin/webscr";
     public static $payPalProdMakeSubscriptionButtonId = "9H4QGFRL3F7HS";
     public static $payPalProdDonationButtonId = "KPJMEYCDVH4XW";
