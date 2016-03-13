@@ -727,7 +727,7 @@
     }
 
     .overlayPanelGroupBorder {
-        border:1px solid blue;
+        border: none;
     }
 
     .overlayPanelGroupExpanded {
@@ -1479,7 +1479,7 @@
     .dlgToolbarContainer {
         width: 28em;
         height: auto;
-        border:2px groove gray;
+        border: none;
         box-sizing: border-box;
         overflow-y: auto;
     }
@@ -1497,7 +1497,7 @@
     .mobileButtonToolbarContainer {
         width: 100%;
         height: auto;
-        border:3px groove gray;
+        border: none;
         box-sizing: border-box;
         overflow-y: auto;
 	margin-bottom: 10px;

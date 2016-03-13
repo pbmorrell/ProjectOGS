@@ -168,7 +168,7 @@
     .dlgToolbarContainer {
         width: 100%;
         height: auto;
-        border:2px groove gray;
+        border: none;
         box-sizing: border-box;
         overflow-y: auto;
     }

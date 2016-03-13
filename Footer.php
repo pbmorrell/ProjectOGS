@@ -25,9 +25,9 @@
 					<tr>
                                             <td>
 						<select style="width: 10em;" name="os0">
-                                                    <option value="1:">1: $25.00 USD</option>
                                                     <option value="2:">2: $5.00 USD</option>
                                                     <option value="3:">3: $10.00 USD</option>
+                                                    <option value="1:">1: $25.00 USD</option>
                                                     <option value="4:">4: $50.00 USD</option>
                                                     <option value="5:">5: $100.00 USD</option>
                                                     <option value="6:">6: $200.00 USD</option>
