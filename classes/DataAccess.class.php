@@ -20,7 +20,7 @@ class DataAccess
     public function BuildQuery($query, $paramArray = null)
     {
         try{
-			$this->errorResult = '';
+            $this->errorResult = '';
             $this->curStatement = $this->dbHandler->prepare($query);
         }
         catch(PDOException $e){
@@ -66,7 +66,7 @@ class DataAccess
     public function GetResultSet()
     {
         try{
-			$this->errorResult = '';
+            $this->errorResult = '';
             if($this->curStatement->execute()){
                 return $this->curStatement->fetchAll(PDO::FETCH_ASSOC);
             }
@@ -83,7 +83,7 @@ class DataAccess
     public function GetResultSetWithPositionalParms($valArray)
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             if($this->curStatement->execute($valArray)) {
                 return $this->curStatement->fetchAll(PDO::FETCH_ASSOC);
             }
@@ -100,7 +100,7 @@ class DataAccess
     public function GetSingleResult()
     {
         try{
-			$this->errorResult = '';
+            $this->errorResult = '';
             if($this->curStatement->execute()){
                 return $this->curStatement->fetch(PDO::FETCH_ASSOC);
             }
@@ -117,7 +117,7 @@ class DataAccess
     public function GetSingleResultWithPositionalParms($valArray)
     {
         try{
-			$this->errorResult = '';
+            $this->errorResult = '';
             if($this->curStatement->execute($valArray)){
                 return $this->curStatement->fetch(PDO::FETCH_ASSOC);
             }
@@ -134,7 +134,7 @@ class DataAccess
     public function ExecuteNonQuery()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->curStatement->execute();
         }
         catch(PDOException $e){
@@ -146,7 +146,7 @@ class DataAccess
     public function ExecuteNonQueryWithPositionalParms($valArray)
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->curStatement->execute($valArray);
         }
         catch(PDOException $e){
@@ -158,7 +158,7 @@ class DataAccess
     public function RowCount()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->curStatement->rowCount();
         }
         catch(PDOException $e) {
@@ -170,7 +170,7 @@ class DataAccess
     public function GetLastInsertId()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->dbHandler->lastInsertId();
         }
         catch(PDOException $e) {
@@ -182,7 +182,7 @@ class DataAccess
     public function BeginTransaction()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->dbHandler->beginTransaction();
         }
         catch(PDOException $e) {
@@ -200,7 +200,7 @@ class DataAccess
     public function CommitTransaction()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->dbHandler->commit();
         }
         catch(PDOException $e) {
@@ -212,7 +212,7 @@ class DataAccess
     public function RollbackTransaction()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->dbHandler->rollBack();
         }
         catch(PDOException $e) {
@@ -224,7 +224,7 @@ class DataAccess
     public function DebugDumpParams()
     {
         try {
-			$this->errorResult = '';
+            $this->errorResult = '';
             return $this->curStatement->debugDumpParams();
         }
         catch(PDOException $e) {
@@ -235,22 +235,22 @@ class DataAccess
     
     public function Open()
     {
-		// Set DSN
-		$dsn = Constants::$dbType . ':host=' . Constants::$dbHost . ';dbname=' . Constants::$dbName;
+	// Set DSN
+	$dsn = Constants::$dbType . ':host=' . Constants::$dbHost . ';dbname=' . Constants::$dbName;
 				
-		// Set connection options
-		$options = array(
-			PDO::ATTR_PERSISTENT => true,
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		);
+	// Set connection options
+	$options = array(
+            PDO::ATTR_PERSISTENT => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+	);
 				
-		// Attempt to create new PDO instance
-		try{
-			$this->dbHandler = new PDO($dsn, Constants::$dbUser, Constants::$dbPassword, $options);
-		}
-		catch(PDOException $e){
-			$this->errorResult = $e->getMessage();
-		}
+	// Attempt to create new PDO instance
+	try{
+            $this->dbHandler = new PDO($dsn, Constants::$dbUser, Constants::$dbPassword, $options);
+	}
+	catch(PDOException $e){
+            $this->errorResult = $e->getMessage();
+	}
     }
     
     public function Close()
