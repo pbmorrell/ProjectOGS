@@ -104,7 +104,7 @@
 							changes and click "Update Profile".
 							</p>
                                                     </div>
-                                                    <h3>How do I add gamer tags to my profile?</h3>
+                                                    <h3>What are Gamer Tags?</h3>
                                                     <div>
                                                         <p>
                                                         Gamer Tags are used to help players identify you online. Simply use your console/pc account name for your gamer tag.

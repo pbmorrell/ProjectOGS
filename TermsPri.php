@@ -3,7 +3,7 @@
     $sessionRequired = false;
     $sessionAllowed = true;
     include "Header.php";
-    $updateDate = "2/7/2016";
+    $updateDate = "3/14/2016";
 ?>
 <!DOCTYPE HTML>
 <!--
@@ -48,7 +48,7 @@
                                                     <h2>Privacy Policy</h2>
                                                     <span class="byline">Updated <?php echo $updateDate; ?></span>
                                                 </header>
-                                                <p>This privacy policy sets out how [business name] uses and protects any information that you give Player Unite when you use this website.</p>
+                                                <p>This privacy policy sets out how Player Unite uses and protects any information that you give Player Unite when you use this website.</p>
                                                 <p>Player Unite is committed to ensuring that your privacy is protected. Should we ask you to provide certain information by which you can be identified when using this website, then you can be assured that it will only be used in accordance with this privacy statement.</p>
                                                 <p>Player Unite may change this policy from time to time by updating this page. You should check this page from time to time to ensure that you are happy with any changes. This policy is effective from 10/01/2015.</p>
                                                 <h2>What we collect</h2>
