@@ -13,7 +13,7 @@
     $curPageName = basename($_SERVER['PHP_SELF'], ".php");
 	
     // Construct page JS init file name for script include
-    $pageInitJSScriptName = $curPageName . "Init.js";
+    $pageInitJSScriptName = $curPageName . "Init.min.js";
     
     $onloadPopupJSCode = "";
     if(isset($_GET['redirectMsg'])){
@@ -231,12 +231,12 @@
         '<script src="js/jquery.dropotron.min.js"></script>'.
         '<script src="js/skel.min.js"></script>'.
         '<script src="js/skel-layers.min.js"></script>'.
-        '<script src="js/init.js"></script>'.
-        '<script src="js/main.js"></script>'.
+        '<script src="js/init.min.js"></script>'.
+        '<script src="js/main.min.js"></script>'.
         '<script src="js/' . $pageInitJSScriptName . '"></script>'.
         '<script src="js/ajax.js"></script>'.
-        '<script src="js/jquery-1.10.2.js"></script>'.
-        '<script src="js/jquery-ui-1.10.4.custom.js"></script>'.
+        '<script src="js/jquery-1.10.2.min.js"></script>'.
+        '<script src="js/jquery-ui-1.10.4.custom.min.js"></script>'.
         '<script src="js/jquery.maskedinput.min.js"></script>'.
         '<script src="js/jquery.timepicker.min.js"></script>'.
         '<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->'.

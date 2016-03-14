@@ -1,1 +1,73 @@
-!function(a){skel.init({reset:"full",breakpoints:{global:{range:"*",href:"css/style.css"},desktop:{range:"737-",href:"css/style-desktop.css",containers:1200,grid:{gutters:25}},"1000px":{range:"737-1200",href:"css/style-1000px.css",containers:1e3,grid:{gutters:20},viewport:{width:1080}},mobile:{range:"-736",href:"css/style-mobile.css",containers:"100%",grid:{collapse:!0,gutters:10},viewport:{scalable:!1}}},plugins:{layers:{navPanel:{hidden:!0,breakpoints:"mobile",position:"top-left",side:"left",animation:"pushX",width:"80%",height:"100%",clickToHide:!0,html:'<div data-action="navList" data-args="nav"></div>',orientation:"vertical"},titleBar:{breakpoints:"mobile",position:"top-left",side:"top",height:44,width:"100%",html:'<span class="toggle" data-action="toggleLayer" data-args="navPanel"></span><span class="title" data-action="copyHTML" data-args="logo"></span>'}}}}),a(function(){var c=(a(window),a("form"));c.length>0&&(c.find(".form-button-submit").on("click",function(){return a(this).parents("form").submit(),!1}),skel.vars.IEVersion<10&&(a.fn.n33_formerize=function(){var b=new Array,c=a(this);return c.find("input[type=text],textarea").each(function(){var b=a(this);(""==b.val()||b.val()==b.attr("placeholder"))&&(b.addClass("formerize-placeholder"),b.val(b.attr("placeholder")))}).blur(function(){var b=a(this);b.attr("name").match(/_fakeformerizefield$/)||""==b.val()&&(b.addClass("formerize-placeholder"),b.val(b.attr("placeholder")))}).focus(function(){var b=a(this);b.attr("name").match(/_fakeformerizefield$/)||b.val()==b.attr("placeholder")&&(b.removeClass("formerize-placeholder"),b.val(""))}),c.find("input[type=password]").each(function(){var b=a(this),c=a(a("<div>").append(b.clone()).remove().html().replace(/type="password"/i,'type="text"').replace(/type=password/i,"type=text"));""!=b.attr("id")&&c.attr("id",b.attr("id")+"_fakeformerizefield"),""!=b.attr("name")&&c.attr("name",b.attr("name")+"_fakeformerizefield"),c.addClass("formerize-placeholder").val(c.attr("placeholder")).insertAfter(b),""==b.val()?b.hide():c.hide(),b.blur(function(b){b.preventDefault();var c=a(this),d=c.parent().find("input[name="+c.attr("name")+"_fakeformerizefield]");""==c.val()&&(c.hide(),d.show())}),c.focus(function(b){b.preventDefault();var c=a(this),d=c.parent().find("input[name="+c.attr("name").replace("_fakeformerizefield","")+"]");c.hide(),d.show().focus()}),c.keypress(function(a){a.preventDefault(),c.val("")})}),c.submit(function(){a(this).find("input[type=text],input[type=password],textarea").each(function(b){var c=a(this);c.attr("name").match(/_fakeformerizefield$/)&&c.attr("name",""),c.val()==c.attr("placeholder")&&(c.removeClass("formerize-placeholder"),c.val(""))})}).bind("reset",function(c){c.preventDefault(),a(this).find("select").val(a("option:first").val()),a(this).find("input,textarea").each(function(){var c,b=a(this);switch(b.removeClass("formerize-placeholder"),this.type){case"submit":case"reset":break;case"password":b.val(b.attr("defaultValue")),c=b.parent().find("input[name="+b.attr("name")+"_fakeformerizefield]"),""==b.val()?(b.hide(),c.show()):(b.show(),c.hide());break;case"checkbox":case"radio":b.attr("checked",b.attr("defaultValue"));break;case"text":case"textarea":b.val(b.attr("defaultValue")),""==b.val()&&(b.addClass("formerize-placeholder"),b.val(b.attr("placeholder")));break;default:b.val(b.attr("defaultValue"))}}),window.setTimeout(function(){for(x in b)b[x].trigger("formerize_sync")},10)}),c},c.n33_formerize())),a("#nav > ul").dropotron({offsetY:-16,mode:"fade",noOpenerFade:!0,hideDelay:400})})}(jQuery);
+/*
+	Project OGS
+	by => Stephen Giles and Paul Morrell
+*/
+
+(function($) {
+
+	skel.init({
+		reset: 'full',
+		breakpoints: {
+			'global':	{ range: '*', href: 'css/style.css' },
+			'desktop':	{ range: '737-', href: 'css/style-desktop.css', containers: 1200, grid: { gutters: 25 } },
+			'1000px':	{ range: '737-1200', href: 'css/style-1000px.css', containers: 1000, grid: { gutters: 20 }, viewport: { width: 1080 } },
+			'mobile':	{ range: '-736', href: 'css/style-mobile.css', containers: '100%', grid: { collapse: true, gutters: 10 }, viewport: { scalable: false } }
+		},
+		plugins: {
+			layers: {
+				navPanel: {
+					hidden: true,
+					breakpoints: 'mobile',
+					position: 'top-left',
+					side: 'left',
+					animation: 'pushX',
+					width: '80%',
+					height: '100%',
+					clickToHide: true,
+					html: '<div data-action="navList" data-args="nav"></div>',
+					orientation: 'vertical'
+				},
+				titleBar: {
+					breakpoints: 'mobile',
+					position: 'top-left',
+					side: 'top',
+					height: 44,
+					width: '100%',
+					html: '<span class="toggle" data-action="toggleLayer" data-args="navPanel"></span><span class="title" data-action="copyHTML" data-args="logo"></span>'
+				}
+			}
+		}
+	});
+
+	$(function() {
+
+		var	$window = $(window);
+			
+		// Forms (IE<10).
+			var $form = $('form');
+			if ($form.length > 0) {
+				
+				$form.find('.form-button-submit')
+					.on('click', function() {
+						$(this).parents('form').submit();
+						return false;
+					});
+		
+				if (skel.vars.IEVersion < 10) {
+					$.fn.n33_formerize=function(){var _fakes=new Array(),_form = $(this);_form.find('input[type=text],textarea').each(function() { var e = $(this); if (e.val() == '' || e.val() == e.attr('placeholder')) { e.addClass('formerize-placeholder'); e.val(e.attr('placeholder')); } }).blur(function() { var e = $(this); if (e.attr('name').match(/_fakeformerizefield$/)) return; if (e.val() == '') { e.addClass('formerize-placeholder'); e.val(e.attr('placeholder')); } }).focus(function() { var e = $(this); if (e.attr('name').match(/_fakeformerizefield$/)) return; if (e.val() == e.attr('placeholder')) { e.removeClass('formerize-placeholder'); e.val(''); } }); _form.find('input[type=password]').each(function() { var e = $(this); var x = $($('<div>').append(e.clone()).remove().html().replace(/type="password"/i, 'type="text"').replace(/type=password/i, 'type=text')); if (e.attr('id') != '') x.attr('id', e.attr('id') + '_fakeformerizefield'); if (e.attr('name') != '') x.attr('name', e.attr('name') + '_fakeformerizefield'); x.addClass('formerize-placeholder').val(x.attr('placeholder')).insertAfter(e); if (e.val() == '') e.hide(); else x.hide(); e.blur(function(event) { event.preventDefault(); var e = $(this); var x = e.parent().find('input[name=' + e.attr('name') + '_fakeformerizefield]'); if (e.val() == '') { e.hide(); x.show(); } }); x.focus(function(event) { event.preventDefault(); var x = $(this); var e = x.parent().find('input[name=' + x.attr('name').replace('_fakeformerizefield', '') + ']'); x.hide(); e.show().focus(); }); x.keypress(function(event) { event.preventDefault(); x.val(''); }); });  _form.submit(function() { $(this).find('input[type=text],input[type=password],textarea').each(function(event) { var e = $(this); if (e.attr('name').match(/_fakeformerizefield$/)) e.attr('name', ''); if (e.val() == e.attr('placeholder')) { e.removeClass('formerize-placeholder'); e.val(''); } }); }).bind("reset", function(event) { event.preventDefault(); $(this).find('select').val($('option:first').val()); $(this).find('input,textarea').each(function() { var e = $(this); var x; e.removeClass('formerize-placeholder'); switch (this.type) { case 'submit': case 'reset': break; case 'password': e.val(e.attr('defaultValue')); x = e.parent().find('input[name=' + e.attr('name') + '_fakeformerizefield]'); if (e.val() == '') { e.hide(); x.show(); } else { e.show(); x.hide(); } break; case 'checkbox': case 'radio': e.attr('checked', e.attr('defaultValue')); break; case 'text': case 'textarea': e.val(e.attr('defaultValue')); if (e.val() == '') { e.addClass('formerize-placeholder'); e.val(e.attr('placeholder')); } break; default: e.val(e.attr('defaultValue')); break; } }); window.setTimeout(function() { for (x in _fakes) _fakes[x].trigger('formerize_sync'); }, 10); }); return _form; };
+					$form.n33_formerize();
+				}
+
+			}
+
+		// Dropdowns.
+			$('#nav > ul').dropotron({ 
+				offsetY: -16,
+				mode: 'fade',
+				noOpenerFade: true,
+				hideDelay: 400
+			});
+
+	});
+
+})(jQuery);

@@ -1,1 +1,4 @@
-function AboutOnReady(){}
+function AboutOnReady()
+{
+    // Nothing to do here yet
+}

@@ -1,1 +1,93 @@
-function PasswordRecoveryOnReady(){$("#resetPasswordFormDiv").length&&($("#forgotPasswordLink").hide(),$("#forgotPasswordLinkMobile").hide(),$("#togglePassword").hide(),$("#togglePasswordConfirm").hide(),$("#newPW").keyup(function(){evaluateCurrentPWVal("#newPW","#newPWConfirm","#passwordStrength","#passwordMatch","#togglePassword")}),$("#newPWConfirm").keyup(function(){evaluateCurrentPWConfirmVal("#newPW","#newPWConfirm","#passwordMatch","#togglePasswordConfirm")}),$("#resetPwdBtn").click(function(){var a=$("#newPW").val(),b=$("#newPWConfirm").val(),c=$("#userId").val();return OnResetPwdButtonClick(a,b,"AJAXHandler.php","MemberHome.php","#newPW","#newPWConfirm","#passwordMatch","#passwordStrength","#togglePassword","#togglePasswordConfirm",c)}));var a=$(window).height();lastWindowHeight=a;var b=$(window).width();lastWindowWidth=b;var c=!0;OnViewportSizeChanged(b,a,"desktop",GetCurWidthClass(),"desktop",GetCurHeightClass(),c)}function OnResetPwdButtonClick(a,b,c,d,e,f,g,h,i,j,k){return 0===a.trim().length?sweetAlert("Oops...","Unable to reset password: The Password field must be filled","error"):a!==b?sweetAlert("Oops...","Unable to reset password: Your new Password does not match the Password Confirmation","error"):$.ajax({type:"POST",url:c,data:"action=ResetUserPassword&resetPW="+a+"&userId="+k,success:function(a){"true"===a?sweetAlert({title:"Success!",text:"Successfully reset password...redirecting to member home page",type:"success"},function(){window.location.href=d}):($(e).val(""),$(f).val(""),$(g).html(""),$(h).html(""),$(i).hide(),$(j).hide(),sweetAlert("Oops...",a,"error"))}}),!1}function OnViewportSizeChanged(a,b,c,d,e,f,g){"desktop"==d||$("#resetPasswordFormDiv").length?$("#forgotPasswordLinkMobile").hide():$("#forgotPasswordLinkMobile").show()}
+function PasswordRecoveryOnReady()
+{
+    if($("#resetPasswordFormDiv").length) {
+        $('#forgotPasswordLink').hide();
+	$('#forgotPasswordLinkMobile').hide();
+        $('#togglePassword').hide();
+        $('#togglePasswordConfirm').hide();
+
+        $('#newPW').keyup(function() {
+            evaluateCurrentPWVal('#newPW', '#newPWConfirm', '#passwordStrength', '#passwordMatch', '#togglePassword');
+        });
+
+        $('#newPWConfirm').keyup(function() {
+            evaluateCurrentPWConfirmVal('#newPW', '#newPWConfirm', '#passwordMatch', '#togglePasswordConfirm');
+        });
+
+        $('#resetPwdBtn').click(function() {
+            var password = $('#newPW').val();
+            var passwordConf = $('#newPWConfirm').val();
+            var userId = $('#userId').val();
+
+            return OnResetPwdButtonClick(password, passwordConf, 'AJAXHandler.php', 'MemberHome.php', '#newPW', '#newPWConfirm', 
+                                         '#passwordMatch', '#passwordStrength', '#togglePassword', '#togglePasswordConfirm', userId);
+        });
+    }
+	
+    // On startup, we want to simulate a viewport size transition, in order to format and size
+    // the current layout to best fit the current browser dimensions...we initialized everything
+    // as if it was in desktop view, so now we run a transition from 'desktop' to whatever the current view class is
+    var curWindowHeight = $(window).height();
+    lastWindowHeight = curWindowHeight;
+    var curWindowWidth = $(window).width();
+    lastWindowWidth = curWindowWidth;
+    var initTransition = true;
+    
+    OnViewportSizeChanged(curWindowWidth, curWindowHeight, 'desktop', GetCurWidthClass(), 'desktop', GetCurHeightClass(), initTransition);
+}
+
+function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pwField, pwConfirmField, pwMatchField, 
+                               pwStrengthField, pwToggleField, pwConfirmToggleField, userId)
+{
+    if(password.trim().length === 0) {
+        sweetAlert("Oops...", "Unable to reset password: The Password field must be filled", "error");
+    }
+    else if (password !== passwordConf) {
+        sweetAlert("Oops...", "Unable to reset password: Your new Password does not match the Password Confirmation", "error");
+    }
+    else {
+        $.ajax({
+            type: "POST",
+            url: actionURL,
+            data: "action=ResetUserPassword&resetPW=" + password + "&userId=" + userId,
+            success: function(response){
+                if(response === 'true') {
+                    sweetAlert({
+                        title: "Success!",
+                        text: "Successfully reset password...redirecting to member home page",
+                        type: "success"
+                    },
+                    function(){
+                        window.location.href = successURL;
+                    });
+                }
+                else {
+                    // Clear input fields
+                    $(pwField).val('');
+                    $(pwConfirmField).val('');
+
+                    // Clear password strength and password-confirm-match indicators
+                    $(pwMatchField).html('');
+                    $(pwStrengthField).html('');
+                    $(pwToggleField).hide();
+                    $(pwConfirmToggleField).hide();
+
+                    // Display error message from server
+                    sweetAlert("Oops...", response, "error");
+                }
+            }
+        });
+    }
+
+    return false;    
+}
+
+function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, curWidthClass, lastHeightClass, curHeightClass, initTransition)
+{   
+    if((curWidthClass == "desktop") || ($("#resetPasswordFormDiv").length)) {
+        $('#forgotPasswordLinkMobile').hide();
+    }
+    else {           
+        $('#forgotPasswordLinkMobile').show();
+    }
+}

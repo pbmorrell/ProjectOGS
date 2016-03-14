@@ -12,9 +12,9 @@
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
-		<!-- Navigation Wrapper -->
-		<!-- Main Wrapper -->
-		<div id="main-wrapper">
+	<!-- Navigation Wrapper -->
+	<!-- Main Wrapper -->
+	<div id="main-wrapper">
             <div class="container">
                 <div class="row">
                     <div class="12u">
@@ -52,8 +52,8 @@
                     </div>
                 </div>
             </div>
-		</div>
-		<!-- Footer Wrapper -->			
+	</div>
+	<!-- Footer Wrapper -->			
         <?php include 'Footer.php'; ?>
         <!-- Footer Wrapper -->
     </body>
