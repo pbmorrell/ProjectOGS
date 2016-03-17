@@ -343,6 +343,9 @@ by => Stephen Giles and Paul Morrell
                                     <section class="box style1">
                                         <h2>Manage Your Events</h2>
                                         <div class="dashboardTitle">Dashboard</div>
+                                        <?php if($objUser->IsPremiumMember): ?>
+                                            <input type="hidden" id="pmx" />
+                                        <?php endif; ?>
                                         <div class="mobileButtonToolbarContainer">
                                             <button type="button" class="memberHomeBtn" id="btnMobileActivate">
                                                 <img src="images/activate.png" />&nbsp;&nbsp;Activate</button>

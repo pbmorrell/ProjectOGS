@@ -610,7 +610,8 @@ function LoadEventManager()
 		$(this).attr('data-playersSignedUp', playerData);
 									
 		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), eventManagerJTableDiv);
+                var showRemovePlayerColumn = ($('#pmx').length > 0) && (dataRecordArray[0].EventCreator === 'ME');
+		OpenChildTableForJoinedPlayers($(this), eventManagerJTableDiv, showRemovePlayerColumn);
                 
                 // Set forecolor of event row, depending on its attributes
                 var isHidden = dataRecordArray[0].Hidden;                
@@ -834,7 +835,7 @@ function LoadCurrentEventViewer()
 		$(this).attr('data-playersSignedUp', playerData);
 																
 		// Pre-load each child table, but do not show yet
-		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv);
+		OpenChildTableForJoinedPlayers($(this), currentEventViewerJTableDiv, false);
 									
 		var isJoined = dataRecordArray[0].Actions;
 		// If all required players are signed up for a given event,
@@ -1268,8 +1269,8 @@ function LeaveSelectedEvents()
     }
 }
 
-function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
-{        
+function OpenChildTableForJoinedPlayers(tableRow, jTableDiv, allowBootJoinedPlayers)
+{    
     $(jTableDiv).jtable('openChildTable', tableRow,
         {
             title: "",
@@ -1286,7 +1287,7 @@ function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
                 },
                 PlayerName: {
                     title: 'Player Name',
-                    width: '55%',
+                    width: '50%',
                     sorting: true,
                     display: function (data) {
                         var $userNameDetailsPopupLink = $('<a href="#" class="actionLink" id="unDetailsLink' + data.record.ID + '">' + data.record.PlayerName + '</a>');
@@ -1301,7 +1302,7 @@ function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
                 },
                 GamerTags: {
                     title: 'View Gamer Tags',
-                    width: '45%',
+                    width: '25%',
                     sorting: false,
                     display: function (data) {
 			var $tagViewerLink = $('<a href="#" class="actionLink" id="tagsLink' + data.record.ID + '">Show Tags</a>');
@@ -1315,6 +1316,26 @@ function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
 			// Return link for display in jTable
 			return $tagViewerLink;
                     }
+                },
+                RemovePlayer: {
+                    title: 'Remove Member',
+                    width: '25%',
+                    sorting: false,
+                    columnSelectable: false,
+                    display: function (data) {
+                        var $removePlayerImage = $('<img alt="Remove" id="rem' + data.record.ID + '" title="Remove this player from event" src="images/cancelsignup.png" />');
+                        
+                        $removePlayerImage.click(function () {
+                            RemovePlayerFromEvent(data.record.ID);
+                            return false;
+                        });
+                        
+                        if(data.record.PlayerName.indexOf("(Creator)") == -1) {
+                            // Return clickable image for display in jTable if this joined player is not the event creator
+                            return $removePlayerImage;
+                        }
+                        else  return $('<label />');
+                    }
                 }
             },
             recordsLoaded: function() {
@@ -1324,11 +1345,24 @@ function OpenChildTableForJoinedPlayers(tableRow, jTableDiv)
                         $(this).addClass('customTheme');
                     });
 
-                    // Do not let child table expand to fill container
-                    $(this).find('table.jtable')
+                // Do not let child table expand to fill container
+                $(this).find('table.jtable')
+                    .each(function() {
+                        $(this).addClass('jTableChild');
+                    });
+                
+                // Only show RemovePlayer column if this is the Event Manager table, and current user is premium member
+                if(!allowBootJoinedPlayers) {
+                    var removePlayerColHdr = $(this).find('table.jtable > thead > tr > th:contains("Remove Member")');
+                    var removePlayerColIdx = $(removePlayerColHdr).index();
+                    $(removePlayerColHdr).addClass('hidden');
+                    
+                    $(this).find('table.jtable > tbody > tr')
                         .each(function() {
-                            $(this).addClass('jTableChild');
-                        });
+                            var removePlayerCol = $(this).children('td').eq(removePlayerColIdx);
+                            $(removePlayerCol).addClass('hidden');
+                        });                    
+                }
             }
         },
         function(data) {
@@ -2041,6 +2075,48 @@ function SearchEventsFormInfo()
     this.postData = '';
 }
 
+function RemovePlayerFromEvent(evtMemberID)
+{
+    sweetAlert({
+      title: "Confirm Removal",
+      text: "Remove this player?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yep, boot them out!",
+      closeOnConfirm: false,
+      closeOnCancel: false,
+      showLoaderOnConfirm: true
+   },
+   function(isConfirm) {
+      if(isConfirm) {
+         // Make AJAX call to remove current event member from the event
+	$.ajax({
+            type: "POST",
+            url: "AJAXHandler.php",
+            data: "action=EventViewerRemoveMemberFromEvent&evtMember=" + evtMemberID,
+            success: function(response){
+		var fullRefresh = false;
+                ReloadUserHostedEventsTable(fullRefresh);
+                
+                if(response.match("^SYSTEM ERROR")) {
+                    sweetAlert("Player Not Removed", response, "error");
+                }
+                else {
+                    sweetAlert("Player Removed", response, "success");
+                }
+            },
+            error: function() {
+		sweetAlert("Player Not Removed", "Unable to remove player form event: server error. Please try again later.", "error");
+            }
+        });
+      }
+      else {
+         // Show cancel message
+         sweetAlert("Player Not Removed", "Canceled event member removal", "info");
+      }
+   });
+}
+
 function EditEvent(eventId, $dialog)
 {
     var eventInfo = ValidateEventFormFields(eventId);
@@ -2114,4 +2190,3 @@ function CreateEvent($dialog)
     
     return false;
 }
-

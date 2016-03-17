@@ -1067,6 +1067,76 @@ class GamingHandler
 				
 	return ($deleteSuccess === true) ? ("SUCCESS: Left requested events") : ("SYSTEM ERROR: Could not leave requested events. Please try again later.");
     }
+    
+    public function EventViewerRemoveMemberFromEvent($dataAccess, $logger, $evtMemberId, $curUserId, $curUserIsPremium)
+    {
+        $validationMsg = $this->ValidateThisMemberCanBeRemoved($dataAccess, $logger, $evtMemberId, $curUserId, $curUserIsPremium);
+        if($validationMsg === "success") {
+            $deleteSuccess = false;
+            $removeUserFromEventsQuery = "DELETE FROM `Gaming.EventMembers` WHERE (`ID` = :evtMemberId);";
+            $parmEvtMemberId = new QueryParameter(':evtMemberId', $evtMemberId, PDO::PARAM_INT);
+            $queryParms = array($parmEvtMemberId);
+
+            $errors = "";
+
+            try {				
+                if($dataAccess->BuildQuery($removeUserFromEventsQuery, $queryParms)){
+                    $deleteSuccess = $dataAccess->ExecuteNonQuery();
+                }
+
+                $errors = $dataAccess->CheckErrors();
+            }
+            catch(Exception $e) {
+                $logger->LogError("Could not remove event member " . $evtMemberId . " from event. Exception: " . $e->getMessage());
+            }
+
+            if(!$deleteSuccess) {
+                $logger->LogError("Could not remove event member " . $evtMemberId . " from event. " . $errors);
+            }
+
+            return ($deleteSuccess === true) ? ("SUCCESS: Removed player from event") : ("SYSTEM ERROR: Could not leave remove player from event. Please try again later.");
+        }
+        else {
+            return "SYSTEM ERROR: Could not leave remove player from event. " . $validationMsg;
+        }
+    }
+    
+    private function ValidateThisMemberCanBeRemoved($dataAccess, $logger, $evtMemberId, $curUserId, $curUserIsPremium)
+    {
+        $validationMsg = "success";
+        if(!$curUserIsPremium)  $validationMsg = "Only premium members are allowed to remove joined members from their events.";
+        else {
+            $lookUpEventMemberInfoQuery = "SELECT em.`FK_User_ID` AS EventMemberUserId, e.`FK_User_ID_EventCreator` AS EventCreatorUserId " .
+                                          "FROM `Gaming.EventMembers` AS em " .
+                                          "INNER JOIN `Gaming.Events` AS e ON e.`ID` = em.`FK_Event_ID` " .
+                                          "WHERE (em.`ID` = :evtMemberId);";
+
+            $parmEvtMemberId = new QueryParameter(':evtMemberId', $evtMemberId, PDO::PARAM_INT);
+            $queryParms = array($parmEvtMemberId);
+            $results = null;
+            
+            if($dataAccess->BuildQuery($lookUpEventMemberInfoQuery, $queryParms)){
+                $results = $dataAccess->GetSingleResult();
+
+                if($results != null){
+                    $eventMemberUserId = $results['EventMemberUserId'];
+                    $eventCreatorUserId = $results['EventCreatorUserId'];
+                    
+                    if($eventCreatorUserId != $curUserId)      $validationMsg = "Can only remove members from events that you've created.";
+                    else if($eventMemberUserId == $curUserId)  $validationMsg = "The event creator (you) cannot be removed from event.";
+                }
+            }
+
+            $errors = $dataAccess->CheckErrors();
+            if((strlen($errors) > 0) || ($results == null)) {
+                $logger->LogError("Could not validation info for event member removal request (evtMember: " . $evtMemberId . 
+                                  "; requesting user ID: " . $curUserId . "). " . $errors);
+                $validationMsg = "Unable to confirm your permissions to perform this action.";
+            }
+        }
+        
+        return $validationMsg;
+    }
 	
     public function AddAllowedUsersToEvent($dataAccess, $logger, $eventID, $allowedUsers, $replaceWithCurrentSet = false)
     {

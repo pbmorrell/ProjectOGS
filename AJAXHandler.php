@@ -638,6 +638,14 @@
                 
                 echo $resetResult;
                 break;
+            case "EventViewerRemoveMemberFromEvent":
+		$evtMemberId = '';
+		if(isset($_POST['evtMember'])) {
+                    $evtMemberId = filter_var(trim($_POST['evtMember']), FILTER_SANITIZE_STRING);
+		}
+
+		echo $gamingHandler->EventViewerRemoveMemberFromEvent($dataAccess, $logger, $evtMemberId, $objUser->UserID, $objUser->IsPremiumMember);
+		break;
         }
     }
     else {
