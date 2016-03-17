@@ -1094,10 +1094,10 @@ class GamingHandler
                 $logger->LogError("Could not remove event member " . $evtMemberId . " from event. " . $errors);
             }
 
-            return ($deleteSuccess === true) ? ("SUCCESS: Removed player from event") : ("SYSTEM ERROR: Could not leave remove player from event. Please try again later.");
+            return ($deleteSuccess === true) ? ("SUCCESS: Removed player from event") : ("SYSTEM ERROR: Could not remove player from event. Please try again later.");
         }
         else {
-            return "SYSTEM ERROR: Could not leave remove player from event. " . $validationMsg;
+            return "SYSTEM ERROR: Could not remove player from event. " . $validationMsg;
         }
     }
     
@@ -1129,7 +1129,7 @@ class GamingHandler
 
             $errors = $dataAccess->CheckErrors();
             if((strlen($errors) > 0) || ($results == null)) {
-                $logger->LogError("Could not validation info for event member removal request (evtMember: " . $evtMemberId . 
+                $logger->LogError("Could not retrieve validation info for event member removal request (evtMember: " . $evtMemberId . 
                                   "; requesting user ID: " . $curUserId . "). " . $errors);
                 $validationMsg = "Unable to confirm your permissions to perform this action.";
             }
