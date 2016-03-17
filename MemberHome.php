@@ -17,7 +17,13 @@ by => Stephen Giles and Paul Morrell
         <script src="js/moment-timezone-with-data.min.js"></script>
 	<script src="js/jTable/jquery.jtable.min.js"></script>
 	<script src="js/jquery.slidereveal.min.js"></script>
-	<script src="js/GamerTagViewer.min.js"></script>
+	
+	<?php if(Constants::$isDebugMode): ?>
+            <script src="js/GamerTagViewer.js"></script>
+	<?php else: ?>
+            <script src="js/GamerTagViewer.min.js"></script>
+	<?php endif; ?>
+	
 	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body>

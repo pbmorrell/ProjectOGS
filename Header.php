@@ -12,8 +12,11 @@
     $welcomeUserName = "Welcome";
     $curPageName = basename($_SERVER['PHP_SELF'], ".php");
 	
+    $jsScriptSuffix = ".min";
+    if(Constants::$isDebugMode)  $jsScriptSuffix = "";
+	
     // Construct page JS init file name for script include
-    $pageInitJSScriptName = $curPageName . "Init.min.js";
+    $pageInitJSScriptName = $curPageName . "Init" . $jsScriptSuffix . ".js";
     
     $onloadPopupJSCode = "";
     if(isset($_GET['redirectMsg'])){
@@ -231,8 +234,8 @@
         '<script src="js/jquery.dropotron.min.js"></script>'.
         '<script src="js/skel.min.js"></script>'.
         '<script src="js/skel-layers.min.js"></script>'.
-        '<script src="js/init.min.js"></script>'.
-        '<script src="js/main.min.js"></script>'.
+        '<script src="js/init' . $jsScriptSuffix . '.js"></script>'.
+        '<script src="js/main' . $jsScriptSuffix . '.js"></script>'.
         '<script src="js/' . $pageInitJSScriptName . '"></script>'.
         '<script src="js/ajax.js"></script>'.
         '<script src="js/jquery-1.10.2.min.js"></script>'.

@@ -531,7 +531,7 @@ class GamingHandler
             if(count($eventIDs) > 0) {
 		$joinedMemberEventIds = $this->GetEventsJoinedByUsersInList($dataAccess, $logger, $searchParms->JoinedUsers, $searchParms->CustomJoinedUserName, $eventIDs);
 		$eventIDs = $this->GetScheduledGameIDList($dataAccess, $logger, $userID, $searchParms, $orderBy, $paginationEnabled, 
-									  $startIndex, $pageSize, $joinedMemberEventIds);
+														  $startIndex, $pageSize, $joinedMemberEventIds);
 		$filterCountByJoinedUsers = true;
 		$totalScheduledGameCnt = $this->GetTotalCountScheduledGames($dataAccess, $logger, $userID, $searchParms, $filterCountByJoinedUsers);
             }
@@ -1452,7 +1452,7 @@ class GamingHandler
                                       "(CASE WHEN membersByEvent.`JoinedCnt` >= e.`RequiredMemberCount` THEN 'FULL' ELSE (CASE WHEN (e.`EventScheduledForDate` < UTC_TIMESTAMP()) " .
                                         "THEN 'UNJOINED' ELSE 'JOIN' END) END) END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";
-				break;
+		break;
             case "EventCreator":
                 $queryOrderByClause = "(CASE WHEN ((em2.`ID` IS NOT NULL) AND (em2.`ID` = u.`ID`)) THEN 'ME' ELSE u.`UserName` END) " . 
                                       $orderByDirection . ", e.`EventScheduledForDate`";

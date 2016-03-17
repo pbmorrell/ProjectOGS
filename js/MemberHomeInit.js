@@ -484,12 +484,28 @@ function LoadEventManager()
             DisplayDate: {
                 title: 'Date',
                 width: '14%',
-                sorting: true
+                sorting: true,
+                display: function (data) {
+                    var displayDateUTC = moment.utc(data.record.EventScheduledForDate, "YYYY-MM-DD HH:mm:ss");
+                    var displayDateLocal = displayDateUTC.local();
+                    var displayDateLocalText = displayDateLocal.format("MMM D, YYYY");
+					
+                    var $displayDate = $('<label title="Date in Time Zone where Event Created: ' + data.record.DisplayDate + '">' + displayDateLocalText + '</label>');
+                    return $displayDate;
+                }
             },
             DisplayTime: {
                 title: 'Time',
                 width: '12%',
-                sorting: false
+                sorting: false,
+                display: function (data) {
+                    var displayDateUTC = moment.utc(data.record.EventScheduledForDate, "YYYY-MM-DD HH:mm:ss");
+                    var displayDateLocal = displayDateUTC.local();
+                    var displayTimeLocalText = displayDateLocal.format("h:mma");
+					
+                    var $displayTime = $('<label title="Time in Time Zone where Event Created: ' + data.record.DisplayTime + '">' + displayTimeLocalText + '</label>');
+                    return $displayTime;
+                }
             },
             Notes: {
                 title: 'Game Notes',
@@ -717,12 +733,28 @@ function LoadCurrentEventViewer()
             DisplayDate: {
                 title: 'Date',
                 width: '14%',
-                sorting: true
+                sorting: true,
+                display: function (data) {
+                    var displayDateUTC = moment.utc(data.record.EventScheduledForDate, "YYYY-MM-DD HH:mm:ss");
+                    var displayDateLocal = displayDateUTC.local();
+                    var displayDateLocalText = displayDateLocal.format("MMM D, YYYY");
+					
+                    var $displayDate = $('<label title="Date in Event Creator Time Zone: ' + data.record.DisplayDate + '">' + displayDateLocalText + '</label>');
+                    return $displayDate;
+                }
             },
             DisplayTime: {
                 title: 'Time',
                 width: '12%',
-                sorting: false
+                sorting: false,
+                display: function (data) {
+                    var displayDateUTC = moment.utc(data.record.EventScheduledForDate, "YYYY-MM-DD HH:mm:ss");
+                    var displayDateLocal = displayDateUTC.local();
+                    var displayTimeLocalText = displayDateLocal.format("h:mma");
+					
+                    var $displayTime = $('<label title="Time in Event Creator Time Zone: ' + data.record.DisplayTime + '">' + displayTimeLocalText + '</label>');
+                    return $displayTime;
+                }
             },
             Notes: {
                 title: 'Game Notes',

@@ -20,6 +20,9 @@ class Constants
     public static $emailSMTPUser = "playerunite.donotreply@gmail.com";
     public static $emailSMTPPassword = "t3\$t*useR";
 	
+    // General configuration
+    public static $isDebugMode = false; // If this variable is true, the full, un-minified version of most JS files will be referenced; otherwise, only minified JS files will be referenced
+	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = false; // Change this to true to test code changes to PayPal handling logic
     //public static $subscriptionOptionNames = ["Monthly" => "6.50", "Yearly" => "39.95"];
