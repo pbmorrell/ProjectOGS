@@ -17,6 +17,7 @@
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
+	<script src="js/pStrength.jquery.js"></script>
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">
             <div class="container">
@@ -44,30 +45,30 @@
                                                     <div id="signupFormDiv" class="signupInp">
                                                         <form name="signupForm" method="POST" action="">
                                                             <input id="signupEmail" type="text" maxlength="100" placeholder=" Email Address"><span></span><br/>
-                                                            <input id="signupPW" type="password" maxlength="50" placeholder=" Password"><span></span>
+                                                            <input id="signupPW" type="password" maxlength="50" placeholder=" Password" data-display="passwordStrength"><span></span>
                                                             <span id="togglePasswordSpan">
                                                                 <a href="#" id="togglePassword" 
                                                                    onclick="return togglePasswordField('#togglePassword', '#signupPW', '#signupPW', '#signupPWConfirm', 
-												' Password', false);">Show Password</a>
+                                                                                                       ' Password', false, 'passwordStrength');">Show Text</a>
                                                             </span>&nbsp;&nbsp;
-                                                            <span id="passwordStrength" class="passwordNone"></span><br/>
+                                                            <span id="passwordStrength"></span><br/>
                                                             <input id="signupPWConfirm" type="password" maxlength="50" placeholder=" Confirm Password"><span></span>
                                                             <span id="togglePasswordConfirmSpan">
                                                                 <a href="#" id="togglePasswordConfirm" 
                                                                    onclick="return togglePasswordField('#togglePasswordConfirm', '#signupPWConfirm', '#signupPW', '#signupPWConfirm', 
-												' Confirm Password', true);">Show Password</a>
+                                                                                                       ' Confirm Password', true);">Show Text</a>
                                                             </span>&nbsp;&nbsp;
-                                                            <span id="passwordMatch" class="passwordWeak"></span><br/><br/>
-								<div class="captchaInputDiv">
-                                                                    <input type="text" name="captcha_code" id="captcha_code" maxlength="6" class="captchaInput" placeholder="Code" />
-								</div>
-								<div class="captchaImageDiv">
-                                                                    <img id="captcha" src="securimage/securimage_show.php" alt="CAPTCHA Image" />
-                                                                    <a href="#" title="Refresh Image"  
-                                                                        onclick="document.getElementById('captcha').src = 'securimage/securimage_show.php?' + Math.random(); this.blur(); return false">
-									<img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
-								</div>
-								<br/><br/>
+                                                            <img id="passwordMatch" src="images/green_checkmark.gif" /><br/><br/>
+                                                            <div class="captchaInputDiv">
+                                                                <input type="text" name="captcha_code" id="captcha_code" maxlength="6" class="captchaInput" placeholder="Code" />
+                                                            </div>
+                                                            <div class="captchaImageDiv">
+                                                                <img id="captcha" src="securimage/securimage_show.php" alt="CAPTCHA Image" />
+                                                                <a href="#" title="Refresh Image"  
+                                                                   onclick="document.getElementById('captcha').src = 'securimage/securimage_show.php?' + Math.random(); this.blur(); return false">
+                                                                <img src="securimage/images/refresh.png" height="32" width="32" alt="Reload Image" onclick="this.blur()" /></a>
+                                                            </div>
+                                                            <br/><br/>
                                                             <button type="submit" class="controlBtn controlBtnIndex button icon fa-cogs" id="signupBtn">Create Free Account</button>
                                                         </form>
                                                     </div>

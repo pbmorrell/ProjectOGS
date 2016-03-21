@@ -26,6 +26,7 @@
 <html>
     <head>
         <?php echo $pageHeaderHTML; ?>
+	<script src="js/pStrength.jquery.js"></script>
     </head>
     <body class="">
         <!-- Navigation Wrapper -->
@@ -55,16 +56,16 @@
                                                                 <span id="togglePasswordSpan">
                                                                     <a href="#" id="togglePassword" 
                                                                        onclick="return togglePasswordField('#togglePassword', '#newPW', '#newPW', '#newPWConfirm', 
-                                                                                                           ' New Password', false);">Show Password</a>
+                                                                                                           ' New Password', false, 'passwordStrength');">Show Text</a>
                                                                 </span>&nbsp;&nbsp;
-                                                                <span id="passwordStrength" class="passwordNone"></span><br/><br/>
+                                                                <span id="passwordStrength"></span><br/><br/>
                                                                 <input id="newPWConfirm" type="password" maxlength="50" placeholder=" Confirm New Password"><span></span>&nbsp;
                                                                 <span id="togglePasswordConfirmSpan">
                                                                     <a href="#" id="togglePasswordConfirm" 
                                                                        onclick="return togglePasswordField('#togglePasswordConfirm', '#newPWConfirm', '#newPW', '#newPWConfirm', 
-                                                                                                           ' Confirm New Password', true);">Show Password</a>
+                                                                                                           ' Confirm New Password', true);">Show Text</a>
                                                                 </span>&nbsp;&nbsp;
-                                                                <span id="passwordMatch" class="passwordWeak"></span><br/><br/>
+                                                                <img id="passwordMatch" src="images/green_checkmark.gif" /><br/><br/>
                                                                 <button type="submit" class="controlBtn controlBtnIndex button icon fa-cogs" id="resetPwdBtn">Reset Password</button>
                                                             </form>
                                                         </div>

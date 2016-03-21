@@ -9,6 +9,7 @@
     include_once 'classes/Constants.class.php';
     include_once 'classes/PayPalTxnMsg.class.php';
     
+    $objUser = User::constructDefaultUser();
     $welcomeUserName = "Welcome";
     $curPageName = basename($_SERVER['PHP_SELF'], ".php");
 	
@@ -95,7 +96,6 @@
     }
 	
     if($sessionRequired || (($sessionAllowed) && (isset($_SESSION['WebUser'])))) {
-        $objUser = User::constructDefaultUser();
         $justCreatedSession = false;
         // If user not logged in or unauthorized to view this page, redirect to login page
         if($securityHandler->UserCanAccessThisPage($dataAccess, $logger, $curPageName, Constants::$authFailureRedirectPage)) {

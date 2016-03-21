@@ -201,7 +201,8 @@ function GetURLParamVal(paramName)
     return (params[paramName] == undefined) ? '' : params[paramName];
 }
 
-function _(x) {
+function _(x) 
+{
     return document.getElementById(x);	
 }
 
@@ -216,23 +217,30 @@ function StringPadLeft(string, padChar, requiredLength)
     return outputString;
 }
 
-function addDaysToDate (date, days) {
+function addDaysToDate (date, days) 
+{
     var result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
 }
 
-function togglePasswordField(targetToggle, targetPWField, pwField, pwConfirmField, targetPWPlaceholder, thisIsConfirmField) {
+function togglePasswordField(targetToggle, targetPWField, pwField, pwConfirmField, targetPWPlaceholder, thisIsConfirmField, pwStrengthField) 
+{
     var $input = $(targetPWField);
     var change = "password";
-    if ($(targetToggle).html() === 'Show Password'){
+    if ($(targetToggle).html() === 'Show Text'){
         change = "text";
-        $(targetToggle).html('Hide Password');
+        $(targetToggle).html('Hide Text');
     } else {
-        $(targetToggle).html('Show Password');
+        $(targetToggle).html('Show Text');
     }
     
-    var rep = $("<input type='" + change + "' maxlength='50' placeholder='" + targetPWPlaceholder + "' />")
+    var dataDisplayAttr = "";
+    if(pwStrengthField) {
+	dataDisplayAttr = "' data-display='" + pwStrengthField;
+    }
+	
+    var rep = $("<input type='" + change + "' maxlength='50' placeholder='" + targetPWPlaceholder + dataDisplayAttr + "' />")
                 .attr("id", $(targetPWField).attr("id"))
                 .attr('class', $(targetPWField).attr('class'))
                 .val($(targetPWField).val())
@@ -247,53 +255,66 @@ function togglePasswordField(targetToggle, targetPWField, pwField, pwConfirmFiel
 	});
     }
     else {
+	$input.pStrength({
+            'changeBackground' : false,
+            'onPasswordStrengthChanged' : function(passwordStrength, strengthPercentage) {
+		evaluateCurrentPWStrength(pwField, '#passwordStrength', passwordStrength, strengthPercentage);
+            }
+	});
+		
 	$input.keyup(function() {
-            evaluateCurrentPWVal(pwField, pwConfirmField, '#passwordStrength', '#passwordMatch', targetToggle);
+            evaluateCurrentPWVal(pwField, pwConfirmField, '#passwordMatch', targetToggle);
 	});
     }
     
     return false;
 }
 
-function evaluateCurrentPWVal(pwField, pwConfirmField, pwStrengthField, pwMatchField, pwToggleLink) {
-    var strongRegex = new RegExp("^(?=.{8,})(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W).*$", "g");
-    var mediumRegex = new RegExp("^(?=.{7,})(((?=.*[A-Z])(?=.*[a-z]))|((?=.*[A-Z])(?=.*[0-9]))|((?=.*[a-z])(?=.*[0-9]))).*$", "g");
-    var enoughRegex = new RegExp("(?=.{6,}).*", "g");
+function evaluateCurrentPWStrength(pwField, pwStrengthField, passwordStrength, strengthPercentage)
+{
+    var curPWVal = $(pwField).val();
 	
+    if(curPWVal.length === 0) {
+	$.fn.pStrength('resetStyle', $(pwField));
+	$(pwStrengthField).html('');
+    } else {
+	$.fn.pStrength('changeBackground', $(pwField), passwordStrength);
+	
+	if(strengthPercentage < 33) {
+            $(pwStrengthField).html('Very Weak');
+	} else if ((strengthPercentage >= 33) && (strengthPercentage < 50)) {
+            $(pwStrengthField).html('Weak');
+	} else if ((strengthPercentage >= 50) && (strengthPercentage < 66)) {
+            $(pwStrengthField).html('Fair');
+	} else if ((strengthPercentage >= 66) && (strengthPercentage < 80)) {
+            $(pwStrengthField).html('Good');
+	} else if ((strengthPercentage >= 80) && (strengthPercentage < 90)) {
+            $(pwStrengthField).html('Strong');
+	} else {
+            $(pwStrengthField).html('Unbreakable!');
+	}	
+    }
+}
+
+function evaluateCurrentPWVal(pwField, pwConfirmField, pwMatchField, pwToggleLink) {	
     var curPWVal = $(pwField).val();
     var curPWConfVal = $(pwConfirmField).val();
 	 
     if(curPWVal.length === 0) {
-	$(pwStrengthField).attr('class', 'passwordNone');
-	$(pwStrengthField).html('');
-	$(pwMatchField).html('');
+	$(pwMatchField).attr('src', 'images/green_checkmark.gif');
+	$(pwMatchField).attr('title', 'Passwords match');
+	$(pwMatchField).hide();
 	$(pwToggleLink).hide();
     } else {
 	if(curPWVal !== curPWConfVal) {
-            $(pwMatchField).attr('class', 'passwordWeak');
-            $(pwMatchField).html('Passwords do not match');
+            $(pwMatchField).attr('src', 'images/red_x.png');
+            $(pwMatchField).attr('title', 'Passwords do not match');
+            $(pwMatchField).show();
             $(pwToggleLink).show();
 	} else {
-            $(pwMatchField).attr('class', 'passwordStrong');
-            $(pwMatchField).html('Passwords match!');
-            $(pwToggleLink).show();
-	}
-		
-	if (false === enoughRegex.test(curPWVal)) {
-            $(pwStrengthField).attr('class', 'passwordWeak');
-            $(pwStrengthField).html('More Characters');
-            $(pwToggleLink).show();
-	} else if (strongRegex.test(curPWVal)) {
-            $(pwStrengthField).attr('class', 'passwordStrong');
-            $(pwStrengthField).html('Strong!');
-            $(pwToggleLink).show();
-	} else if (mediumRegex.test(curPWVal)) {
-            $(pwStrengthField).attr('class', 'passwordOK');
-            $(pwStrengthField).html('Medium');
-            $(pwToggleLink).show();
-	} else {
-            $(pwStrengthField).attr('class', 'passwordWeak');
-            $(pwStrengthField).html('Weak');
+            $(pwMatchField).attr('src', 'images/green_checkmark.gif');
+            $(pwMatchField).attr('title', 'Passwords match');
+            $(pwMatchField).show();
             $(pwToggleLink).show();
 	}
     }
@@ -307,15 +328,18 @@ function evaluateCurrentPWConfirmVal(pwField, pwConfirmField, pwMatchField, pwTo
 	
     if((curPWConfirmVal.length === 0) && 
        (curPWVal.length === 0)) {
-	$(pwMatchField).html('');
 	$(pwToggleLink).hide();
+	$(pwMatchField).attr('src', 'images/green_checkmark.gif');
+	$(pwMatchField).attr('title', 'Passwords match');
+	$(pwMatchField).hide();
     } else if(curPWConfirmVal !== curPWVal) {
-	$(pwMatchField).attr('class', 'passwordWeak');
-	$(pwMatchField).html('Passwords do not match');
+	$(pwMatchField).attr('src', 'images/red_x.png');
+	$(pwMatchField).attr('title', 'Passwords do not match');
 	$(pwToggleLink).show();
     } else {
-	$(pwMatchField).attr('class', 'passwordStrong');
-	$(pwMatchField).html('Passwords match!');
+	$(pwMatchField).attr('src', 'images/green_checkmark.gif');
+	$(pwMatchField).attr('title', 'Passwords match');
+	$(pwMatchField).show();
 	$(pwToggleLink).show();
     }	
 }
@@ -713,23 +737,23 @@ function SaveCurrentJTableContentsToClipboard(jTableDiv, title, tableTitle)
 
 function SelectAllTextInTextArea(parms)
 {
-	$('.autoSelectTextArea').each(function() {
+    $('.autoSelectTextArea').each(function() {
         var $this = $(this);
 		
-		$this.select();
+	$this.select();
 
-		window.setTimeout(function() {
-			$this.select();
-		}, 1);
+	window.setTimeout(function() {
+            $this.select();
+	}, 1);
 
-		function mouseUpHandler() {
-			// Prevent further mouseup intervention
-			$this.off("mouseup", mouseUpHandler);
-			return false;
-		}
+	function mouseUpHandler() {
+            // Prevent further mouseup intervention
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+	}
 
-		$this.mouseup(mouseUpHandler);
-	});
+	$this.mouseup(mouseUpHandler);
+    });
     //$(this).find('.autoSelectTextArea').each(function() {
     //    var $this = $(this);
     //    $this.focus();

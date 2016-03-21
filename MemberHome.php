@@ -15,16 +15,16 @@ by => Stephen Giles and Paul Morrell
         <?php echo $pageHeaderHTML; ?>
         <script src="js/moment.min.js"></script>
         <script src="js/moment-timezone-with-data.min.js"></script>
-	<script src="js/jTable/jquery.jtable.min.js"></script>
-	<script src="js/jquery.slidereveal.min.js"></script>
+		<script src="js/jTable/jquery.jtable.min.js"></script>
+		<script src="js/jquery.slidereveal.min.js"></script>
 	
-	<?php if(Constants::$isDebugMode): ?>
+		<?php if(Constants::$isDebugMode): ?>
             <script src="js/GamerTagViewer.js"></script>
-	<?php else: ?>
+		<?php else: ?>
             <script src="js/GamerTagViewer.min.js"></script>
-	<?php endif; ?>
+		<?php endif; ?>
 	
-	<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
+		<link rel="stylesheet" href="css/jTable/lightcolor/green/jtable.min.css" />
     </head>
     <body>
 	<?php 

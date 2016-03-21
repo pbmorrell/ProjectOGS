@@ -109,6 +109,7 @@
 	<?php else: ?>
             <script src="js/GamerTagViewer.min.js"></script>
 	<?php endif; ?>
+	<script src="js/pStrength.jquery.js"></script>
         <link rel="stylesheet" href="css/jTable/lightcolor/blue/jtable.min.css" />
     </head>
     <body class="">
@@ -182,17 +183,17 @@
                                                         <span id="togglePasswordSpan">
                                                             <a href="#" id="togglePassword" 
                                                                onclick="return togglePasswordField('#togglePassword', '#pwd', '#pwd', '#pwdConfirm', 
-                                                                                                   ' Password', false);">Show Password</a>
+                                                                                                   ' Password', false, 'passwordStrength');">Show Text</a>
                                                         </span>&nbsp;&nbsp;
-                                                        <span id="passwordStrength" class="passwordNone"></span><br/><br/>
+                                                        <span id="passwordStrength"></span><br/><br/>
                                                         
                                                         <input id="pwdConfirm" type="password" maxlength="50" placeholder=" Confirm Password" /><br/>
                                                         <span id="togglePasswordConfirmSpan">
                                                             <a href="#" id="togglePasswordConfirm" 
                                                                onclick="return togglePasswordField('#togglePasswordConfirm', '#pwdConfirm', '#pwd', '#pwdConfirm', 
-                                                                                                   ' Confirm Password', true);">Show Password</a>
+                                                                                                   ' Confirm Password', true);">Show Text</a>
                                                         </span>&nbsp;<br/>
-                                                        <span id="passwordMatch" class="passwordWeak"></span>
+                                                        <img id="passwordMatch" src="images/green_checkmark.gif" />
                                                     </section>
                                                     <section class="4u">
                                                         <p><i class="fa fa-gamepad"></i>&nbsp;&nbsp;Which console(s) do you game on?<br /><label>(check all that apply)</label></p>

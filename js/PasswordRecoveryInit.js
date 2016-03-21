@@ -5,9 +5,17 @@ function PasswordRecoveryOnReady()
 	$('#forgotPasswordLinkMobile').hide();
         $('#togglePassword').hide();
         $('#togglePasswordConfirm').hide();
+        $('#passwordMatch').hide();
+
+        $('#newPW').pStrength({
+            'changeBackground' : false,
+            'onPasswordStrengthChanged' : function(passwordStrength, strengthPercentage) {
+                evaluateCurrentPWStrength('#newPW', '#passwordStrength', passwordStrength, strengthPercentage);
+            }
+        });
 
         $('#newPW').keyup(function() {
-            evaluateCurrentPWVal('#newPW', '#newPWConfirm', '#passwordStrength', '#passwordMatch', '#togglePassword');
+            evaluateCurrentPWVal('#newPW', '#newPWConfirm', '#passwordMatch', '#togglePassword');
         });
 
         $('#newPWConfirm').keyup(function() {
@@ -39,13 +47,15 @@ function PasswordRecoveryOnReady()
 function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pwField, pwConfirmField, pwMatchField, 
                                pwStrengthField, pwToggleField, pwConfirmToggleField, userId)
 {
+    var curPwdStrengthLevel = $("#passwordStrength").text();
+    
     if(password.trim().length === 0) {
         sweetAlert("Oops...", "Unable to reset password: The Password field must be filled", "error");
-    }
-    else if (password !== passwordConf) {
+    } else if (password !== passwordConf) {
         sweetAlert("Oops...", "Unable to reset password: Your new Password does not match the Password Confirmation", "error");
-    }
-    else {
+    } else if ((curPwdStrengthLevel == 'Very Weak') || (curPwdStrengthLevel == 'Weak')) {
+	sweetAlert("Oops...", "Unable to reset password: The strength rating for your new password must at least be 'Fair'", "error");
+    } else {
         $.ajax({
             type: "POST",
             url: actionURL,
@@ -67,8 +77,13 @@ function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pw
                     $(pwConfirmField).val('');
 
                     // Clear password strength and password-confirm-match indicators
-                    $(pwMatchField).html('');
+                    $(pwMatchField).attr('src', 'images/green_checkmark.gif');
+                    $(pwMatchField).attr('title', 'Passwords match');
+                    $(pwMatchField).hide();
+					
                     $(pwStrengthField).html('');
+                    $.fn.pStrength('resetStyle', $(pwField));
+                    
                     $(pwToggleField).hide();
                     $(pwConfirmToggleField).hide();
 

@@ -18,9 +18,17 @@ function EditProfileOnReady()
 
     $('#togglePassword').hide();
     $('#togglePasswordConfirm').hide();
+    $('#passwordMatch').hide();
+
+    $('#pwd').pStrength({
+        'changeBackground' : false,
+        'onPasswordStrengthChanged' : function(passwordStrength, strengthPercentage) {
+            evaluateCurrentPWStrength('#pwd', '#passwordStrength', passwordStrength, strengthPercentage);
+        }
+    });
 
     $('#pwd').keyup(function() {
-        evaluateCurrentPWVal('#pwd', '#pwdConfirm', '#passwordStrength', '#passwordMatch', '#togglePassword');
+        evaluateCurrentPWVal('#pwd', '#pwdConfirm', '#passwordMatch', '#togglePassword');
     });
 
     $('#pwdConfirm').keyup(function() {
@@ -89,6 +97,7 @@ function OnEditProfile(editProfileStatusId)
     var email = $('#emailAddress').val();
     var password = $('#pwd').val();
     var passwordConf = $('#pwdConfirm').val();
+    var curPwdStrengthLevel = $("#passwordStrength").text();
     var userName = $('#userName').val();
     var dob = $('#DOBDatePicker').val();
     var bio = $('#message').val();
@@ -96,17 +105,15 @@ function OnEditProfile(editProfileStatusId)
 
     if (validEmailRegEx.test(email) === false) {
         sweetAlert("Oops...", "Unable to update account: Please enter a valid email address", "error");
-    }
-    else if (password !== passwordConf) {
+    } else if (password !== passwordConf) {
         sweetAlert("Oops...", "Unable to update account: Your Password does not match the Password Confirmation", "error");
-    }
-    else if (userName.trim().length === 0) {
+    } else if ((password.length > 0) && ((curPwdStrengthLevel == 'Very Weak') || (curPwdStrengthLevel == 'Weak'))) {
+	sweetAlert("Oops...", "Unable to update account: The strength rating for your new password must at least be 'Fair'", "error");
+    } else if (userName.trim().length === 0) {
         sweetAlert("Oops...", "Unable to update account: The Username field must be filled", "error");
-    }
-    else if((email.trim().length === 0) || (dob.trim().length === 0) || (bio.trim().length === 0)) {
+    } else if((email.trim().length === 0) || (dob.trim().length === 0) || (bio.trim().length === 0)) {
         sweetAlert("Oops...", "Unable to update account: The Email, Birthdate and Autobiography fields must be filled", "error");
-    } 
-    else if ((checkedPlatforms > 0) || ((checkedPlatforms === 0) && (confirm("No game platforms selected...proceed with update?")))) {
+    } else if ((checkedPlatforms > 0) || ((checkedPlatforms === 0) && (confirm("No game platforms selected...proceed with update?")))) {
         $(editProfileStatusId).attr('class', 'preEditProfile');
         $(editProfileStatusId).html("Updating Account...");
         $(editProfileStatusId).fadeIn(200);
