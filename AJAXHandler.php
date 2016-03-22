@@ -132,7 +132,7 @@
 
                 // Get login credentials
                 try {
-                    $password = trim($_POST["signupPW"]);
+                    $password = filter_var(trim($_POST["signupPW"]), FILTER_SANITIZE_STRING);
                     $userEmail = filter_var(trim($_POST["signupEmail"]), FILTER_SANITIZE_EMAIL);
 
                     if((strlen($password) == 0) || (strlen($userEmail) == 0)) {
@@ -230,7 +230,7 @@
                     $email =            filter_var(trim($_POST["emailAddress"]), FILTER_SANITIZE_EMAIL);
 
                     if(strlen(trim($_POST['pwd'])) > 0) {
-                        $encryptedPassword = $securityHandler->EncryptPassword(trim($_POST['pwd']));
+                        $encryptedPassword = $securityHandler->EncryptPassword(filter_var(trim($_POST['pwd']), FILTER_SANITIZE_STRING));
                     }
 
                     if(strlen(trim($_POST['DOBDatePicker'])) > 0) {

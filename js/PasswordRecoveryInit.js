@@ -59,7 +59,7 @@ function OnResetPwdButtonClick(password, passwordConf, actionURL, successURL, pw
         $.ajax({
             type: "POST",
             url: actionURL,
-            data: "action=ResetUserPassword&resetPW=" + password + "&userId=" + userId,
+            data: "action=ResetUserPassword&resetPW=" + encodeURI(password) + "&userId=" + userId,
             success: function(response){
                 if(response === 'true') {
                     sweetAlert({

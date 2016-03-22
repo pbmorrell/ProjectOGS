@@ -106,10 +106,12 @@
 		
 	<?php if(Constants::$isDebugMode): ?>
             <script src="js/GamerTagViewer.js"></script>
+            <script src="js/pStrength.jquery.js"></script>
 	<?php else: ?>
             <script src="js/GamerTagViewer.min.js"></script>
+            <script src="js/pStrength.jquery.min.js"></script>
 	<?php endif; ?>
-	<script src="js/pStrength.jquery.js"></script>
+            
         <link rel="stylesheet" href="css/jTable/lightcolor/blue/jtable.min.css" />
     </head>
     <body class="">

@@ -17,7 +17,12 @@
     </head>
     <body class="">
         <?php echo $headerHTML; ?>
-	<script src="js/pStrength.jquery.js"></script>
+        
+	<?php if(Constants::$isDebugMode): ?>
+            <script src="js/pStrength.jquery.js"></script>
+	<?php else: ?>
+            <script src="js/pStrength.jquery.min.js"></script>
+	<?php endif; ?>
 	<!-- Main Wrapper -->
 	<div id="main-wrapper">
             <div class="container">

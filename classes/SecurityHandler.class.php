@@ -40,7 +40,7 @@ class SecurityHandler
             array_push($queryParms, $parmUserName);
         }
 
-        $authenticateUserQuery = "SELECT u.`ID`, u.`Password`, r.`SecurityLevel`, u.`FK_Timezone_ID`, u.`FirstName`, u.`LastName`, " .
+        $authenticateUserQuery = "SELECT u.`ID`, u.`UserName`, u.`Password`, r.`SecurityLevel`, u.`FK_Timezone_ID`, u.`FirstName`, u.`LastName`, " .
                                  "u.`EmailAddress`, u.`IsPremiumMember`, u.`Gender`, u.`Birthdate`, u.`Autobiography`, " .
 				 "(IFNULL(ppu.`MembershipExpirationDate`, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY))) as MembershipExpirationDate, " .
 				 "(IFNULL(ppu.`IsActive`, 0)) as IsActiveMember " .
@@ -77,7 +77,7 @@ class SecurityHandler
 			}
 						
 						
-			$objUser = new User($results['ID'], $results['SecurityLevel'], $results['FK_Timezone_ID'], $userName, 
+			$objUser = new User($results['ID'], $results['SecurityLevel'], $results['FK_Timezone_ID'], $results['UserName'], 
                                             $results['FirstName'], $results['LastName'], $results['EmailAddress'], $isPremiumMember, 
                                             $results['Gender'], $results['Birthdate'], $results['Autobiography'], $userPlatforms);
                         $success = true;

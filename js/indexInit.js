@@ -71,7 +71,7 @@ function OnSignupButtonClick(email, password, passwordConf, captcha, actionURL, 
         $.ajax({
             type: "POST",
             url: actionURL,
-            data: "action=Signup&signupPW=" + password + "&signupEmail=" + email + "&captcha_code=" + captcha,
+            data: "action=Signup&signupPW=" + encodeURI(password) + "&signupEmail=" + email + "&captcha_code=" + captcha,
             success: function(response){
                 if(response === 'true') {
                     window.location.href = successURL;
