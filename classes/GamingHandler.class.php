@@ -370,7 +370,7 @@ class GamingHandler
                             'type="text" maxlength="9" placeholder=" Time"><br />' .
                             $this->GetTimezoneList($dataAccess, (($eventInfo != null) ? $eventInfo->ScheduledTimeZoneID : $userDefaultTimeZoneId), $eventId) .
                         '</p>'.
-			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>'. 
+			'<p><i class="fa fa-user"></i> &nbsp; Total number of players needed<br/>(Make sure to include yourself)<br/>'. 
                             $gamePlayersNeededSelect .
                         '<p><i class="fa fa-gamepad"></i> &nbsp; Choose a platform for this game<br/>'. 
                             $this->GetPlatformDropdownList($dataAccess, (($eventInfo != null) ? $eventInfo->SelectedPlatformID : $userDefaultPlatformId), $eventId) .

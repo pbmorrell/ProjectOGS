@@ -1365,6 +1365,22 @@
         height: 10em;
         resize: none;
     }
+    
+    #message::-webkit-input-placeholder {
+         color: #a9a9a9;
+    }
+
+    #message:-moz-placeholder { /* Firefox 18- */
+         color: #a9a9a9;  
+    }
+
+    #message::-moz-placeholder {  /* Firefox 19+ */
+        color: #a9a9a9;  
+    }
+
+    #message:-ms-input-placeholder {  
+        color: #a9a9a9;
+    }
 
     .customDialogStyle .ui-dialog-titlebar > span {
         white-space: normal !important;
