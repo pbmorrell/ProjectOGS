@@ -646,6 +646,9 @@
 
 		echo $gamingHandler->EventViewerRemoveMemberFromEvent($dataAccess, $logger, $evtMemberId, $objUser->UserID, $objUser->IsPremiumMember);
 		break;
+            case "EventReminderSettingsLoad":
+		echo $securityHandler->EventReminderSettingsLoad($dataAccess, $logger, $objUser->UserID);
+		break;
         }
     }
     else {

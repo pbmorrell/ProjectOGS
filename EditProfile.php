@@ -134,6 +134,7 @@
                                                     ?>&nbsp;
                                                     <div class="submitFormDiv desktopButtonDisplay">
                                                         <button type="button" class="controlBtn button icon fa-sitemap" id="gamerTagUpdateBtn">Manage Gamer Tags</button>
+                                                        <!--<button type="submit" class="controlBtn button icon fa-calendar" id="eventReminderSettingsBtn">Event Reminders</button> -->
                                                         <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtn">Update Profile</button>
                                                     </div>
                                                 </h2>
@@ -211,6 +212,8 @@
                                                             <br/><br/>
                                                             <button type="button" class="controlBtn button icon fa-sitemap" id="gamerTagUpdateBtnMobile">Manage Gamer Tags</button>
                                                             <br/><br/>
+                                                            <!--<button type="submit" class="controlBtn button icon fa-calendar" id="eventReminderSettingsBtnMobile">Event Reminders</button>
+                                                            <br/><br/>-->
                                                             <button type="submit" class="controlBtn button icon fa-wrench" id="signupBtnMobile">Update Profile</button>
                                                         </div>
                                                     </section>

@@ -1,5 +1,5 @@
 <?php
-include_once 'classes/DataAccess.class.php';
+include_once 'DataAccess.class.php';
 
 class Logger
 {	

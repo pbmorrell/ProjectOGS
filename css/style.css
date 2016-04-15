@@ -108,6 +108,10 @@
     .box.style3 input[type=password],select{
         height: 2.15em !important; /* Fix for IE display of textboxes */
     }
+    
+    .timeIntervalSelect {
+        max-width: 4em;
+    }
 
     #ddlTimeZones, #toggleShowPastEvents{
         width: auto !important;

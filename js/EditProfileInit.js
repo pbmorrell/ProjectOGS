@@ -1,5 +1,6 @@
 var editProfileGamerTagManagerDlg = "gamerTagManagerDlg";
 var editProfileGamerTagManagerJTableDiv = "#manageGamerTagsDiv";
+var selReminderEmailTimeInterval = "hr";
 
 function EditProfileOnReady()
 {
@@ -58,12 +59,51 @@ function EditProfileOnReady()
     $('.submitFormDiv').on('click', '#gamerTagUpdateBtn', function() {
         return OnGamerTagUpdateClick();
     });
+    
+    // Attach delegated event handler to Event Reminders mobile button, for when/if it becomes visible
+    $('.mobileButtonDisplay').on('click', '#eventReminderSettingsBtnMobile', function() {
+        return OnEventReminderSettingsClick();
+    });
+
+    // Attach delegated event handler to Event Reminders desktop button, for when/if it becomes visible
+    $('.submitFormDiv').on('click', '#eventReminderSettingsBtn', function() {
+        return OnEventReminderSettingsClick();
+    });
 }
 
 function OnGamerTagUpdateClick()
 {
     OpenGamerTagViewer(editProfileGamerTagManagerDlg, editProfileGamerTagManagerJTableDiv.substring(1), "Gamer Tag Management", 
                        "Your Gamer Tags", false, false, -1);
+    return false;
+}
+
+function OnEventReminderSettingsClick()
+{
+    var curWidthClass = GetCurWidthClass();
+    var curHeightClass = GetCurHeightClass();
+    var displayContainerPosition = "top";
+    var dlgWidth = 600;
+    var dlgHeight = 700;
+    
+    if(curWidthClass == 'mobile') {
+        dlgWidth = 400;
+        displayContainerPosition = "top+10%";
+    }
+    if(curWidthClass == 'xtraSmall') {
+        dlgWidth = 275;
+        displayContainerPosition = "top+10%";
+    }
+    
+    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
+        dlgHeight = 450;
+    }
+    
+    displayJQueryDialog("dlgEvtReminderSettings", "Event Reminder Settings", "top", displayContainerPosition, window, false, true, 
+                        "AJAXHandler.php?action=EventReminderSettingsLoad", function() {
+        EventReminderDialogOnReady($('#dlgEvtReminderSettings').dialog(), curWidthClass);
+    }, dlgWidth, dlgHeight);
+    
     return false;
 }
 
@@ -140,5 +180,46 @@ function OnEditProfile(editProfileStatusId)
         });
     }
 
+    return false;
+}
+
+function EventReminderDialogOnReady($dialog, curWidthClass)
+{
+    // Attach event handler to Cancel button
+    $('#cancelBtn').click(function() {
+        $dialog.dialog('destroy').remove();
+        return false;
+    });
+    
+    // Attach event handler to Update Event Reminder Settings button
+    $('#submitBtn').click(function() {
+        return OnApplyEventReminderChanges($dialog);
+    });    
+    
+    // Attach selection change handler to time interval dropdown
+    $('#timeIntervalSelector').change(function() {
+        var selTimeInterval = $('#timeIntervalSelector').val();
+        if(selReminderEmailTimeInterval == selTimeInterval)  return false;
+        
+        selReminderEmailTimeInterval = selTimeInterval;
+        $('.timeIntervalSelect').addClass('hidden');
+        if(selTimeInterval == 'min') {
+            $('#minuteSelector').removeClass('hidden');
+        } else if (selTimeInterval == 'hr') {
+            $('#hourSelector').removeClass('hidden');
+        } else {
+            $('#daySelector').removeClass('hidden');
+        }
+    });
+    
+    
+}
+
+function OnApplyEventReminderChanges($dialog)
+{
+    
+    
+    sweetAlert('Success', 'Updated event reminder settings!', 'success');
+    $dialog.dialog('destroy').remove();
     return false;
 }

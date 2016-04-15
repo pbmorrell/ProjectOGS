@@ -1,12 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.3.8
+-- version 4.4.13.1
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Aug 29, 2015 at 12:54 AM
--- Server version: 5.5.42-37.1
--- PHP Version: 5.4.23
-USE raiden01_ProjectOGS;
+-- Host: localhost:3306
+-- Generation Time: Mar 26, 2016 at 05:40 PM
+-- Server version: 5.6.26
+-- PHP Version: 5.5.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -15,180 +14,558 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `raiden01_ProjectOGS`
+-- Database: `raiden01_projectogs`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Administration.Logging`
+-- Table structure for table `administration.logging`
 --
 
-CREATE TABLE IF NOT EXISTS `Administration.Logging` (
+CREATE TABLE IF NOT EXISTS `administration.logging` (
   `ID` int(11) NOT NULL,
   `Category` varchar(35) DEFAULT NULL,
   `Title` varchar(50) DEFAULT NULL,
   `Message` text,
   `EntryTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4;
-
-
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.GameGenres`
+-- Table structure for table `configuration.gamegenres`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.GameGenres` (
+CREATE TABLE IF NOT EXISTS `configuration.gamegenres` (
   `ID` int(11) NOT NULL,
   `FK_Game_ID` int(11) NOT NULL,
   `FK_Genre_ID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=256 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Configuration.GameGenres`
+-- Dumping data for table `configuration.gamegenres`
 --
 
-INSERT INTO `Configuration.GameGenres` (`ID`, `FK_Game_ID`, `FK_Genre_ID`) VALUES
-(1, 1, 5),
-(2, 2, 5),
-(3, 3, 5),
-(4, 4, 5),
-(5, 5, 5),
-(6, 1, 7),
-(7, 2, 7),
-(8, 3, 7),
-(9, 4, 7),
-(10, 5, 7),
-(11, 6, 5),
-(12, 7, 5),
-(13, 8, 3),
-(14, 9, 3);
+INSERT INTO `configuration.gamegenres` (`ID`, `FK_Game_ID`, `FK_Genre_ID`) VALUES
+(1, 12, 38),
+(2, 12, 39),
+(3, 12, 42),
+(4, 12, 52),
+(5, 12, 55),
+(6, 12, 56),
+(8, 13, 38),
+(9, 13, 44),
+(10, 13, 49),
+(11, 13, 56),
+(12, 13, 57),
+(15, 14, 38),
+(16, 14, 44),
+(17, 14, 49),
+(18, 14, 56),
+(19, 14, 57),
+(22, 15, 43),
+(23, 16, 47),
+(24, 16, 52),
+(25, 16, 56),
+(26, 17, 38),
+(27, 17, 44),
+(28, 17, 52),
+(29, 17, 55),
+(30, 17, 57),
+(33, 18, 38),
+(34, 18, 44),
+(35, 18, 52),
+(36, 18, 55),
+(37, 18, 57),
+(40, 19, 38),
+(41, 19, 44),
+(42, 19, 49),
+(43, 19, 56),
+(44, 19, 57),
+(47, 20, 38),
+(48, 20, 44),
+(49, 20, 49),
+(50, 20, 56),
+(51, 20, 57),
+(54, 21, 38),
+(55, 21, 44),
+(56, 21, 49),
+(57, 21, 56),
+(58, 21, 57),
+(61, 22, 39),
+(62, 22, 52),
+(63, 22, 56),
+(64, 22, 57),
+(65, 22, 63),
+(68, 23, 50),
+(69, 23, 52),
+(70, 23, 55),
+(71, 23, 56),
+(75, 24, 43),
+(76, 25, 44),
+(77, 25, 52),
+(78, 25, 55),
+(79, 25, 56),
+(80, 25, 57),
+(83, 26, 38),
+(84, 26, 46),
+(85, 26, 55),
+(86, 27, 44),
+(87, 27, 50),
+(88, 27, 52),
+(89, 28, 45),
+(90, 28, 51),
+(92, 29, 43),
+(93, 30, 44),
+(94, 30, 60),
+(95, 30, 65),
+(96, 31, 50),
+(97, 31, 60),
+(99, 32, 48),
+(100, 32, 58),
+(101, 32, 59),
+(102, 32, 61),
+(106, 33, 50),
+(107, 33, 55),
+(109, 34, 48),
+(110, 34, 58),
+(111, 34, 59),
+(112, 34, 61),
+(116, 35, 38),
+(117, 35, 39),
+(118, 35, 52),
+(119, 35, 56),
+(123, 36, 50),
+(124, 36, 55),
+(126, 37, 43),
+(127, 38, 39),
+(128, 38, 52),
+(129, 38, 56),
+(130, 38, 57),
+(131, 38, 63),
+(134, 39, 44),
+(135, 39, 57),
+(137, 40, 41),
+(138, 40, 62),
+(140, 41, 43),
+(141, 42, 43),
+(142, 43, 43),
+(143, 44, 45),
+(144, 44, 51),
+(146, 45, 41),
+(147, 45, 62),
+(149, 46, 42),
+(150, 46, 52),
+(151, 46, 56),
+(152, 46, 63),
+(156, 47, 43),
+(157, 48, 40),
+(158, 48, 48),
+(159, 48, 58),
+(160, 48, 61),
+(164, 49, 38),
+(165, 49, 55),
+(167, 50, 44),
+(168, 50, 52),
+(169, 50, 57),
+(170, 51, 44),
+(171, 51, 50),
+(173, 52, 45),
+(174, 52, 51),
+(176, 53, 38),
+(177, 53, 53),
+(178, 53, 59),
+(179, 53, 61),
+(183, 54, 50),
+(184, 54, 55),
+(186, 55, 42),
+(187, 55, 52),
+(188, 55, 56),
+(189, 55, 57),
+(190, 55, 63),
+(193, 56, 62),
+(194, 56, 64),
+(195, 56, 66),
+(196, 57, 45),
+(197, 57, 51),
+(199, 58, 50),
+(200, 58, 57),
+(202, 59, 54),
+(203, 60, 50),
+(204, 60, 55),
+(206, 61, 43),
+(207, 62, 43),
+(208, 63, 50),
+(209, 63, 55),
+(210, 63, 57),
+(211, 64, 38),
+(212, 64, 44),
+(213, 64, 45),
+(214, 64, 57),
+(218, 65, 39),
+(219, 65, 42),
+(220, 65, 56),
+(221, 66, 50),
+(222, 66, 55),
+(224, 67, 38),
+(225, 67, 39),
+(226, 67, 42),
+(227, 67, 63),
+(231, 68, 44),
+(232, 68, 45),
+(233, 68, 49),
+(234, 68, 57),
+(235, 68, 67),
+(238, 69, 38),
+(239, 69, 45),
+(240, 69, 55),
+(241, 69, 57),
+(245, 70, 38),
+(246, 70, 50),
+(248, 71, 50),
+(249, 71, 55),
+(251, 72, 38),
+(252, 72, 50),
+(254, 73, 62),
+(255, 73, 66);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.GamePlatforms`
+-- Table structure for table `configuration.gameplatforms`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.GamePlatforms` (
+CREATE TABLE IF NOT EXISTS `configuration.gameplatforms` (
   `ID` int(11) NOT NULL,
   `FK_Platform_ID` int(11) NOT NULL,
   `FK_Game_ID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Configuration.GamePlatforms`
+-- Dumping data for table `configuration.gameplatforms`
 --
 
-INSERT INTO `Configuration.GamePlatforms` (`ID`, `FK_Platform_ID`, `FK_Game_ID`) VALUES
-(23, 13, 1),
-(24, 13, 2),
-(25, 13, 3),
-(26, 13, 4),
-(27, 13, 5),
-(28, 14, 1),
-(29, 14, 2),
-(30, 14, 3),
-(31, 14, 4),
-(32, 14, 5),
-(33, 13, 6),
-(34, 13, 7),
-(35, 14, 6),
-(36, 14, 7),
-(37, 10, 6),
-(38, 10, 7),
-(39, 11, 6),
-(40, 11, 7),
-(41, 9, 6),
-(42, 9, 7),
-(43, 9, 8),
-(44, 9, 9);
+INSERT INTO `configuration.gameplatforms` (`ID`, `FK_Platform_ID`, `FK_Game_ID`) VALUES
+(1, 9, 12),
+(2, 9, 13),
+(3, 10, 13),
+(4, 11, 13),
+(5, 13, 13),
+(6, 14, 13),
+(9, 9, 14),
+(10, 10, 14),
+(11, 11, 14),
+(12, 13, 14),
+(13, 14, 14),
+(16, 10, 15),
+(17, 11, 15),
+(18, 14, 15),
+(19, 11, 16),
+(20, 9, 17),
+(21, 10, 17),
+(22, 11, 17),
+(23, 13, 17),
+(24, 14, 17),
+(27, 9, 18),
+(28, 10, 18),
+(29, 11, 18),
+(30, 13, 18),
+(31, 14, 18),
+(34, 9, 19),
+(35, 10, 19),
+(36, 11, 19),
+(37, 13, 19),
+(38, 14, 19),
+(41, 9, 20),
+(42, 10, 20),
+(43, 11, 20),
+(44, 13, 20),
+(45, 14, 20),
+(48, 9, 21),
+(49, 10, 21),
+(50, 13, 21),
+(51, 9, 22),
+(52, 9, 23),
+(53, 10, 23),
+(54, 11, 23),
+(55, 9, 24),
+(56, 10, 24),
+(57, 11, 24),
+(58, 13, 24),
+(59, 14, 24),
+(62, 10, 25),
+(63, 11, 25),
+(64, 13, 25),
+(65, 14, 25),
+(69, 9, 26),
+(70, 10, 26),
+(71, 11, 26),
+(72, 13, 26),
+(73, 14, 26),
+(76, 11, 27),
+(77, 14, 27),
+(79, 9, 28),
+(80, 10, 29),
+(81, 11, 29),
+(82, 13, 29),
+(83, 14, 29),
+(87, 9, 30),
+(88, 9, 31),
+(89, 9, 32),
+(90, 10, 32),
+(91, 11, 32),
+(92, 13, 32),
+(93, 14, 32),
+(96, 9, 33),
+(97, 10, 33),
+(98, 11, 33),
+(99, 9, 34),
+(100, 9, 35),
+(101, 10, 35),
+(102, 11, 35),
+(103, 13, 35),
+(104, 14, 35),
+(107, 9, 36),
+(108, 10, 37),
+(109, 11, 37),
+(111, 9, 38),
+(112, 14, 39),
+(113, 9, 40),
+(114, 9, 41),
+(115, 10, 41),
+(116, 11, 41),
+(117, 12, 41),
+(118, 13, 41),
+(119, 14, 41),
+(121, 10, 42),
+(122, 11, 42),
+(124, 14, 43),
+(125, 9, 44),
+(126, 9, 45),
+(127, 9, 46),
+(128, 10, 46),
+(129, 11, 46),
+(130, 13, 46),
+(131, 14, 46),
+(134, 9, 47),
+(135, 10, 47),
+(136, 11, 47),
+(137, 13, 47),
+(138, 14, 47),
+(141, 9, 48),
+(142, 10, 48),
+(143, 11, 48),
+(144, 13, 48),
+(145, 14, 48),
+(148, 9, 49),
+(149, 9, 50),
+(150, 10, 50),
+(151, 11, 50),
+(152, 13, 50),
+(153, 14, 50),
+(156, 9, 51),
+(157, 11, 51),
+(158, 14, 51),
+(159, 9, 52),
+(160, 9, 53),
+(161, 11, 53),
+(163, 9, 54),
+(164, 9, 55),
+(165, 9, 56),
+(166, 9, 57),
+(167, 14, 57),
+(169, 12, 58),
+(170, 9, 59),
+(171, 9, 60),
+(172, 9, 61),
+(173, 10, 61),
+(174, 11, 61),
+(175, 13, 61),
+(179, 9, 62),
+(180, 11, 62),
+(182, 11, 63),
+(183, 14, 63),
+(185, 9, 64),
+(186, 9, 65),
+(187, 10, 65),
+(188, 11, 65),
+(189, 12, 65),
+(190, 13, 65),
+(191, 14, 65),
+(193, 9, 66),
+(194, 11, 66),
+(195, 14, 66),
+(196, 10, 67),
+(197, 11, 67),
+(199, 9, 68),
+(200, 9, 69),
+(201, 11, 69),
+(202, 14, 69),
+(203, 9, 70),
+(204, 9, 71),
+(205, 9, 72),
+(206, 9, 73);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.Games`
+-- Table structure for table `configuration.games`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.Games` (
+CREATE TABLE IF NOT EXISTS `configuration.games` (
   `ID` int(11) NOT NULL,
   `Name` varchar(50) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Configuration.Games`
+-- Dumping data for table `configuration.games`
 --
 
-INSERT INTO `Configuration.Games` (`ID`, `Name`) VALUES
-(1, 'Halo'),
-(2, 'Halo 2'),
-(3, 'Halo 3'),
-(4, 'Halo 4'),
-(5, 'Halo 5'),
-(6, 'Call Of Duty'),
-(7, 'Call Of Duty 2'),
-(8, 'EverQuest II'),
-(9, 'ArcheAge');
+INSERT INTO `configuration.games` (`ID`, `Name`) VALUES
+(12, 'ARK: Survival Evolved'),
+(13, 'Battlefield 4'),
+(14, 'Battlefield: Hardline'),
+(15, 'BlazBlue: Chrono Phantasma Extend'),
+(16, 'Bloodborne'),
+(17, 'Borderlands 2'),
+(18, 'Borderlands: The Pre-Sequel'),
+(19, 'Call Of Duty: Advance Warfare'),
+(20, 'Call Of Duty: Black Ops 3'),
+(21, 'Counter-Strike: Global Offensive'),
+(22, 'DayZ'),
+(23, 'DC Universe Online'),
+(24, 'Dead or Alive 5: Last Round'),
+(25, 'Destiny'),
+(26, 'Diablo III'),
+(27, 'Doom'),
+(28, 'DOTA 2'),
+(29, 'Dragon Ball Xenoverse'),
+(30, 'Elite: Dangerous'),
+(31, 'EVE Online'),
+(32, 'FIFA 15'),
+(33, 'Final Fantasy XIV: A Realm Reborn'),
+(34, 'Football Manager 2015'),
+(35, 'Grand Theft Auto V'),
+(36, 'Guild Wars 2'),
+(37, 'Guilty Gear Xrd Sign'),
+(38, 'H1Z1'),
+(39, 'Halo: The Master Chief Collection'),
+(40, 'Hearthstone: Heros of Warcraft'),
+(41, 'Injustice: Gods Among US'),
+(42, 'J-Stars Victory VS+'),
+(43, 'Killer Instinct '),
+(44, 'League of Legends'),
+(45, 'Magic: The Gathering'),
+(46, 'Minecraft'),
+(47, 'Mortal Kombat X'),
+(48, 'NBA 2K16'),
+(49, 'Path of Exile'),
+(50, 'Pay Day 2'),
+(51, 'PlanetSide 2'),
+(52, 'Prime World'),
+(53, 'Rocket League'),
+(54, 'Runescape'),
+(55, 'Rust'),
+(56, 'Sid Meier''s Civilization'),
+(57, 'Smite'),
+(58, 'Splatoon'),
+(59, 'Star Craft II'),
+(60, 'Star Wars: The Old Republic'),
+(61, 'Street Fighter IV'),
+(62, 'Street Fighter V'),
+(63, 'The Division'),
+(64, 'Team Fortress 2'),
+(65, 'Terraria'),
+(66, 'The Elder Scrolls Online: Tamriel Unlimited'),
+(67, 'The Last of Us'),
+(68, 'War Thunder'),
+(69, 'Warframe'),
+(70, 'World of Tanks'),
+(71, 'World of Warcraft'),
+(72, 'World of Warships'),
+(73, 'XCOM: 2');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.Genres`
+-- Table structure for table `configuration.genres`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.Genres` (
+CREATE TABLE IF NOT EXISTS `configuration.genres` (
   `ID` int(11) NOT NULL,
   `Name` varchar(50) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Configuration.Genres`
+-- Dumping data for table `configuration.genres`
 --
 
-INSERT INTO `Configuration.Genres` (`ID`, `Name`) VALUES
-(1, 'Aircraft Racing'),
-(2, 'Car Racing'),
-(3, 'Fantasy'),
-(4, 'Flight Simulators'),
-(5, 'Military'),
-(6, 'Puzzles'),
-(7, 'Science Fiction');
+INSERT INTO `configuration.genres` (`ID`, `Name`) VALUES
+(38, 'Action'),
+(39, 'Adventure'),
+(40, 'Basketball'),
+(41, 'Card Game'),
+(42, 'Crafting'),
+(43, 'Fighting'),
+(44, 'FPS'),
+(45, 'Free to Play'),
+(46, 'Hack and Slash'),
+(47, 'Horror'),
+(48, 'Management'),
+(49, 'Military'),
+(50, 'MMO'),
+(51, 'MOBA'),
+(52, 'Open World'),
+(53, 'Racing'),
+(54, 'Real Time Strategy'),
+(55, 'RPG'),
+(56, 'Sandbox'),
+(57, 'Shooter'),
+(58, 'Simulation'),
+(59, 'Soccer'),
+(60, 'Space simulation'),
+(61, 'Sports'),
+(62, 'Strategy'),
+(63, 'Survival'),
+(64, 'Tactical'),
+(65, 'Trading'),
+(66, 'Turn Based'),
+(67, 'World War 2');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.Platforms`
+-- Table structure for table `configuration.platforms`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.Platforms` (
+CREATE TABLE IF NOT EXISTS `configuration.platforms` (
   `ID` int(11) NOT NULL,
   `Name` varchar(35) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Configuration.Platforms`
+-- Dumping data for table `configuration.platforms`
 --
 
-INSERT INTO `Configuration.Platforms` (`ID`, `Name`) VALUES
+INSERT INTO `configuration.platforms` (`ID`, `Name`) VALUES
 (9, 'PC/MAC'),
 (10, 'PlayStation 3'),
 (11, 'PlayStation 4'),
-(12, 'Wii'),
+(12, 'Wii U'),
 (13, 'Xbox 360'),
 (14, 'Xbox One');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Configuration.TimeZones`
+-- Table structure for table `configuration.timezones`
 --
 
-CREATE TABLE IF NOT EXISTS `Configuration.TimeZones` (
+CREATE TABLE IF NOT EXISTS `configuration.timezones` (
   `ID` int(11) NOT NULL,
   `Abbreviation` varchar(5) CHARACTER SET utf8 DEFAULT NULL,
   `Description` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
@@ -196,67 +573,67 @@ CREATE TABLE IF NOT EXISTS `Configuration.TimeZones` (
 ) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `Configuration.TimeZones`
+-- Dumping data for table `configuration.timezones`
 --
 
-INSERT INTO `Configuration.TimeZones` (`ID`, `Abbreviation`, `Description`, `SortOrder`) VALUES
+INSERT INTO `configuration.timezones` (`ID`, `Abbreviation`, `Description`, `SortOrder`) VALUES
 (142, 'EST', 'US/Eastern', 1),
 (143, 'CST', 'US/Central', 2),
 (144, 'MST', 'US/Mountain', 3),
 (145, 'PST', 'US/Pacific', 4),
 (146, 'AKST', 'US/Alaska', 5),
-(150, '', 'Pacific/Guam', 9),
-(151, '', 'Pacific/Midway', 10),
-(152, '', 'Pacific/Samoa', 11),
-(153, '', 'Pacific/Tahiti', 12),
-(154, '', 'Asia/Baghdad', 13),
-(155, '', 'Asia/Bangkok', 14),
-(156, '', 'Asia/Beirut', 15),
-(157, '', 'Asia/Calcutta', 16),
-(158, '', 'Asia/Dubai', 17),
-(159, '', 'Asia/Gaza', 18),
-(160, '', 'Asia/Ho_Chi_Minh', 19),
-(161, '', 'Asia/Hong_Kong', 20),
-(162, '', 'Asia/Istanbul', 21),
-(163, '', 'Asia/Jakarta', 22),
-(164, '', 'Asia/Jerusalem', 23),
-(165, '', 'Asia/Kabul', 24),
-(166, '', 'Asia/Macau', 25),
-(167, '', 'Asia/Qatar', 26),
-(168, '', 'Asia/Saigon', 27),
-(169, '', 'Asia/Seoul', 28),
-(170, '', 'Asia/Shanghai', 29),
-(171, '', 'Asia/Singapore', 30),
-(172, '', 'Asia/Taipei', 31),
-(173, '', 'Asia/Tehran', 32),
-(174, '', 'Asia/Tel_Aviv', 33),
-(175, '', 'Asia/Tokyo', 34),
-(176, '', 'Australia/Adelaide', 35),
-(177, '', 'Australia/Brisbane', 36),
-(178, '', 'Australia/Perth', 37),
-(179, '', 'Australia/Sydney', 38),
-(180, '', 'Canada/Atlantic', 39),
-(181, '', 'Canada/Central', 40),
-(182, '', 'Canada/Eastern', 41),
-(183, '', 'Canada/Mountain', 42),
-(184, '', 'Canada/Newfoundland', 43),
-(185, '', 'Canada/Pacific', 44),
-(186, '', 'Europe/Berlin', 45),
-(187, '', 'Europe/Copenhagen', 46),
-(188, '', 'Europe/Dublin', 47),
-(189, '', 'Europe/London', 48),
-(190, '', 'Europe/Luxembourg', 49),
-(191, '', 'Europe/Madrid', 50),
-(192, '', 'Europe/Moscow', 51),
-(193, '', 'Europe/Paris', 52),
-(194, '', 'Europe/Prague', 53),
-(195, '', 'Europe/Rome', 54),
-(196, '', 'Europe/Vatican', 55),
-(197, '', 'Mexico/BajaNorte', 56),
-(198, '', 'Mexico/BajaSur', 57),
-(199, '', 'Mexico/General', 58),
-(200, '', 'NZ', 59),
-(201, '', 'NZ-CHAT', 60),
+(150, NULL, 'Pacific/Guam', 9),
+(151, NULL, 'Pacific/Midway', 10),
+(152, NULL, 'Pacific/Samoa', 11),
+(153, NULL, 'Pacific/Tahiti', 12),
+(154, NULL, 'Asia/Baghdad', 13),
+(155, NULL, 'Asia/Bangkok', 14),
+(156, NULL, 'Asia/Beirut', 15),
+(157, NULL, 'Asia/Calcutta', 16),
+(158, NULL, 'Asia/Dubai', 17),
+(159, NULL, 'Asia/Gaza', 18),
+(160, NULL, 'Asia/Ho_Chi_Minh', 19),
+(161, NULL, 'Asia/Hong_Kong', 20),
+(162, NULL, 'Asia/Istanbul', 21),
+(163, NULL, 'Asia/Jakarta', 22),
+(164, NULL, 'Asia/Jerusalem', 23),
+(165, NULL, 'Asia/Kabul', 24),
+(166, NULL, 'Asia/Macau', 25),
+(167, NULL, 'Asia/Qatar', 26),
+(168, NULL, 'Asia/Saigon', 27),
+(169, NULL, 'Asia/Seoul', 28),
+(170, NULL, 'Asia/Shanghai', 29),
+(171, NULL, 'Asia/Singapore', 30),
+(172, NULL, 'Asia/Taipei', 31),
+(173, NULL, 'Asia/Tehran', 32),
+(174, NULL, 'Asia/Tel_Aviv', 33),
+(175, NULL, 'Asia/Tokyo', 34),
+(176, NULL, 'Australia/Adelaide', 35),
+(177, NULL, 'Australia/Brisbane', 36),
+(178, NULL, 'Australia/Perth', 37),
+(179, NULL, 'Australia/Sydney', 38),
+(180, NULL, 'Canada/Atlantic', 39),
+(181, NULL, 'Canada/Central', 40),
+(182, NULL, 'Canada/Eastern', 41),
+(183, NULL, 'Canada/Mountain', 42),
+(184, NULL, 'Canada/Newfoundland', 43),
+(185, NULL, 'Canada/Pacific', 44),
+(186, NULL, 'Europe/Berlin', 45),
+(187, NULL, 'Europe/Copenhagen', 46),
+(188, NULL, 'Europe/Dublin', 47),
+(189, NULL, 'Europe/London', 48),
+(190, NULL, 'Europe/Luxembourg', 49),
+(191, NULL, 'Europe/Madrid', 50),
+(192, NULL, 'Europe/Moscow', 51),
+(193, NULL, 'Europe/Paris', 52),
+(194, NULL, 'Europe/Prague', 53),
+(195, NULL, 'Europe/Rome', 54),
+(196, NULL, 'Europe/Vatican', 55),
+(197, NULL, 'Mexico/BajaNorte', 56),
+(198, NULL, 'Mexico/BajaSur', 57),
+(199, NULL, 'Mexico/General', 58),
+(200, NULL, 'NZ', 59),
+(201, NULL, 'NZ-CHAT', 60),
 (202, 'GMT', 'GMT', 61),
 (203, 'UTC', 'UTC', 62),
 (204, NULL, 'US/Aleutian', 6),
@@ -266,33 +643,35 @@ INSERT INTO `Configuration.TimeZones` (`ID`, `Abbreviation`, `Description`, `Sor
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.EventMembers`
+-- Table structure for table `gaming.eventallowedmembers`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.EventMembers` (
+CREATE TABLE IF NOT EXISTS `gaming.eventallowedmembers` (
   `ID` bigint(20) NOT NULL,
   `FK_Event_ID` bigint(20) NOT NULL,
   `FK_User_ID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gaming.eventmembers`
+--
+
+CREATE TABLE IF NOT EXISTS `gaming.eventmembers` (
+  `ID` bigint(20) NOT NULL,
+  `FK_Event_ID` bigint(20) NOT NULL,
+  `FK_User_ID` bigint(20) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.EventAllowedMembers`
+-- Table structure for table `gaming.events`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.EventAllowedMembers` (
-  `ID` bigint(20) NOT NULL,
-  `FK_Event_ID` bigint(20) NOT NULL,
-  `FK_User_ID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `Gaming.Events`
---
-
-CREATE TABLE IF NOT EXISTS `Gaming.Events` (
+CREATE TABLE IF NOT EXISTS `gaming.events` (
   `ID` bigint(20) NOT NULL,
   `FK_User_ID_EventCreator` bigint(20) NOT NULL,
   `FK_Game_ID` int(11) DEFAULT NULL,
@@ -308,16 +687,18 @@ CREATE TABLE IF NOT EXISTS `Gaming.Events` (
   `FK_UserGames_ID` bigint(20) DEFAULT NULL,
   `Notes` text NOT NULL,
   `DisplayDate` date DEFAULT NULL,
-  `DisplayTime` time NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
+  `DisplayTime` time NOT NULL,
+  `DateReminderSent` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.EventSubscriptions`
+-- Table structure for table `gaming.eventsubscriptions`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.EventSubscriptions` (
+CREATE TABLE IF NOT EXISTS `gaming.eventsubscriptions` (
   `ID` int(11) NOT NULL,
   `FK_User_ID_EventSubscriber` bigint(20) NOT NULL,
   `FK_Genre_ID` int(11) NOT NULL,
@@ -330,139 +711,148 @@ CREATE TABLE IF NOT EXISTS `Gaming.EventSubscriptions` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.UserFriends`
+-- Table structure for table `gaming.reminderemailbatch`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.UserFriends` (
+CREATE TABLE IF NOT EXISTS `gaming.reminderemailbatch` (
   `ID` bigint(20) NOT NULL,
-  `FK_User_ID_ThisUser` bigint(20) NOT NULL,
-  `FK_User_ID_Friend` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+  `FK_User_ID` bigint(20) NOT NULL,
+  `FK_Event_ID` bigint(20) NOT NULL,
+  `EmailAddress` varchar(100) NOT NULL,
+  `DateBatched` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `DateToSend` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `DateSendAttempted` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `IsProcessed` tinyint(4) NOT NULL DEFAULT '0',
+  `SendSuccess` tinyint(4) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.UserFriendInvitations`
+-- Table structure for table `gaming.userfriendinvitations`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.UserFriendInvitations` (
-        `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-        `FK_User_ID_Inviter` bigint(20) NOT NULL,
-        `FK_User_ID_Invitee` bigint(20) NOT NULL,
-        `IsRejected` tinyint(4) NOT NULL DEFAULT '0',
-    PRIMARY KEY (`ID`),
-    KEY `IDX_UserFriendInvitations_FK_User_ID_Invitee` (`FK_User_ID_Invitee`),
-    KEY `IDX_UserFriendInvitations_FK_User_ID_Inviter` (`FK_User_ID_Inviter`)
+CREATE TABLE IF NOT EXISTS `gaming.userfriendinvitations` (
+  `ID` bigint(20) NOT NULL,
+  `FK_User_ID_Inviter` bigint(20) NOT NULL,
+  `FK_User_ID_Invitee` bigint(20) NOT NULL,
+  `IsRejected` tinyint(4) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Table structure for table `Gaming.UserGames`
+-- Table structure for table `gaming.userfriends`
 --
 
-CREATE TABLE IF NOT EXISTS `Gaming.UserGames` (
+CREATE TABLE IF NOT EXISTS `gaming.userfriends` (
+  `ID` bigint(20) NOT NULL,
+  `FK_User_ID_ThisUser` bigint(20) NOT NULL,
+  `FK_User_ID_Friend` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gaming.usergamertags`
+--
+
+CREATE TABLE IF NOT EXISTS `gaming.usergamertags` (
+  `ID` int(11) NOT NULL,
+  `FK_User_ID` bigint(20) DEFAULT NULL,
+  `FK_Platform_ID` int(11) DEFAULT NULL,
+  `GamerTagName` varchar(50) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gaming.usergames`
+--
+
+CREATE TABLE IF NOT EXISTS `gaming.usergames` (
   `ID` bigint(20) NOT NULL,
   `FK_User_ID` bigint(11) NOT NULL,
   `Name` varchar(50) NOT NULL,
   `CreatedDate` datetime NOT NULL,
   `ModifiedDate` datetime NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Gaming.UserGamerTags`
+-- Table structure for table `gaming.userplatforms`
 --
 
-CREATE TABLE `Gaming.UserGamerTags` (
-  `ID` INT NOT NULL AUTO_INCREMENT COMMENT '',
-  `FK_User_ID` BIGINT NULL COMMENT '',
-  `FK_Platform_ID` INT NULL COMMENT '',
-  `GamerTagName` VARCHAR(50) NOT NULL COMMENT '',
-  PRIMARY KEY (`ID`)  COMMENT '',
-  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC)  COMMENT '',
-  INDEX `IDX_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '',
-  INDEX `IDX_FK_Platform_ID` (`FK_Platform_ID` ASC)  COMMENT '')
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `Gaming.UserPlatforms`
---
-
-CREATE TABLE IF NOT EXISTS `Gaming.UserPlatforms` (
+CREATE TABLE IF NOT EXISTS `gaming.userplatforms` (
   `ID` bigint(20) NOT NULL,
   `FK_User_ID` bigint(11) NOT NULL,
   `FK_Platform_ID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=209 DEFAULT CHARSET=utf8;
+
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Payments.PayPalTransactions`
+-- Table structure for table `payments.paypaltransactions`
 --
 
-CREATE TABLE `Payments.PayPalTransactions` (
-  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
-  `TxnId` VARCHAR(35) NOT NULL COMMENT '',
-  `PayerId` VARCHAR(25) NULL COMMENT '',
-  `SubscriptionID` VARCHAR(35) NOT NULL COMMENT '',
-  `TxnType` VARCHAR(25) NULL COMMENT '',
-  `PDTOperation` VARCHAR(25) NULL COMMENT '',
-  `PaymentStatus` VARCHAR(25) NOT NULL COMMENT '',
-  `NotificationType` VARCHAR(5) NULL COMMENT '',
-  `NotificationDate` datetime NULL,
+CREATE TABLE IF NOT EXISTS `payments.paypaltransactions` (
+  `ID` bigint(20) NOT NULL,
+  `TxnId` varchar(35) NOT NULL,
+  `PayerId` varchar(25) DEFAULT NULL,
+  `SubscriptionID` varchar(35) NOT NULL,
+  `TxnType` varchar(25) DEFAULT NULL,
+  `PDTOperation` varchar(25) DEFAULT NULL,
+  `PaymentStatus` varchar(25) NOT NULL,
+  `NotificationType` varchar(5) DEFAULT NULL,
+  `NotificationDate` datetime DEFAULT NULL,
   `PayPalMsgData` text,
-  `TransactionDate` datetime NULL,
-  PRIMARY KEY (`ID`)  COMMENT '',
-  UNIQUE INDEX `IDX_SubscriptionID_TxnId_TxnType_PaymentStatus_UNIQUE` (`SubscriptionID` ASC, `TxnId` ASC, `TxnType` ASC, `PaymentStatus` ASC) COMMENT '')
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+  `TransactionDate` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Payments.PayPalUsers`
+-- Table structure for table `payments.paypalusers`
 --
 
-CREATE TABLE `Payments.PayPalUsers` (
-  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '',
-  `FK_User_ID` BIGINT NULL COMMENT '',
-  `PayerId` VARCHAR(25) NULL COMMENT '',
-  `SubscriptionID` VARCHAR(35) NOT NULL COMMENT '',
-  `SubscriptionType` VARCHAR(25) NULL COMMENT '',
-  `SubscriptionAmtTotal` DECIMAL(6,2) NULL COMMENT '',
-  `SubscriptionAmtPaidLastCycle` DECIMAL(6,2) NULL COMMENT '',
-  `LastBillDate` datetime NULL,
-  `MembershipExpirationDate` datetime NULL,
-  `ExtendedMembershipDays` INT NOT NULL DEFAULT '0' COMMENT '',
+CREATE TABLE IF NOT EXISTS `payments.paypalusers` (
+  `ID` bigint(20) NOT NULL,
+  `FK_User_ID` bigint(20) DEFAULT NULL,
+  `PayerId` varchar(25) DEFAULT NULL,
+  `SubscriptionID` varchar(35) NOT NULL,
+  `SubscriptionType` varchar(25) DEFAULT NULL,
+  `SubscriptionAmtTotal` decimal(6,2) DEFAULT NULL,
+  `SubscriptionAmtPaidLastCycle` decimal(6,2) DEFAULT NULL,
+  `LastBillDate` datetime DEFAULT NULL,
+  `MembershipExpirationDate` datetime DEFAULT NULL,
+  `ExtendedMembershipDays` int(11) NOT NULL DEFAULT '0',
   `IsRecurring` tinyint(1) NOT NULL DEFAULT '0',
   `IsActive` tinyint(1) NOT NULL DEFAULT '0',
-  `SubscriptionStartedDate` datetime NULL,
-  `SubscriptionModifiedDate` datetime NULL,
-  PRIMARY KEY (`ID`)  COMMENT '',
-  INDEX `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID` ASC)  COMMENT '')
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
+  `SubscriptionStartedDate` datetime DEFAULT NULL,
+  `SubscriptionModifiedDate` datetime DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
 
 --
--- Table structure for table `Security.PageRoles`
+-- Table structure for table `security.pageroles`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.PageRoles` (
+CREATE TABLE IF NOT EXISTS `security.pageroles` (
   `ID` int(11) NOT NULL,
   `FK_Page_ID` int(11) NOT NULL,
   `FK_Role_ID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Security.PageRoles`
+-- Dumping data for table `security.pageroles`
 --
 
-INSERT INTO `Security.PageRoles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
+INSERT INTO `security.pageroles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
 (1, 7, 4),
 (2, 8, 3),
 (3, 9, 3),
@@ -478,19 +868,19 @@ INSERT INTO `Security.PageRoles` (`ID`, `FK_Page_ID`, `FK_Role_ID`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Security.Pages`
+-- Table structure for table `security.pages`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.Pages` (
+CREATE TABLE IF NOT EXISTS `security.pages` (
   `ID` int(11) NOT NULL,
   `Name` varchar(35) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Security.Pages`
+-- Dumping data for table `security.pages`
 --
 
-INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
+INSERT INTO `security.pages` (`ID`, `Name`) VALUES
 (7, 'index'),
 (8, 'MemberHome'),
 (9, 'EditProfile'),
@@ -506,20 +896,33 @@ INSERT INTO `Security.Pages` (`ID`, `Name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Security.Roles`
+-- Table structure for table `security.passwordrecoverysession`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.Roles` (
+CREATE TABLE IF NOT EXISTS `security.passwordrecoverysession` (
+  `ID` bigint(20) NOT NULL,
+  `FK_User_ID` bigint(20) NOT NULL,
+  `SessionId` varchar(32) NOT NULL,
+  `ExpirationTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `security.roles`
+--
+
+CREATE TABLE IF NOT EXISTS `security.roles` (
   `ID` int(11) NOT NULL,
   `Name` varchar(35) NOT NULL,
   `SecurityLevel` int(11) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `Security.Roles`
+-- Dumping data for table `security.roles`
 --
 
-INSERT INTO `Security.Roles` (`ID`, `Name`, `SecurityLevel`) VALUES
+INSERT INTO `security.roles` (`ID`, `Name`, `SecurityLevel`) VALUES
 (1, 'Admin', 1),
 (2, 'PremiumMember', 2),
 (3, 'BasicMember', 3),
@@ -528,22 +931,23 @@ INSERT INTO `Security.Roles` (`ID`, `Name`, `SecurityLevel`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Security.UserRoles`
+-- Table structure for table `security.userroles`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.UserRoles` (
+CREATE TABLE IF NOT EXISTS `security.userroles` (
   `ID` bigint(20) NOT NULL,
   `FK_User_ID` bigint(20) NOT NULL,
   `FK_Role_ID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8;
+
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Security.Users`
+-- Table structure for table `security.users`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.Users` (
+CREATE TABLE IF NOT EXISTS `security.users` (
   `ID` bigint(11) NOT NULL,
   `FK_Timezone_ID` int(11) DEFAULT NULL,
   `UserName` varchar(100) NOT NULL,
@@ -555,32 +959,20 @@ CREATE TABLE IF NOT EXISTS `Security.Users` (
   `Gender` char(1) DEFAULT NULL,
   `Birthdate` date DEFAULT NULL,
   `Autobiography` text,
-  `IsActive` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8;
+  `IsActive` tinyint(1) NOT NULL DEFAULT '1',
+  `SendEventReminderEmails` tinyint(4) NOT NULL DEFAULT '0',
+  `SendEventReminderEmailsToAddress` varchar(100) DEFAULT NULL,
+  `SendEventReminderEmailMinutesBeforeEvent` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8;
+
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Security.PasswordRecoverySession`
+-- Table structure for table `security.usersessions`
 --
 
-CREATE TABLE IF NOT EXISTS `Security.PasswordRecoverySession` (
-    `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-    `FK_User_ID` bigint(20) NOT NULL,
-    `SessionId` varchar(32) NOT NULL,
-    `ExpirationTimestamp` TIMESTAMP NOT NULL,
-    PRIMARY KEY (`ID`),
-    KEY `IDX_PasswordRecoverySession_FK_User_ID` (`FK_User_ID`),
-    CONSTRAINT `FK_PasswordRecoverySession_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `Security.UserSessions`
---
-
-CREATE TABLE IF NOT EXISTS `Security.UserSessions` (
+CREATE TABLE IF NOT EXISTS `security.usersessions` (
   `ID` varchar(32) NOT NULL,
   `LastAccess` int(10) unsigned DEFAULT NULL,
   `LastAccessTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -592,123 +984,201 @@ CREATE TABLE IF NOT EXISTS `Security.UserSessions` (
 --
 
 --
--- Indexes for table `Administration.Logging`
+-- Indexes for table `administration.logging`
 --
-ALTER TABLE `Administration.Logging`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_Category` (`Category`);
+ALTER TABLE `administration.logging`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_Category` (`Category`);
 
 --
--- Indexes for table `Configuration.GameGenres`
+-- Indexes for table `configuration.gamegenres`
 --
-ALTER TABLE `Configuration.GameGenres`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_GameGenres_GameID` (`FK_Game_ID`), ADD KEY `IDX_GameGenres_GenreID` (`FK_Genre_ID`);
+ALTER TABLE `configuration.gamegenres`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_GameGenres_GameID` (`FK_Game_ID`),
+  ADD KEY `IDX_GameGenres_GenreID` (`FK_Genre_ID`);
 
 --
--- Indexes for table `Configuration.GamePlatforms`
+-- Indexes for table `configuration.gameplatforms`
 --
-ALTER TABLE `Configuration.GamePlatforms`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_GamePlatforms_PlatformID` (`FK_Platform_ID`), ADD KEY `IDX_GamePlatforms_GameID` (`FK_Game_ID`);
+ALTER TABLE `configuration.gameplatforms`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_GamePlatforms_PlatformID` (`FK_Platform_ID`),
+  ADD KEY `IDX_GamePlatforms_GameID` (`FK_Game_ID`);
 
 --
--- Indexes for table `Configuration.Games`
+-- Indexes for table `configuration.games`
 --
-ALTER TABLE `Configuration.Games`
+ALTER TABLE `configuration.games`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Configuration.Genres`
+-- Indexes for table `configuration.genres`
 --
-ALTER TABLE `Configuration.Genres`
+ALTER TABLE `configuration.genres`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Configuration.Platforms`
+-- Indexes for table `configuration.platforms`
 --
-ALTER TABLE `Configuration.Platforms`
+ALTER TABLE `configuration.platforms`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Configuration.TimeZones`
+-- Indexes for table `configuration.timezones`
 --
-ALTER TABLE `Configuration.TimeZones`
+ALTER TABLE `configuration.timezones`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Gaming.EventMembers`
+-- Indexes for table `gaming.eventallowedmembers`
 --
-ALTER TABLE `Gaming.EventMembers`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_EventMembers_EventID` (`FK_Event_ID`), ADD KEY `IDX_EventMembers_UserID` (`FK_User_ID`);
+ALTER TABLE `gaming.eventallowedmembers`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_EventAllowedMembers_EventID` (`FK_Event_ID`),
+  ADD KEY `IDX_EventAllowedMembers_UserID` (`FK_User_ID`);
 
 --
--- Indexes for table `Gaming.EventMembers`
+-- Indexes for table `gaming.eventmembers`
 --
-ALTER TABLE `Gaming.EventAllowedMembers`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_EventAllowedMembers_EventID` (`FK_Event_ID`), ADD KEY `IDX_EventAllowedMembers_UserID` (`FK_User_ID`);
-  
---
--- Indexes for table `Gaming.Events`
---
-ALTER TABLE `Gaming.Events`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_Events_UserID` (`FK_User_ID_EventCreator`), ADD KEY `IDX_Events_GameID` (`FK_Game_ID`), ADD KEY `IDX_Events_GenreID` (`FK_Genre_ID`), ADD KEY `IDX_Events_PlatformID` (`FK_Platform_ID`), ADD KEY `IDX_Events_TimezoneID` (`FK_Timezone_ID`), ADD KEY `FK_Events_UserGamesID_idx` (`FK_UserGames_ID`);
+ALTER TABLE `gaming.eventmembers`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_EventMembers_EventID` (`FK_Event_ID`),
+  ADD KEY `IDX_EventMembers_UserID` (`FK_User_ID`);
 
 --
--- Indexes for table `Gaming.EventSubscriptions`
+-- Indexes for table `gaming.events`
 --
-ALTER TABLE `Gaming.EventSubscriptions`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_EventSubscriptions_UserID` (`FK_User_ID_EventSubscriber`), ADD KEY `IDX_EventSubscriptions_GameID` (`FK_Game_ID`), ADD KEY `IDX_EventSubscriptions_PlatformID` (`FK_Platform_ID`), ADD KEY `IDX_EventSubscriptions_TimezoneID` (`FK_Timezone_ID`), ADD KEY `IDX_EventSubscriptions_GenreID` (`FK_Genre_ID`);
+ALTER TABLE `gaming.events`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_Events_UserID` (`FK_User_ID_EventCreator`),
+  ADD KEY `IDX_Events_GameID` (`FK_Game_ID`),
+  ADD KEY `IDX_Events_GenreID` (`FK_Genre_ID`),
+  ADD KEY `IDX_Events_PlatformID` (`FK_Platform_ID`),
+  ADD KEY `IDX_Events_TimezoneID` (`FK_Timezone_ID`),
+  ADD KEY `FK_Events_UserGamesID_idx` (`FK_UserGames_ID`);
 
 --
--- Indexes for table `Gaming.UserFriends`
+-- Indexes for table `gaming.eventsubscriptions`
 --
-ALTER TABLE `Gaming.UserFriends`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_UserFriends_UserID_ThisUser` (`FK_User_ID_ThisUser`), ADD KEY `IDX_UserFriends_UserID_Friend` (`FK_User_ID_Friend`);
+ALTER TABLE `gaming.eventsubscriptions`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_EventSubscriptions_UserID` (`FK_User_ID_EventSubscriber`),
+  ADD KEY `IDX_EventSubscriptions_GameID` (`FK_Game_ID`),
+  ADD KEY `IDX_EventSubscriptions_PlatformID` (`FK_Platform_ID`),
+  ADD KEY `IDX_EventSubscriptions_TimezoneID` (`FK_Timezone_ID`),
+  ADD KEY `IDX_EventSubscriptions_GenreID` (`FK_Genre_ID`);
 
 --
--- Indexes for table `Gaming.UserGames`
+-- Indexes for table `gaming.reminderemailbatch`
 --
-ALTER TABLE `Gaming.UserGames`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_UserGames_UserID` (`FK_User_ID`),  ADD UNIQUE `IDX_Unique_UserID_Name`(`FK_User_ID`, `Name`);
+ALTER TABLE `gaming.reminderemailbatch`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_ReminderEmailBatch_FK_User_ID` (`FK_User_ID`),
+  ADD KEY `IDX_ReminderEmailBatch_FK_Event_ID` (`FK_Event_ID`);
 
 --
--- Indexes for table `Gaming.UserPlatforms`
+-- Indexes for table `gaming.userfriendinvitations`
 --
-ALTER TABLE `Gaming.UserPlatforms`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_UserPlatforms_UserID` (`FK_User_ID`), ADD KEY `IDX_UserPlatforms_PlatformID` (`FK_Platform_ID`);
+ALTER TABLE `gaming.userfriendinvitations`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_UserFriendInvitations_FK_User_ID_Invitee` (`FK_User_ID_Invitee`),
+  ADD KEY `IDX_UserFriendInvitations_FK_User_ID_Inviter` (`FK_User_ID_Inviter`);
 
 --
--- Indexes for table `Security.PageRoles`
+-- Indexes for table `gaming.userfriends`
 --
-ALTER TABLE `Security.PageRoles`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_Page_ID` (`FK_Page_ID`), ADD KEY `IDX_Role_ID` (`FK_Role_ID`);
+ALTER TABLE `gaming.userfriends`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_UserFriends_UserID_ThisUser` (`FK_User_ID_ThisUser`),
+  ADD KEY `IDX_UserFriends_UserID_Friend` (`FK_User_ID_Friend`);
 
 --
--- Indexes for table `Security.Pages`
+-- Indexes for table `gaming.usergamertags`
 --
-ALTER TABLE `Security.Pages`
+ALTER TABLE `gaming.usergamertags`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `ID_UNIQUE` (`ID`),
+  ADD KEY `IDX_FK_User_ID` (`FK_User_ID`),
+  ADD KEY `IDX_FK_Platform_ID` (`FK_Platform_ID`);
+
+--
+-- Indexes for table `gaming.usergames`
+--
+ALTER TABLE `gaming.usergames`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `IDX_Unique_UserID_Name` (`FK_User_ID`,`Name`),
+  ADD KEY `IDX_UserGames_UserID` (`FK_User_ID`);
+
+--
+-- Indexes for table `gaming.userplatforms`
+--
+ALTER TABLE `gaming.userplatforms`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_UserPlatforms_UserID` (`FK_User_ID`),
+  ADD KEY `IDX_UserPlatforms_PlatformID` (`FK_Platform_ID`);
+
+--
+-- Indexes for table `payments.paypaltransactions`
+--
+ALTER TABLE `payments.paypaltransactions`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `IDX_SubscriptionID_TxnId_TxnType_PaymentStatus_UNIQUE` (`SubscriptionID`,`TxnId`,`TxnType`,`PaymentStatus`);
+
+--
+-- Indexes for table `payments.paypalusers`
+--
+ALTER TABLE `payments.paypalusers`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_PayPalUsers_FK_User_ID` (`FK_User_ID`);
+
+--
+-- Indexes for table `security.pageroles`
+--
+ALTER TABLE `security.pageroles`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_Page_ID` (`FK_Page_ID`),
+  ADD KEY `IDX_Role_ID` (`FK_Role_ID`);
+
+--
+-- Indexes for table `security.pages`
+--
+ALTER TABLE `security.pages`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Security.Roles`
+-- Indexes for table `security.passwordrecoverysession`
 --
-ALTER TABLE `Security.Roles`
+ALTER TABLE `security.passwordrecoverysession`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_PasswordRecoverySession_FK_User_ID` (`FK_User_ID`);
+
+--
+-- Indexes for table `security.roles`
+--
+ALTER TABLE `security.roles`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `Security.UserRoles`
+-- Indexes for table `security.userroles`
 --
-ALTER TABLE `Security.UserRoles`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_User_ID` (`FK_User_ID`), ADD KEY `IDX_Role_ID` (`FK_Role_ID`);
+ALTER TABLE `security.userroles`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_User_ID` (`FK_User_ID`),
+  ADD KEY `IDX_Role_ID` (`FK_Role_ID`);
 
 --
--- Indexes for table `Security.Users`
+-- Indexes for table `security.users`
 --
-ALTER TABLE `Security.Users`
-  ADD PRIMARY KEY (`ID`), ADD KEY `IDX_TimeZoneID` (`FK_Timezone_ID`), ADD KEY `IDX_IsActive` (`IsActive`);
+ALTER TABLE `security.users`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `IDX_TimeZoneID` (`FK_Timezone_ID`),
+  ADD KEY `IDX_IsActive` (`IsActive`);
 
 --
--- Indexes for table `Security.UserSessions`
+-- Indexes for table `security.usersessions`
 --
-ALTER TABLE `Security.UserSessions`
+ALTER TABLE `security.usersessions`
   ADD PRIMARY KEY (`ID`);
 
 --
@@ -716,212 +1186,255 @@ ALTER TABLE `Security.UserSessions`
 --
 
 --
--- AUTO_INCREMENT for table `Administration.Logging`
+-- AUTO_INCREMENT for table `administration.logging`
 --
-ALTER TABLE `Administration.Logging`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=104;
+ALTER TABLE `administration.logging`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=37;
 --
--- AUTO_INCREMENT for table `Configuration.GameGenres`
+-- AUTO_INCREMENT for table `configuration.gamegenres`
 --
-ALTER TABLE `Configuration.GameGenres`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15;
+ALTER TABLE `configuration.gamegenres`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=256;
 --
--- AUTO_INCREMENT for table `Configuration.GamePlatforms`
+-- AUTO_INCREMENT for table `configuration.gameplatforms`
 --
-ALTER TABLE `Configuration.GamePlatforms`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=45;
---
--- AUTO_INCREMENT for table `Configuration.Games`
---
-ALTER TABLE `Configuration.Games`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10;
---
--- AUTO_INCREMENT for table `Configuration.Genres`
---
-ALTER TABLE `Configuration.Genres`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8;
---
--- AUTO_INCREMENT for table `Configuration.Platforms`
---
-ALTER TABLE `Configuration.Platforms`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15;
---
--- AUTO_INCREMENT for table `Configuration.TimeZones`
---
-ALTER TABLE `Configuration.TimeZones`
+ALTER TABLE `configuration.gameplatforms`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=207;
 --
--- AUTO_INCREMENT for table `Gaming.EventMembers`
+-- AUTO_INCREMENT for table `configuration.games`
 --
-ALTER TABLE `Gaming.EventMembers`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
+ALTER TABLE `configuration.games`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=74;
 --
--- AUTO_INCREMENT for table `Gaming.EventAllowedMembers`
+-- AUTO_INCREMENT for table `configuration.genres`
 --
-ALTER TABLE `Gaming.EventAllowedMembers`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
+ALTER TABLE `configuration.genres`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=68;
 --
--- AUTO_INCREMENT for table `Gaming.Events`
+-- AUTO_INCREMENT for table `configuration.platforms`
 --
-ALTER TABLE `Gaming.Events`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=73;
+ALTER TABLE `configuration.platforms`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15;
 --
--- AUTO_INCREMENT for table `Gaming.EventSubscriptions`
+-- AUTO_INCREMENT for table `configuration.timezones`
 --
-ALTER TABLE `Gaming.EventSubscriptions`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `configuration.timezones`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=207;
 --
--- AUTO_INCREMENT for table `Gaming.UserFriends`
+-- AUTO_INCREMENT for table `gaming.eventallowedmembers`
 --
-ALTER TABLE `Gaming.UserFriends`
+ALTER TABLE `gaming.eventallowedmembers`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `gaming.eventmembers`
+--
+ALTER TABLE `gaming.eventmembers`
   MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8;
 --
--- AUTO_INCREMENT for table `Gaming.UserGames`
+-- AUTO_INCREMENT for table `gaming.events`
 --
-ALTER TABLE `Gaming.UserGames`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=26;
+ALTER TABLE `gaming.events`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
--- AUTO_INCREMENT for table `Gaming.UserPlatforms`
+-- AUTO_INCREMENT for table `gaming.eventsubscriptions`
 --
-ALTER TABLE `Gaming.UserPlatforms`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=98;
+ALTER TABLE `gaming.eventsubscriptions`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table `Security.PageRoles`
+-- AUTO_INCREMENT for table `gaming.reminderemailbatch`
 --
-ALTER TABLE `Security.PageRoles`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+ALTER TABLE `gaming.reminderemailbatch`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table `Security.Pages`
+-- AUTO_INCREMENT for table `gaming.userfriendinvitations`
 --
-ALTER TABLE `Security.Pages`
+ALTER TABLE `gaming.userfriendinvitations`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `gaming.userfriends`
+--
+ALTER TABLE `gaming.userfriends`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `gaming.usergamertags`
+--
+ALTER TABLE `gaming.usergamertags`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=28;
+--
+-- AUTO_INCREMENT for table `gaming.usergames`
+--
+ALTER TABLE `gaming.usergames`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `gaming.userplatforms`
+--
+ALTER TABLE `gaming.userplatforms`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=209;
+--
+-- AUTO_INCREMENT for table `payments.paypaltransactions`
+--
+ALTER TABLE `payments.paypaltransactions`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `payments.paypalusers`
+--
+ALTER TABLE `payments.paypalusers`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=38;
+--
+-- AUTO_INCREMENT for table `security.pageroles`
+--
+ALTER TABLE `security.pageroles`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=12;
 --
--- AUTO_INCREMENT for table `Security.Roles`
+-- AUTO_INCREMENT for table `security.pages`
 --
-ALTER TABLE `Security.Roles`
+ALTER TABLE `security.pages`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=18;
+--
+-- AUTO_INCREMENT for table `security.passwordrecoverysession`
+--
+ALTER TABLE `security.passwordrecoverysession`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15;
+--
+-- AUTO_INCREMENT for table `security.roles`
+--
+ALTER TABLE `security.roles`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 --
--- AUTO_INCREMENT for table `Security.UserRoles`
+-- AUTO_INCREMENT for table `security.userroles`
 --
-ALTER TABLE `Security.UserRoles`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=92;
+ALTER TABLE `security.userroles`
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=109;
 --
--- AUTO_INCREMENT for table `Security.Users`
+-- AUTO_INCREMENT for table `security.users`
 --
-ALTER TABLE `Security.Users`
-  MODIFY `ID` bigint(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=89;
+ALTER TABLE `security.users`
+  MODIFY `ID` bigint(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=106;
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `Configuration.GameGenres`
+-- Constraints for table `configuration.gamegenres`
 --
-ALTER TABLE `Configuration.GameGenres`
-ADD CONSTRAINT `FK_GameGenres_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `Configuration.Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_GameGenres_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `Configuration.Genres` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `configuration.gamegenres`
+  ADD CONSTRAINT `FK_GameGenres_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `configuration.games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_GameGenres_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `configuration.genres` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Configuration.GamePlatforms`
+-- Constraints for table `configuration.gameplatforms`
 --
-ALTER TABLE `Configuration.GamePlatforms`
-ADD CONSTRAINT `FK_GamePlatforms_Game_ID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `Configuration.Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_GamePlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `configuration.gameplatforms`
+  ADD CONSTRAINT `FK_GamePlatforms_Game_ID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `configuration.games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_GamePlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `configuration.platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.EventMembers`
+-- Constraints for table `gaming.eventallowedmembers`
 --
-ALTER TABLE `Gaming.EventMembers`
-ADD CONSTRAINT `FK_EventMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `Gaming.Events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.eventallowedmembers`
+  ADD CONSTRAINT `FK_EventAllowedMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `gaming.events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventAllowedMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.EventAllowedMembers`
+-- Constraints for table `gaming.eventmembers`
 --
-ALTER TABLE `Gaming.EventAllowedMembers`
-ADD CONSTRAINT `FK_EventAllowedMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `Gaming.Events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventAllowedMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.eventmembers`
+  ADD CONSTRAINT `FK_EventMembers_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `gaming.events` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventMembers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.Events`
+-- Constraints for table `gaming.events`
 --
-ALTER TABLE `Gaming.Events`
-ADD CONSTRAINT `FK_Events_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `Configuration.Games` (`ID`),
-ADD CONSTRAINT `FK_Events_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `Configuration.Genres` (`ID`),
-ADD CONSTRAINT `FK_Events_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`),
-ADD CONSTRAINT `FK_Events_TimeZoneID` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `Configuration.TimeZones` (`ID`),
-ADD CONSTRAINT `FK_Events_UserGamesID` FOREIGN KEY (`FK_UserGames_ID`) REFERENCES `Gaming.UserGames` (`ID`) ON DELETE SET NULL ON UPDATE NO ACTION,
-ADD CONSTRAINT `FK_Events_UserID` FOREIGN KEY (`FK_User_ID_EventCreator`) REFERENCES `Security.Users` (`ID`);
+ALTER TABLE `gaming.events`
+  ADD CONSTRAINT `FK_Events_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `configuration.games` (`ID`),
+  ADD CONSTRAINT `FK_Events_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `configuration.genres` (`ID`),
+  ADD CONSTRAINT `FK_Events_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `configuration.platforms` (`ID`),
+  ADD CONSTRAINT `FK_Events_TimeZoneID` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `configuration.timezones` (`ID`),
+  ADD CONSTRAINT `FK_Events_UserGamesID` FOREIGN KEY (`FK_UserGames_ID`) REFERENCES `gaming.usergames` (`ID`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_Events_UserID` FOREIGN KEY (`FK_User_ID_EventCreator`) REFERENCES `security.users` (`ID`);
 
 --
--- Constraints for table `Gaming.EventSubscriptions`
+-- Constraints for table `gaming.eventsubscriptions`
 --
-ALTER TABLE `Gaming.EventSubscriptions`
-ADD CONSTRAINT `FK_EventSubscriptions_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `Configuration.Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventSubscriptions_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `Configuration.Genres` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventSubscriptions_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventSubscriptions_TimezoneID` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `Configuration.TimeZones` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_EventSubscriptions_UserID` FOREIGN KEY (`FK_User_ID_EventSubscriber`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.eventsubscriptions`
+  ADD CONSTRAINT `FK_EventSubscriptions_GameID` FOREIGN KEY (`FK_Game_ID`) REFERENCES `configuration.games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventSubscriptions_GenreID` FOREIGN KEY (`FK_Genre_ID`) REFERENCES `configuration.genres` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventSubscriptions_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `configuration.platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventSubscriptions_TimezoneID` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `configuration.timezones` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_EventSubscriptions_UserID` FOREIGN KEY (`FK_User_ID_EventSubscriber`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.UserFriends`
+-- Constraints for table `gaming.reminderemailbatch`
 --
-ALTER TABLE `Gaming.UserFriends`
-ADD CONSTRAINT `FK_UserFriends_Users_Friend` FOREIGN KEY (`FK_User_ID_Friend`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_UserFriends_Users_ThisUser` FOREIGN KEY (`FK_User_ID_ThisUser`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.reminderemailbatch`
+  ADD CONSTRAINT `FK_ReminderEmailBatch_EventID` FOREIGN KEY (`FK_Event_ID`) REFERENCES `gaming.events` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_ReminderEmailBatch_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
--- Constraints for table `Gaming.UserFriendInvitations`
+-- Constraints for table `gaming.userfriendinvitations`
 --
-ALTER TABLE `Gaming.UserFriendInvitations`
-ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Invitee` FOREIGN KEY (`FK_User_ID_Invitee`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Inviter` FOREIGN KEY (`FK_User_ID_Inviter`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `gaming.userfriendinvitations`
+  ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Invitee` FOREIGN KEY (`FK_User_ID_Invitee`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_UserFriendInvitations_UserID_Inviter` FOREIGN KEY (`FK_User_ID_Inviter`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
--- Constraints for table `Gaming.UserGames`
+-- Constraints for table `gaming.userfriends`
 --
-ALTER TABLE `Gaming.UserGames`
-ADD CONSTRAINT `FK_UserGames_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.userfriends`
+  ADD CONSTRAINT `FK_UserFriends_Users_Friend` FOREIGN KEY (`FK_User_ID_Friend`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_UserFriends_Users_ThisUser` FOREIGN KEY (`FK_User_ID_ThisUser`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.UserGamerTags`
+-- Constraints for table `gaming.usergamertags`
 --
-ALTER TABLE `Gaming.UserGamerTags`
-ADD CONSTRAINT `FK_UserGamerTags_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_UserGamerTags_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `gaming.usergamertags`
+  ADD CONSTRAINT `FK_UserGamerTags_PlatformID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `configuration.platforms` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_UserGamerTags_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Gaming.UserPlatforms`
+-- Constraints for table `gaming.usergames`
 --
-ALTER TABLE `Gaming.UserPlatforms`
-ADD CONSTRAINT `FK_UserPlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `Configuration.Platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_UserPlatforms_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `gaming.usergames`
+  ADD CONSTRAINT `FK_UserGames_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Payments.PayPalUsers`
+-- Constraints for table `gaming.userplatforms`
 --
-ALTER TABLE `Payments.PayPalUsers`
-ADD CONSTRAINT `FK_PayPalUsers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `gaming.userplatforms`
+  ADD CONSTRAINT `FK_UserPlatforms_Platform_ID` FOREIGN KEY (`FK_Platform_ID`) REFERENCES `configuration.platforms` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_UserPlatforms_User_ID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Security.PageRoles`
+-- Constraints for table `payments.paypalusers`
 --
-ALTER TABLE `Security.PageRoles`
-ADD CONSTRAINT `FK_PageRoles_Pages` FOREIGN KEY (`FK_Page_ID`) REFERENCES `Security.Pages` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_PageRoles_Roles` FOREIGN KEY (`FK_Role_ID`) REFERENCES `Security.Roles` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `payments.paypalusers`
+  ADD CONSTRAINT `FK_PayPalUsers_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints for table `Security.UserRoles`
+-- Constraints for table `security.pageroles`
 --
-ALTER TABLE `Security.UserRoles`
-ADD CONSTRAINT `FK_UserRoles_Roles` FOREIGN KEY (`FK_Role_ID`) REFERENCES `Security.Roles` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `FK_UserRoles_Users` FOREIGN KEY (`FK_User_ID`) REFERENCES `Security.Users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `security.pageroles`
+  ADD CONSTRAINT `FK_PageRoles_Pages` FOREIGN KEY (`FK_Page_ID`) REFERENCES `security.pages` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_PageRoles_Roles` FOREIGN KEY (`FK_Role_ID`) REFERENCES `security.roles` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `Security.Users`
+-- Constraints for table `security.passwordrecoverysession`
 --
-ALTER TABLE `Security.Users`
-ADD CONSTRAINT `FK_Users_TimeZones` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `Configuration.TimeZones` (`ID`);
+ALTER TABLE `security.passwordrecoverysession`
+  ADD CONSTRAINT `FK_PasswordRecoverySession_UserID` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `security.userroles`
+--
+ALTER TABLE `security.userroles`
+  ADD CONSTRAINT `FK_UserRoles_Roles` FOREIGN KEY (`FK_Role_ID`) REFERENCES `security.roles` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_UserRoles_Users` FOREIGN KEY (`FK_User_ID`) REFERENCES `security.users` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `security.users`
+--
+ALTER TABLE `security.users`
+  ADD CONSTRAINT `FK_Users_TimeZones` FOREIGN KEY (`FK_Timezone_ID`) REFERENCES `configuration.timezones` (`ID`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

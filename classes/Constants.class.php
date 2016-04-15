@@ -8,6 +8,13 @@ class Constants
     public static $dbPassword = "t3\$t*useR";
     public static $dbName = "raiden01_ProjectOGS";
 	
+    // General configuration
+    public static $isDebugMode = true; // If this variable is true, the full, un-minified version of most JS files will be referenced; otherwise, only minified JS files will be referenced
+    public static $emailSMTPServer = "smtp.gmail.com";
+    public static $emailSMTPPort = 587;
+    public static $emailSMTPUser = "playerunite.donotreply@gmail.com";
+    public static $emailSMTPPassword = "t3\$t*useR";
+    
     // Security configuration
     public static $authFailureRedirectPage = "index.php";
     public static $pwdRecoveryPage = "https://www.playerunite.com/PasswordRecovery.php";
@@ -15,13 +22,14 @@ class Constants
     public static $pwdRecoveryEmailSenderFriendlyName = "PlayerUnite - DoNotReply";
     public static $pwdRecoverySessionExpTimeInMinutes = "12";
     public static $pwdRecoverySessionEmailSubject = "PlayerUnite Password Reset Instructions";
-    public static $emailSMTPServer = "smtp.gmail.com";
-    public static $emailSMTPPort = 587;
-    public static $emailSMTPUser = "playerunite.donotreply@gmail.com";
-    public static $emailSMTPPassword = "t3\$t*useR";
 	
-    // General configuration
-    public static $isDebugMode = false; // If this variable is true, the full, un-minified version of most JS files will be referenced; otherwise, only minified JS files will be referenced
+    // Reminder event configuration
+    public static $reminderEventsPollFutureEventsMaxHourLimit = 1440;
+    public static $reminderEventsBatchSize = 200;
+    public static $playerUniteLinkPage = "https://www.playerunite.com";
+    public static $reminderEventsEmailSubject = "PlayerUnite Event Reminder";
+    public static $reminderEventsEmailSenderEmail = "playerunite.donotreply@gmail.com";
+    public static $reminderEventsEmailSenderFriendlyName = "PlayerUnite - DoNotReply";
 	
     /* ************************************** PAYPAL CONFIGURATION *******************************************/
     public static $isPayPalTest = false; // Change this to true to test code changes to PayPal handling logic

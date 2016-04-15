@@ -1069,4 +1069,61 @@ class SecurityHandler
         $logger->LogError("ResetUserPassword(): Could not update account for user ID '" . $userId . "' with new password. " . $errors);
 	return "System Error: Could not reset your password. Please try again later -- we apologize for the inconvenience!";
     }
+    
+    public function EventReminderSettingsLoad($dataAccess, $logger, $user)
+    {
+        $optionFormat = '<option value="%d"%s>%d</option>';
+        $minuteOptions = '';
+        for($i = 5; $i < 60; $i++) {
+            $selected = '';
+            if($i == 30)  $selected = 'selected="true"';
+            
+            $minuteOptions .= sprintf($optionFormat, $i, $selected, $i);
+        }
+        
+        $hourOptions = '';
+        for($i = 1; $i < 24; $i++) {
+            $selected = '';
+            if($i == 1)  $selected = 'selected="true"';
+            
+            $hourOptions .= sprintf($optionFormat, $i, $selected, $i);
+        }
+        
+        $dayOptions = '';
+        for($i = 1; $i < 31; $i++) {
+            $selected = '';
+            if($i == 1)  $selected = 'selected="true"';
+            
+            $dayOptions .= sprintf($optionFormat, $i, $selected, $i);
+        }
+        
+        $numberOptionsForMinuteSelector = '<select id="minuteSelector" name="minuteSelector" class="hidden timeIntervalSelect">' . $minuteOptions . '</select>';
+        $numberOptionsForHourSelector = '<select id="hourSelector" name="hourSelector" class="timeIntervalSelect">' . $hourOptions . '</select>';
+        $numberOptionsForDaySelector = '<select id="daySelector" name="daySelector" class="hidden timeIntervalSelect">' . $dayOptions . '</select>';
+        
+        $timeIntervalSelector =
+            '<select id="timeIntervalSelector" name="timeIntervalSelector" style="max-width: 9em;">' .
+                '<option value="min">Minutes</option>' .
+                '<option value="hr" selected="true">Hours</option>' .
+                '<option value="day">Days</option>' .
+            '</select>';
+        
+        return
+            '<div class="box style3 paddingOverride">' .
+                '<form id="evtReminderSettingsEditForm" name="evtReminderSettingsEditForm" method="POST" action="">' .
+                    '<i class="fa fa-power-off"></i>&nbsp;Send Event Reminder Emails?<br /><input type="checkbox" ' .
+                        'id="reminderEmailsEnabled" name="reminderEmailsEnabled" value="remindersEnabled" />Enabled<br /><br />' .
+                    '<i class="fa fa-at"></i>&nbsp;Reminder Email Address To Use<br /><input id="reminderEmailAddress" type="text" ' . 
+                        'maxlength="100" placeholder=" Email Address" /><br /><br />' .
+                    '<i class="fa fa-clock-o"></i>&nbsp;When Should We Send Your Reminder?<br />Send Reminder Emails  ' .
+                        $numberOptionsForMinuteSelector . $numberOptionsForHourSelector . $numberOptionsForDaySelector .
+                        '&nbsp;&nbsp;' . $timeIntervalSelector . '<br />Before Event Scheduled Time' .
+                        '<br /><br />' .
+                '</form><br />' .
+                '<div id="eventReminderSettingsDialogToolbar" class="dlgToolbarContainer">' .
+                    '<button class="controlBtn icon fa-cogs" id="submitBtn">&nbsp;Apply Changes</button>' .
+                    '<button class="controlBtn icon fa-close" id="cancelBtn">&nbsp;Close</button>' .
+                '</div>' .
+            '</div>';
+    }
 }

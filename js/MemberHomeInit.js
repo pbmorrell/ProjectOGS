@@ -1215,10 +1215,10 @@ function JoinSelectedEvents()
     var eventsToDeselect = [];
     $selectedRows.each(function() {
         var id = $(this).data('record').ID;
-        var isJoined = $(this).data('record').Joined;
+        var action = $(this).data('record').Actions;
             
         // Only try to join events that this user has not already joined
-        if(isJoined === 'JOIN') {
+        if(action === 'JOIN') {
             selectedEventIds.push(id);
         }
         else {

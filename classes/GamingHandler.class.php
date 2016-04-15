@@ -1,13 +1,16 @@
 <?php
-include_once 'classes/DataAccess.class.php';
-include_once 'classes/Logger.class.php';
-include_once 'classes/User.class.php';
-include_once 'classes/Game.class.php';
-include_once 'classes/EventMember.class.php';
-include_once 'classes/Utils.class.php';
-include_once 'classes/EventSearchParameters.class.php';
-include_once 'classes/UserSearchParameters.class.php';
-include_once 'classes/UserInviteInfo.class.php';
+include_once 'DataAccess.class.php';
+include_once 'Logger.class.php';
+include_once 'User.class.php';
+include_once 'Game.class.php';
+include_once 'EventMember.class.php';
+include_once 'EventReminderData.class.php';
+include_once 'Utils.class.php';
+include_once 'EventSearchParameters.class.php';
+include_once 'UserSearchParameters.class.php';
+include_once 'UserInviteInfo.class.php';
+include_once 'PHPMailer/class.phpmailer.php';
+include_once 'PHPMailer/class.smtp.php';
 
 class GamingHandler
 {    
@@ -1875,6 +1878,367 @@ class GamingHandler
         }
 
         $userGame->JoinStatus = $joinStatus;
+    }
+	
+    public function GetListNextScheduledGamesByUser($dataAccess, $logger)
+    {        
+        $getUserGamesQuery = "SELECT e.`ID` AS EventId, e.`EventScheduledForDate`, u.`ID` AS UserID, u.`SendEventReminderEmailsToAddress`, u.`SendEventReminderEmailMinutesBeforeEvent` " .
+                             "FROM `Gaming.Events` AS e ".
+				 "INNER JOIN `Gaming.EventMembers` AS em ON e.`ID` = em.`FK_Event_ID` ".
+                                 "INNER JOIN `Security.Users` AS u ON u.`ID` = em.`FK_User_ID` ".
+                             "LEFT JOIN `Gaming.ReminderEmailBatch` AS reb ON (reb.`FK_User_ID` = u.`ID`) AND (reb.`FK_Event_ID` = e.`ID`) ".
+                             "WHERE (e.`IsActive` = 1) AND (e.`DateReminderSent` IS NULL) AND (reb.`IsProcessed` IS NULL) AND ".
+				 "(e.`EventScheduledForDate` > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 3 MINUTE)) AND ".
+				 "(e.`EventScheduledForDate` < DATE_ADD(UTC_TIMESTAMP(), INTERVAL " . strval(Constants::$reminderEventsPollFutureEventsMaxHourLimit) . 
+				 " HOUR)) AND ".
+				 "(u.`IsActive` = 1) AND (u.`SendEventReminderEmails` = 1) ". // Only pull events for active users who have opted in to reminder emails
+                             "ORDER BY e.`ID`;";
+        
+		$userGames = array();
+        
+	if($dataAccess->BuildQuery($getUserGamesQuery)){
+            $results = $dataAccess->GetResultSet();
+				
+            if($results != null){
+		foreach($results as $row) {
+                    $userGame = new EventReminderData($row['EventId'], $row['EventScheduledForDate'], $row['UserID'], 
+                                                      $row['SendEventReminderEmailsToAddress'], $row['SendEventReminderEmailMinutesBeforeEvent']);
+                    array_push($userGames, $userGame);
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve list of next scheduled games per user. " . $errors);
+	}
+        
+        return $userGames;
+    }
+	
+    public function QueueReminderEmailBatch($dataAccess, $logger, $userGames)
+    {
+        $valuesClauseFormat = "(%s, %s, %s, %s)";
+	$userParmNameFormat = ":FKUserId%d";
+        $eventParmNameFormat = ":FKEventId%d";
+	$emailParmNameFormat = ":EmailAddress%d";
+	$dateParmNameFormat = ":DateToSend%d";
+
+	// Insert reminder emails in batches of 50 at a time to prevent excessively long SQL statements from being sent to database
+	$reminderEmailBatches = array_chunk($userGames, 50);
+		
+	for($i = 0; $i < count($reminderEmailBatches); $i++) {
+            $reminderEmailBatch = $reminderEmailBatches[$i];
+            $queueReminderEmailBatchQuery = "INSERT INTO `Gaming.ReminderEmailBatch` (`FK_User_ID`, `FK_Event_ID`, `EmailAddress`, `DateToSend`) VALUES ";
+            $queryParms = [];
+			
+            // Build insert statement
+            for($j = 0; $j < count($reminderEmailBatch); $j++) {
+		$valuesClauseSuffix = ", ";
+		if($j === (count($reminderEmailBatch) - 1)) {
+                    $valuesClauseSuffix = ";";
+		}
+
+		$userParmName = sprintf($userParmNameFormat, $j);
+		$eventParmName = sprintf($eventParmNameFormat, $j);
+		$emailParmName = sprintf($emailParmNameFormat, $j);
+		$dateParmName = sprintf($dateParmNameFormat, $j);
+		$queueReminderEmailBatchQuery .= (sprintf($valuesClauseFormat, $userParmName, $eventParmName, $emailParmName, $dateParmName) . 
+                                                  $valuesClauseSuffix);
+
+		// Calculate DateToSend value
+		$eventScheduledDate = date_create_from_format('Y-m-d H:i:s', $reminderEmailBatch[$j]->EventScheduledForDate, new DateTimeZone("UTC"));
+		$reminderInterval = new DateInterval("PT" . strval($reminderEmailBatch[$j]->TimeInMinsBeforeEventToSend) . "M");
+		$dateToSend = date_sub($eventScheduledDate, $reminderInterval);
+				
+		// Push param values for this event
+		$parmUserId = new QueryParameter($userParmName, $reminderEmailBatch[$j]->UserID, PDO::PARAM_INT);
+		$parmEventId = new QueryParameter($eventParmName, $reminderEmailBatch[$j]->EventID, PDO::PARAM_INT);
+		$parmEmailAddress = new QueryParameter($emailParmName, $reminderEmailBatch[$j]->EmailAddress, PDO::PARAM_STR);
+		$parmDateToSend = new QueryParameter($dateParmName, $dateToSend->format("Y-m-d H:i:s"), PDO::PARAM_STR);
+		array_push($queryParms, $parmEventId, $parmUserId, $parmEmailAddress, $parmDateToSend);
+            }
+			
+            if($dataAccess->BuildQuery($queueReminderEmailBatchQuery, $queryParms)){
+		$dataAccess->ExecuteNonQuery();
+            }
+				
+            $errors = $dataAccess->CheckErrors();
+
+            if(strlen($errors) > 0) {
+		$logger->LogError("Could not insert email reminder batch (count: " . strval(count($reminderEmailBatch)) . 
+                                  " reminders). " . $errors);
+            }
+            else { 
+		if(Constants::$isDebugMode) {
+                    $logger->LogInfo("[QueueReminderEmailBatch]: Inserted " . strval(count($reminderEmailBatch)) . " email reminders");
+                }
+            }
+	}
+    }
+    
+    public function SendNextReminderEmailBatch($dataAccess, $logger)
+    {
+        $getNextBatchQuery = "SELECT reb.`ID` AS ReminderId, reb.`FK_User_ID` AS UserId, reb.`FK_Event_ID` AS EventId, reb.`EmailAddress`, " .
+                             "COALESCE(tz.`Description`, '') AS TimeZone " .
+                             "FROM `Gaming.ReminderEmailBatch` AS reb ".
+                             "INNER JOIN `Security.Users` AS u ON u.`ID` = reb.`FK_User_ID` " .
+                             "LEFT JOIN `Configuration.TimeZones` AS tz ON u.`FK_Timezone_ID` = tz.`ID` " .
+                             "WHERE (reb.`DateToSend` <= UTC_TIMESTAMP()) AND (reb.`IsProcessed` = 0) ".
+                             "ORDER BY reb.`DateToSend`, reb.`ID` " .
+                             "LIMIT 0, " . strval(Constants::$reminderEventsBatchSize) . ";";
+        
+	if($dataAccess->BuildQuery($getNextBatchQuery)){
+            $results = $dataAccess->GetResultSet();
+				
+            if($results != null){
+		foreach($results as $row) {
+                    // Update IsProcessed immediately (to prevent this reminder from being processed again)
+                    $this->UpdateEventReminderStatus($dataAccess, $logger, $row['ReminderId'], $row['EventId'], 1, "", 0, "");
+                    
+                    // Retrieve event details for each event in this batch
+                    $eventDetails = $this->GetEventReminderDetails($dataAccess, $logger, $row['EventId'], $row['UserId'], 
+                                                                   $row['EmailAddress'], $row['ReminderId'], $row['TimeZone']);
+                    
+                    // Construct email HTML for the event
+                    $messageHTML = $this->ConstructEventReminderEmail($eventDetails, $logger);
+                    
+                    // Send email to user's requested email address
+                    $success = $this->SendEventReminderEmail($eventDetails->EmailAddress, $messageHTML);
+                    
+                    // Update EventReminders table with results of send attempt
+                    $curDate = gmdate('Y-m-d H:i:s');
+                    $this->UpdateEventReminderStatus($dataAccess, $logger, $eventDetails->EventReminderID, $eventDetails->EventID, 
+                                                     ($success ? 1 : 0), $curDate, $success, $curDate);
+		}
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("Could not retrieve next batch of reminder emails to send. " . $errors);
+	}
+    }
+	
+    private function GetEventReminderDetails($dataAccess, $logger, $eventID, $userID, $emailAddress, $reminderID, $timeZone)
+    {
+        $getEventDetailsQuery = "SELECT e.`EventScheduledForDate`, COALESCE(cg.`Name`, ug.`Name`) AS GameTitle " .
+                                "FROM `Gaming.Events` AS e " .
+				"LEFT JOIN `Configuration.Games` AS cg ON cg.`ID` = e.`FK_Game_ID` ".
+				"LEFT JOIN `Gaming.UserGames` AS ug ON ug.`ID` = e.`FK_UserGames_ID` ".
+                                "WHERE e.`ID` = :eventID;";
+        
+        $parmEventId = new QueryParameter(':eventID', $eventID, PDO::PARAM_INT);
+        $queryParms = array($parmEventId);
+		
+	$eventDetails = EventReminderData::constructDefaultEventReminderData();
+	if($dataAccess->BuildQuery($getEventDetailsQuery, $queryParms)){
+            $result = $dataAccess->GetSingleResult();
+				
+            if($result != null){
+		$playersSignedUpByEvent = $this->GetEventMembers($dataAccess, $logger, [$eventID]);
+		$playersSignedUp = [];
+                $curEvent = Utils::SearchGameArrayByEventID($playersSignedUpByEvent, $eventID);
+                if($curEvent != null) {
+                    $playersSignedUp = $curEvent->EventMembers;
+                }
+			
+		$eventDetails = new EventReminderData($eventID, $result['EventScheduledForDate'], $userID, $emailAddress, -1, 
+                                                      $reminderID, $result['GameTitle'], $playersSignedUp, $timeZone);
+            }
+	}
+        
+	$errors = $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("GetEventReminderDetails(): Could not retrieve event reminder details for event " . $eventID . 
+                              ". " . $errors);
+	}
+		
+	return $eventDetails;
+    }
+    
+    private function UpdateEventReminderStatus($dataAccess, $logger, $reminderID, $eventID, $isProcessed, $dateSendAttempted, 
+                                               $sendSuccess, $dateReminderSent)
+    {
+	$updateSuccessful = false;
+	$updateEventsTable = ((strlen($dateReminderSent) > 0) && $sendSuccess);
+	$errors = "";
+		
+	// Wrap ReminderEmailBatch and Events table updates in transaction: either both should succeed, or neither
+	if($dataAccess->BeginTransaction()) {
+            $parmIsProcessed = new QueryParameter(':isProcessed', $isProcessed, PDO::PARAM_INT);
+            $parmSendSuccess = new QueryParameter(':sendSuccess', ($sendSuccess ? 1 : 0), PDO::PARAM_INT);
+            $parmReminderId = new QueryParameter(':reminderId', $reminderID, PDO::PARAM_INT);
+            $queryParms = array($parmIsProcessed, $parmSendSuccess, $parmReminderId);
+			
+            $dateSendAttemptedSQL = "";
+            if(strlen($dateSendAttempted) > 0) {
+		$dateSendAttemptedSQL = ",`DateSendAttempted` = :dateSendAttempted";
+		$parmDateSendAttempted = new QueryParameter(':dateSendAttempted', $dateSendAttempted, PDO::PARAM_STR);
+		array_push($queryParms, $parmDateSendAttempted);
+            }
+			
+            $updateReminderStatusQuery = "UPDATE `Gaming.ReminderEmailBatch` SET `IsProcessed` = :isProcessed, `SendSuccess` = :sendSuccess" . 
+					 $dateSendAttemptedSQL . " WHERE `ID` = :reminderId;";
+			
+            if($dataAccess->BuildQuery($updateReminderStatusQuery, $queryParms)){
+		$updateSuccessful = ($dataAccess->ExecuteNonQuery()) && (!$updateEventsTable);
+            }
+
+            if((strlen($dataAccess->CheckErrors()) == 0) && $updateEventsTable) {
+                $updateEventSQL = "UPDATE `Gaming.Events` SET `DateReminderSent` = :dateReminderSent WHERE `ID` = :eventId;";
+                $parmDateReminderSent = new QueryParameter(':dateReminderSent', $dateReminderSent, PDO::PARAM_STR);
+                $parmEventId = new QueryParameter(':eventId', $eventID, PDO::PARAM_INT);
+                $queryParms = array($parmDateReminderSent, $parmEventId);
+
+                if($dataAccess->BuildQuery($updateEventSQL, $queryParms)){
+                    $updateSuccessful = $dataAccess->ExecuteNonQuery();
+
+                    if(!$updateSuccessful || (!$dataAccess->CommitTransaction())) {
+                        $errors = "Could not complete transaction for reminder ID " . $reminderID . "...rolling back updates. ";
+                        $updateSuccessful = false;
+                    }
+                }
+            }
+	}
+	else {
+            $errors = "Could not begin transaction for reminder ID " . $reminderID . ". ";
+	}
+
+	$errors .= $dataAccess->CheckErrors();
+	if(strlen($errors) > 0) {
+            $logger->LogError("UpdateEventReminderStatus(): . " . $errors);
+	}
+		
+	if(!$updateSuccessful && ($dataAccess->CheckIfInTransaction()))      $dataAccess->RollbackTransaction();
+	else if($updateSuccessful && ($dataAccess->CheckIfInTransaction()))  $dataAccess->CommitTransaction();
+		
+	return $updateSuccessful;
+    }
+    
+    private function ConstructEventReminderEmail($eventReminderData, $logger)
+    {
+	// Build bulleted list of signed-up players
+        $playersSignedUpList = "";
+	$curUserIsEventCreator = false;
+        foreach($eventReminderData->PlayersSignedUp as $member) {
+            if($member->UserID == $eventReminderData->UserID) {
+		if(strpos($member->UserDisplayName, "(Creator)") !== false)  $curUserIsEventCreator = true;
+		continue;
+            }
+			
+            $playersSignedUpList .= ("<li>" . $member->UserDisplayName . "</li>");
+        }
+		
+	$playersSignedUpList = ("<li>You (" . ($curUserIsEventCreator ? "Event Creator" : "Event Member") . ")</li>") . $playersSignedUpList;
+		
+	// Convert Event Scheduled Date from UTC to the user's profile time zone
+	$eventDate = date_create_from_format('Y-m-d H:i:s', $eventReminderData->EventScheduledForDate, new DateTimeZone("UTC"));
+		
+	try {
+            if(strlen($eventReminderData->UserTimeZone) > 0) {
+		$eventDate->setTimezone(new DateTimeZone($eventReminderData->UserTimeZone));
+            }
+	}
+	catch(Exception $e) {
+            $logger->LogError("ConstructEventReminderEmail(): Could not convert event scheduled date for event ID " . $eventReminderData->EventID . 
+                              " from UTC to user time zone " . $eventReminderData->UserTimeZone . ". Exception: " . $e->getMessage());
+	}
+		
+	$eventDateStr = $eventDate->format('M j, Y  \a\t  g:ia (e)');
+        
+	$message = 
+            "<html>
+		<body>
+		    <div style='background-color: rgb(255, 255, 255);'>
+                        <table style='border-collapse:collapse; table-layout:fixed; word-wrap:break-word;'><tbody>
+                            <tr>
+				<td colspan='2'>
+                                    <div style='border-collapse:collapse; table-layout:fixed; word-wrap:break-word; height: 150px;
+						background-position: 0px 0px; background-image: url(https://www.playerunite.com/images/controller.jpg); 
+						background-repeat: no-repeat;'>
+                                        <h1 style='color: #DE7002; padding:30px 0px 0px 5px; text-shadow: 2px 2px 4px #E33109; font-style: italic;'>Ready, Player One...</h1>
+					<h2 style='color: #08CF08; margin-top:-5px; padding:0px 0px 0px 5px;'>Your Scheduled Game Is Almost Here!</h2>
+                                    </div>
+				</td>
+                            </tr>
+                            <tr>
+                                <td style='border-bottom: 1px solid gray;padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+                                           font-family:Avenir,sans-serif;width:200px;'>
+                                    <div style='margin:20px 20px 20px 20px;'>
+					<h2 style='margin-top:0px;margin-bottom:0px;font-style:normal;font-weight:normal;color:rgb(88,89,91);font-size:20px;
+                                                   line-height:28px;font-family:Roboto,Tahoma,sans-serif;'><strong>Which Game:</strong></h2>
+				    </div>
+				</td>
+				<td style='border-bottom: 1px solid gray;padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+					   font-family:Avenir,sans-serif;width:400px;'>
+                                    <div style='margin:23px 20px 20px 20px;'>
+                                        <p>" . $eventReminderData->GameTitle . "</p>
+                                    </div>
+				</td>
+                            </tr>
+                            <tr>
+                                <td style='border-bottom: 1px solid gray;padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+                                           font-family:Avenir,sans-serif;width:200px;'>
+                                    <div style='margin:20px 20px 20px 20px;'>
+                                        <h2 style='margin-top:0px;margin-bottom:0px;font-style:normal;font-weight:normal;color:rgb(88,89,91);font-size:20px;
+						   line-height:28px;font-family:Roboto,Tahoma,sans-serif;'><strong>What Time:</strong></h2>
+                                    </div>
+				</td>
+				<td style='border-bottom: 1px solid gray;padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+                                           font-family:Avenir,sans-serif;width:400px;'>
+                                    <div style='margin:23px 20px 20px 20px;'>
+                                        <p>" . $eventDateStr . "</p>
+                                    </div>
+				</td>
+                            </tr>
+                            <tr>
+                                <td style='padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+                                           font-family:Avenir,sans-serif;width:200px;'>
+                                    <div style='margin:20px 20px 20px 20px;'>
+                                        <h2 style='margin-top:0px;margin-bottom:0px;font-style:normal;font-weight:normal;color:rgb(88,89,91);font-size:20px;
+                                                   line-height:28px;font-family:Roboto,Tahoma,sans-serif;'><strong>Who's Signed Up:</strong></h2>
+                                    </div>
+				</td>
+				<td style='padding:0px;text-align:left;vertical-align:top;color:rgb(128,130,133);font-size:14px;line-height:21px;
+                                           font-family:Avenir,sans-serif;width:400px;'>
+                                    <div style='margin:23px 20px 20px 20px;'>
+                                        <ul style='padding-left:15px;'>" .
+                                            $playersSignedUpList .
+					"</ul>
+                                    </div>
+				</td>
+                            </tr>
+			</tbody></table>
+			<br /><br />
+			<div style='font-size:15px;line-height:15px;mso-line-height-rule:exactly; padding-left: 10px;' />
+                            <a href='" . Constants::$playerUniteLinkPage . "'>Log In To PlayerUnite</a>
+			</div>
+                    </body>
+		</html>";
+
+	return $message;
+    }
+    
+    private function SendEventReminderEmail($emailAddress, $messageHTML)
+    {
+	// Configure email sender
+        $mailer = new PHPMailer();
+        $mailer->isSMTP();
+        $mailer->SMTPAuth = true;
+        $mailer->Host = Constants::$emailSMTPServer;
+        $mailer->Port = Constants::$emailSMTPPort;
+        $mailer->Username = Constants::$emailSMTPUser;
+        $mailer->Password = Constants::$emailSMTPPassword;
+        
+        // Set reminder email data
+        $mailer->setFrom(Constants::$reminderEventsEmailSenderEmail, Constants::$reminderEventsEmailSenderFriendlyName);
+        $mailer->Subject = Constants::$reminderEventsEmailSubject;
+        $mailer->msgHTML($messageHTML);
+        $mailer->addAddress($emailAddress);
+        
+        // Send email
+        return $mailer->send();
     }
 
     private function GetTotalCountFriendListUsers($dataAccess, $logger, $userID,  $searchParms = null, $forAvailableFriendList = true)
