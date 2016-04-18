@@ -9,7 +9,7 @@ class Constants
     public static $dbName = "raiden01_ProjectOGS";
 	
     // General configuration
-    public static $isDebugMode = true; // If this variable is true, the full, un-minified version of most JS files will be referenced; otherwise, only minified JS files will be referenced
+    public static $isDebugMode = false; // If this variable is true, the full, un-minified version of most JS files will be referenced; otherwise, only minified JS files will be referenced
     public static $emailSMTPServer = "smtp.gmail.com";
     public static $emailSMTPPort = 587;
     public static $emailSMTPUser = "playerunite.donotreply@gmail.com";
@@ -24,7 +24,7 @@ class Constants
     public static $pwdRecoverySessionEmailSubject = "PlayerUnite Password Reset Instructions";
 	
     // Reminder event configuration
-    public static $reminderEventsPollFutureEventsMaxHourLimit = 1440;
+    public static $reminderEventsPollFutureEventsMaxHourLimit = 24;
     public static $reminderEventsBatchSize = 200;
     public static $playerUniteLinkPage = "https://www.playerunite.com";
     public static $reminderEventsEmailSubject = "PlayerUnite Event Reminder";

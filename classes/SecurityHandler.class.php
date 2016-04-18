@@ -43,7 +43,8 @@ class SecurityHandler
         $authenticateUserQuery = "SELECT u.`ID`, u.`UserName`, u.`Password`, r.`SecurityLevel`, u.`FK_Timezone_ID`, u.`FirstName`, u.`LastName`, " .
                                  "u.`EmailAddress`, u.`IsPremiumMember`, u.`Gender`, u.`Birthdate`, u.`Autobiography`, " .
 				 "(IFNULL(ppu.`MembershipExpirationDate`, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY))) as MembershipExpirationDate, " .
-				 "(IFNULL(ppu.`IsActive`, 0)) as IsActiveMember " .
+				 "(IFNULL(ppu.`IsActive`, 0)) as IsActiveMember, u.`SendEventReminderEmails`, u.`SendEventReminderEmailsToAddress`, " .
+                                 "u.`SendEventReminderEmailMinutesBeforeEvent` " .
                                  "FROM `Security.Users` as u " .
                                  "INNER JOIN `Security.UserRoles` ur ON ur.`FK_User_ID` = u.`ID` " .
                                  "INNER JOIN `Security.Roles` as r ON r.`ID` = ur.`FK_Role_ID` " .
@@ -79,7 +80,9 @@ class SecurityHandler
 						
 			$objUser = new User($results['ID'], $results['SecurityLevel'], $results['FK_Timezone_ID'], $results['UserName'], 
                                             $results['FirstName'], $results['LastName'], $results['EmailAddress'], $isPremiumMember, 
-                                            $results['Gender'], $results['Birthdate'], $results['Autobiography'], $userPlatforms);
+                                            $results['Gender'], $results['Birthdate'], $results['Autobiography'], $userPlatforms,
+                                            $results['SendEventReminderEmails'] == 1, $results['SendEventReminderEmailsToAddress'], 
+                                            $results['SendEventReminderEmailMinutesBeforeEvent']);
                         $success = true;
                     }
                 }
@@ -1070,13 +1073,41 @@ class SecurityHandler
 	return "System Error: Could not reset your password. Please try again later -- we apologize for the inconvenience!";
     }
     
-    public function EventReminderSettingsLoad($dataAccess, $logger, $user)
+    public function EventReminderSettingsLoad($user)
     {
+        $selectedMinute = -1;
+        $selectedHour = -1;
+        $selectedDay = -1;
+        $minuteSelectorClass = "hidden timeIntervalSelect";
+        $hourSelectorClass = "hidden timeIntervalSelect";
+        $daySelectorClass = "hidden timeIntervalSelect";
+        $timeIntervalMinOptionSelected = "";
+        $timeIntervalHrOptionSelected = "";
+        $timeIntervalDayOptionSelected = "";
+        
+        if(($user->ReminderEmailSendInterval > 4) && ($user->ReminderEmailSendInterval < 60)) {
+            // User's current selected reminder interval is in minutes
+            $selectedMinute = $user->ReminderEmailSendInterval;
+        } else if(($user->ReminderEmailSendInterval > 59) && ($user->ReminderEmailSendInterval < 1440)) {
+            // User's current selected reminder interval is in hours
+            $selectedHour = (int)($user->ReminderEmailSendInterval / 60);
+        } else if($user->ReminderEmailSendInterval > 1439) {
+            // User's current selected reminder interval is in days
+            $selectedDay = (int)($user->ReminderEmailSendInterval / 1440);
+        }
+        
         $optionFormat = '<option value="%d"%s>%d</option>';
         $minuteOptions = '';
         for($i = 5; $i < 60; $i++) {
             $selected = '';
-            if($i == 30)  $selected = 'selected="true"';
+            if($selectedMinute > -1) {
+                if($i == $selectedMinute)  $selected = 'selected="true"';
+                
+                $minuteSelectorClass = "timeIntervalSelect";
+                $timeIntervalMinOptionSelected = ' selected="true"';
+            } else if($i == 30) {
+                $selected = 'selected="true"';
+            }
             
             $minuteOptions .= sprintf($optionFormat, $i, $selected, $i);
         }
@@ -1084,7 +1115,16 @@ class SecurityHandler
         $hourOptions = '';
         for($i = 1; $i < 24; $i++) {
             $selected = '';
-            if($i == 1)  $selected = 'selected="true"';
+            if($selectedHour > -1) {
+                if($i == $selectedHour)  $selected = 'selected="true"';
+            } else if($i == 1) {
+                $selected = 'selected="true"';
+            }
+            
+            if(($selectedMinute == -1) && ($selectedDay == -1)) {
+                $hourSelectorClass = "timeIntervalSelect";
+                $timeIntervalHrOptionSelected = ' selected="true"';
+            }
             
             $hourOptions .= sprintf($optionFormat, $i, $selected, $i);
         }
@@ -1092,38 +1132,97 @@ class SecurityHandler
         $dayOptions = '';
         for($i = 1; $i < 31; $i++) {
             $selected = '';
-            if($i == 1)  $selected = 'selected="true"';
+            if($selectedDay > -1) {
+                if($i == $selectedDay)  $selected = 'selected="true"';
+                
+                $daySelectorClass = "timeIntervalSelect";
+                $timeIntervalDayOptionSelected = ' selected="true"';
+            } else if($i == 1) {
+                $selected = 'selected="true"';
+            }
             
             $dayOptions .= sprintf($optionFormat, $i, $selected, $i);
         }
         
-        $numberOptionsForMinuteSelector = '<select id="minuteSelector" name="minuteSelector" class="hidden timeIntervalSelect">' . $minuteOptions . '</select>';
-        $numberOptionsForHourSelector = '<select id="hourSelector" name="hourSelector" class="timeIntervalSelect">' . $hourOptions . '</select>';
-        $numberOptionsForDaySelector = '<select id="daySelector" name="daySelector" class="hidden timeIntervalSelect">' . $dayOptions . '</select>';
+        $numberOptionsForMinuteSelector = '<select id="minuteSelector" name="minuteSelector" class="' . $minuteSelectorClass . '">' . $minuteOptions . '</select>';
+        $numberOptionsForHourSelector = '<select id="hourSelector" name="hourSelector" class="' . $hourSelectorClass . '">' . $hourOptions . '</select>';
+        $numberOptionsForDaySelector = '<select id="daySelector" name="daySelector" class="' . $daySelectorClass . '">' . $dayOptions . '</select>';
         
         $timeIntervalSelector =
-            '<select id="timeIntervalSelector" name="timeIntervalSelector" style="max-width: 9em;">' .
-                '<option value="min">Minutes</option>' .
-                '<option value="hr" selected="true">Hours</option>' .
-                '<option value="day">Days</option>' .
+            '<select id="timeIntervalSelector" name="timeIntervalSelector" style="max-width: 7em;">' .
+                '<option value="min"' . $timeIntervalMinOptionSelected . '>Minutes</option>' .
+                '<option value="hr"' . $timeIntervalHrOptionSelected . '>Hours</option>' .
+                '<option value="day"' . $timeIntervalDayOptionSelected . '>Days</option>' .
             '</select>';
+        
+        // Initialize Event Reminder Email checkbox and email address to current settings
+        $sendReminderEmailsIsChecked = "";
+        if($user->SendReminderEmails) {
+            $sendReminderEmailsIsChecked = "checked='checked'";
+        }
+        
+        $reminderEmailAddressInitialVal = $user->ReminderEmailAddress;
+        if(strlen($reminderEmailAddressInitialVal) == 0) {
+            $reminderEmailAddressInitialVal = $user->EmailAddress;
+        }
         
         return
             '<div class="box style3 paddingOverride">' .
                 '<form id="evtReminderSettingsEditForm" name="evtReminderSettingsEditForm" method="POST" action="">' .
-                    '<i class="fa fa-power-off"></i>&nbsp;Send Event Reminder Emails?<br /><input type="checkbox" ' .
-                        'id="reminderEmailsEnabled" name="reminderEmailsEnabled" value="remindersEnabled" />Enabled<br /><br />' .
-                    '<i class="fa fa-at"></i>&nbsp;Reminder Email Address To Use<br /><input id="reminderEmailAddress" type="text" ' . 
-                        'maxlength="100" placeholder=" Email Address" /><br /><br />' .
-                    '<i class="fa fa-clock-o"></i>&nbsp;When Should We Send Your Reminder?<br />Send Reminder Emails  ' .
-                        $numberOptionsForMinuteSelector . $numberOptionsForHourSelector . $numberOptionsForDaySelector .
-                        '&nbsp;&nbsp;' . $timeIntervalSelector . '<br />Before Event Scheduled Time' .
-                        '<br /><br />' .
-                '</form><br />' .
+                    '<i class="fa fa-power-off"></i>&nbsp;<label style="font-size: 1.25em;">Send Event Reminder Emails?</label><br />' .
+                        '<input type="checkbox" id="reminderEmailsEnabled" name="reminderEmailsEnabled" value="remindersEnabled" ' . 
+                        $sendReminderEmailsIsChecked . ' style="margin-top:0.2em;margin-left:1em;" />Enabled<br /><br />' .
+                    '<i class="fa fa-at"></i>&nbsp;<label style="font-size: 1.25em;">Reminder Email Address To Use</label><br />' . 
+                        '<input id="reminderEmailAddress" type="text" maxlength="100" placeholder=" Email Address" value="' . 
+                        $reminderEmailAddressInitialVal . '" style="margin-top:0.2em;margin-left:1em;" /><br /><br />' .
+                    '<i class="fa fa-clock-o"></i>&nbsp;<label style="font-size: 1.25em;">When Should We Send Your Reminder?</label><br />' .
+                        '<div style="margin-top:0.2em;margin-left:1em;">Send Reminder Emails<br />' . $numberOptionsForMinuteSelector . 
+                        $numberOptionsForHourSelector . $numberOptionsForDaySelector . '&nbsp;&nbsp;' . $timeIntervalSelector . 
+                        '<br />Before Event Scheduled Time</div><br />' .
+                '</form>' .
                 '<div id="eventReminderSettingsDialogToolbar" class="dlgToolbarContainer">' .
-                    '<button class="controlBtn icon fa-cogs" id="submitBtn">&nbsp;Apply Changes</button>' .
+                    '<button class="controlBtn icon fa-cogs" id="submitBtn">&nbsp;Save</button>' .
                     '<button class="controlBtn icon fa-close" id="cancelBtn">&nbsp;Close</button>' .
                 '</div>' .
             '</div>';
+    }
+    
+    public function EventReminderSettingsUpdate($dataAccess, $logger, $user, $sendReminderEmails, 
+                                                $reminderEmailAddress, $reminderEmailTimeToSend)
+    {
+	$parmUserId = new QueryParameter(':userId', $user->UserID, PDO::PARAM_INT);
+        $parmSendReminderEmails = new QueryParameter(':sendReminderEmails', $sendReminderEmails, PDO::PARAM_INT);
+        $parmReminderEmailAddress = new QueryParameter(':reminderEmailAddress', $reminderEmailAddress, PDO::PARAM_STR);
+        $parmReminderEmailTimeToSend = new QueryParameter(':reminderEmailTimeToSend', $reminderEmailTimeToSend, PDO::PARAM_INT);
+	$queryParms = array($parmUserId, $parmSendReminderEmails, $parmReminderEmailAddress, $parmReminderEmailTimeToSend);
+        
+	$updateUserQuery = "UPDATE `Security.Users` SET `SendEventReminderEmails` = :sendReminderEmails, " .
+                                "`SendEventReminderEmailsToAddress` = :reminderEmailAddress, " .
+                                "`SendEventReminderEmailMinutesBeforeEvent` = :reminderEmailTimeToSend " .
+                           "WHERE `ID` = :userId;";
+		
+        if($dataAccess->BuildQuery($updateUserQuery, $queryParms)){
+            $dataAccess->ExecuteNonQuery();
+        }
+
+        $errors = $dataAccess->CheckErrors();
+        if(strlen($errors) == 0) {
+            // Update event reminder settings in user session object as well
+            $sessionDataAccess = new DataAccess();
+            $sessionHandler = new DBSessionHandler($sessionDataAccess);
+            session_set_save_handler($sessionHandler, true);
+            session_start();
+
+            $user->SendReminderEmails = ($sendReminderEmails == 1);
+            $user->ReminderEmailAddress = $reminderEmailAddress;
+            $user->ReminderEmailSendInterval = $reminderEmailTimeToSend;
+            $_SESSION['WebUser'] = $user;
+            $_SESSION['lastActivity'] = time();
+            
+            return "true";
+        }
+
+        $logger->LogError("EventReminderSettingsUpdate(): Could not update event reminder email settings for user ID '" . $userId . "'. " . $errors);
+	return "System Error: Could not update reminder settings. Please try again later -- we apologize for the inconvenience!";
     }
 }

@@ -1,6 +1,7 @@
 var editProfileGamerTagManagerDlg = "gamerTagManagerDlg";
 var editProfileGamerTagManagerJTableDiv = "#manageGamerTagsDiv";
-var selReminderEmailTimeInterval = "hr";
+var selReminderEmailTimeInterval = "";
+var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
 function EditProfileOnReady()
 {
@@ -81,10 +82,9 @@ function OnGamerTagUpdateClick()
 function OnEventReminderSettingsClick()
 {
     var curWidthClass = GetCurWidthClass();
-    var curHeightClass = GetCurHeightClass();
     var displayContainerPosition = "top";
-    var dlgWidth = 600;
-    var dlgHeight = 700;
+    var dlgWidth = 500;
+    var dlgHeight = 465;
     
     if(curWidthClass == 'mobile') {
         dlgWidth = 400;
@@ -95,13 +95,9 @@ function OnEventReminderSettingsClick()
         displayContainerPosition = "top+10%";
     }
     
-    if((curHeightClass == 'mobile') || (curHeightClass == 'xtraSmall')) {
-        dlgHeight = 450;
-    }
-    
     displayJQueryDialog("dlgEvtReminderSettings", "Event Reminder Settings", "top", displayContainerPosition, window, false, true, 
                         "AJAXHandler.php?action=EventReminderSettingsLoad", function() {
-        EventReminderDialogOnReady($('#dlgEvtReminderSettings').dialog(), curWidthClass);
+        EventReminderDialogOnReady($('#dlgEvtReminderSettings').dialog());
     }, dlgWidth, dlgHeight);
     
     return false;
@@ -132,8 +128,6 @@ function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, 
 
 function OnEditProfile(editProfileStatusId)
 {
-    var validEmailRegEx = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-
     var email = $('#emailAddress').val();
     var password = $('#pwd').val();
     var passwordConf = $('#pwdConfirm').val();
@@ -183,7 +177,7 @@ function OnEditProfile(editProfileStatusId)
     return false;
 }
 
-function EventReminderDialogOnReady($dialog, curWidthClass)
+function EventReminderDialogOnReady($dialog)
 {
     // Attach event handler to Cancel button
     $('#cancelBtn').click(function() {
@@ -194,7 +188,10 @@ function EventReminderDialogOnReady($dialog, curWidthClass)
     // Attach event handler to Update Event Reminder Settings button
     $('#submitBtn').click(function() {
         return OnApplyEventReminderChanges($dialog);
-    });    
+    });
+    
+    // Initialize time interval global var to current DB value
+    selReminderEmailTimeInterval = $('#timeIntervalSelector').val();
     
     // Attach selection change handler to time interval dropdown
     $('#timeIntervalSelector').change(function() {
@@ -211,15 +208,51 @@ function EventReminderDialogOnReady($dialog, curWidthClass)
             $('#daySelector').removeClass('hidden');
         }
     });
-    
-    
 }
 
 function OnApplyEventReminderChanges($dialog)
 {
+    var sendReminderEmails = ($('#reminderEmailsEnabled').is(':checked')) ? 1 : 0;
+    var email = $('#reminderEmailAddress').val();
     
+    if (validEmailRegEx.test(email) === false) {
+        sweetAlert("Oops...", "Unable to update event reminder settings: Please enter a valid email address", "error");
+    } else {
+        // Convert selected reminder time into minutes
+        var timeIntervalInMinutes = -1;
+        switch($('#timeIntervalSelector').val()) {
+            case "min":
+                timeIntervalInMinutes = $('#minuteSelector').val();
+                break;
+            case "hr":
+                var timeIntervalInHours = $('#hourSelector').val();
+                timeIntervalInMinutes = timeIntervalInHours * 60;
+                break;
+            case "day":
+                var timeIntervalInDays = $('#daySelector').val();
+                timeIntervalInMinutes = timeIntervalInDays * 1440;                
+                break;
+        }
+        
+        // Update user reminder settings
+        var postData = "action=EventReminderSettingsUpdate&sendReminderEmails=" + sendReminderEmails + 
+                       "&reminderEmailAddress=" + email + "&reminderEmailTimeToSend=" + timeIntervalInMinutes;
+
+        $.ajax({
+            type: "POST",
+            url: "AJAXHandler.php",
+            data: postData,
+            success: function(response){
+                if(response === 'true') {                
+                    sweetAlert('Success', 'Updated event reminder settings!', 'success');
+                    $dialog.dialog('destroy').remove();
+                }
+                else {
+                    sweetAlert(response);
+                }
+            }
+        });
+    }
     
-    sweetAlert('Success', 'Updated event reminder settings!', 'success');
-    $dialog.dialog('destroy').remove();
     return false;
 }

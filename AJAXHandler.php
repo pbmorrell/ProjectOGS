@@ -647,7 +647,18 @@
 		echo $gamingHandler->EventViewerRemoveMemberFromEvent($dataAccess, $logger, $evtMemberId, $objUser->UserID, $objUser->IsPremiumMember);
 		break;
             case "EventReminderSettingsLoad":
-		echo $securityHandler->EventReminderSettingsLoad($dataAccess, $logger, $objUser->UserID);
+		echo $securityHandler->EventReminderSettingsLoad($objUser);
+		break;
+            case "EventReminderSettingsUpdate":
+                $sendReminderEmails = isset($_POST['sendReminderEmails']) ? 
+                                        filter_var($_POST['sendReminderEmails'], FILTER_SANITIZE_STRING) : "-1";
+                $reminderEmailAddress = isset($_POST['reminderEmailAddress']) ? 
+                                        filter_var($_POST['reminderEmailAddress'], FILTER_SANITIZE_STRING) : "";
+                $reminderEmailTimeToSend = isset($_POST['reminderEmailTimeToSend']) ? 
+                                        filter_var($_POST['reminderEmailTimeToSend'], FILTER_SANITIZE_STRING) : "-1";
+                
+		echo $securityHandler->EventReminderSettingsUpdate($dataAccess, $logger, $objUser, $sendReminderEmails, 
+                                                                   $reminderEmailAddress, $reminderEmailTimeToSend);
 		break;
         }
     }
