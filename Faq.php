@@ -39,7 +39,7 @@
                                                     <div>
                                                         <p>
                                                             Yes! The main components of Player Unite are completely free. This includes a personal login,
-                                                            unique profile, the ability to create and join gaming events, and access to search tools! The site has
+                                                            unique profile, the ability to create and join gaming events, email reminders, and access to search tools! The site has
                                                             been designed so anyone may use it, without being held back by member fees.
                                                         </p>
                                                         <p>
@@ -48,14 +48,6 @@
                                                             and the ability to keep your gaming events private.
                                                         </p>
                                                     </div> 
-                                                    <h3>Where do my donations go?</h3>
-                                                    <div>
-							<p>
-                                                        All donations go towards the future of Player Unite. Your money gifts are 
-							reinvested into the server hosting cost, additional future features, improved integration,
-							marketing, and website maintenance.
-							</p>
-                                                    </div>
                                                     <h3>How do I become a member of Player Unite?</h3>
                                                     <div>
 							<p>
@@ -120,6 +112,17 @@
                                                         gamer tags.
 							</p>
                                                     </div>
+                                                    <h3>Event notifications and how to setup</h3>
+                                                    <div>
+                                                        <p>
+                                                        Event notifications are an automated email we send out when your scheduled/joined event is close
+                                                        to starting. You pick when you would like to be reminded.
+                                                        </p>
+                                                        <p>
+                                                        Navigate to "Edit Profile", and click on "Event Reminders". From here you can choose to enable or
+                                                        disable the feature, choose an email recipient, and designate a time. Make sure to save your changes.
+                                                        </p>
+                                                    </div>
                                                     <h3>How do I create an event for others to join?</h3>
                                                     <div>
 							<p>
@@ -162,6 +165,14 @@
                                                         <p>
 							Click on "Filter Events". Make sure previously used search fields are deactivated and click "Search". 
 							Close the Search box to return to the Event Feed.
+							</p>
+                                                    </div>
+                                                    <h3>Where do my donations go?</h3>
+                                                    <div>
+							<p>
+                                                        All donations go towards the future of Player Unite. Your money gifts are 
+							reinvested into the server hosting cost, additional future features, improved integration,
+							marketing, and website maintenance.
 							</p>
                                                     </div>
 						</div>
