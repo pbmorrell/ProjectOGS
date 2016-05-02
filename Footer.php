@@ -63,8 +63,11 @@
                                     <li class="icon fa-envelope">
                                         <a href="mailto:playerunite@gmail.com?subject=General Support" style="text-decoration:none;">&nbsp;Email</a>
                                     </li>
+                                    <li class="icon fa-facebook-square">
+                                        <a href="https://www.facebook.com/playerunite" target="_blank" style="text-decoration:none;">&nbsp;Facebook</a>
+                                    </li>
                                     <li class="icon fa-twitter">
-                                        <a href="https://twitter.com/PlayerUnite" target="_blank" style="text-decoration:none;">&nbsp;@PlayerUnite</a>
+                                        <a href="https://twitter.com/PlayerUnite" target="_blank" style="text-decoration:none;">&nbsp;Twitter</a>
                                     </li>
                                 </ul>
                             </section>
