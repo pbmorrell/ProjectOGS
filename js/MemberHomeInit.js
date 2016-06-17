@@ -184,6 +184,7 @@ function MemberHomeOnReady()
     
     // Initialize event status checkbox states
     $('#evtStatusCreated').prop('checked', true);
+    $('#evtStatusJoined').prop('checked', true);
     
     // Force user to select at least one of (but possibly both of) "Show My Joined Events" and 
     // "Show My Created Events" search panel checkboxes
@@ -649,7 +650,7 @@ function LoadEventManager()
     var postData = 
         {
             action: eventManagerLoadAction,
-            'evtStatus[]': 'showCreated'
+            'evtStatus[]': ['showCreated', 'showJoined']
         };
 		
     $(eventManagerJTableDiv).jtable('load', postData);
