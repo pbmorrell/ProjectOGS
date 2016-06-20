@@ -44,7 +44,7 @@ by => Stephen Giles and Paul Morrell
 				<div class="controlPanelSection">
                                     <!-- Content -->
                                     <div id="content">							
-					<section class="box ctaz">
+					<section class="box style1">
                                             <section>
                                                 <h2>Control Panel</h2>
 						<ul class="style3 contact">
@@ -332,7 +332,7 @@ by => Stephen Giles and Paul Morrell
                                     </div>
 				</div>
 				<div id="currentEventsDiv" class="9u jTableContainer">
-                                    <section class="box style1">
+                                    <section class="box style3">
 					<h2>Current Events</h2>
 					<span id="totalGamesToJoin" class="byline"></span><br/><br/>
 					<div id="currentEventsContent">
@@ -340,7 +340,7 @@ by => Stephen Giles and Paul Morrell
                                     </section><br/>
 				</div>
 				<div id="manageEventsDiv" class="9u jTableContainer">
-                                    <section class="box style1">
+                                    <section class="box style3">
                                         <h2>Manage Your Events</h2>
                                         <div class="dashboardTitle">Dashboard</div>
                                         <?php if($objUser->IsPremiumMember): ?>
