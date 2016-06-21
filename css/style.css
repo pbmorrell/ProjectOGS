@@ -648,6 +648,17 @@
 	border:1px solid #000;
 	padding: 5px;
     }
+    
+    .quickSearchLinkDiv {
+        float: right;
+        margin-top: 0.5em;
+        margin-bottom: 2em;
+    }
+    
+    .searchTypeSelector {
+        margin-left:1em;
+        width:15em;
+    }
 
     .overlayPanelModalBackground {
 	z-index: 100000;

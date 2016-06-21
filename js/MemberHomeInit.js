@@ -27,6 +27,17 @@ function MemberHomeOnReady()
     LoadCurrentEventViewer();
     LoadEventManager();
     
+    // Add change listener to quick search dropdowns
+    $('#myEvtSearchTypeSelector').change(function() {
+        var selectedOption = $('#myEvtSearchTypeSelector').val();
+        QuickSearchHandler(selectedOption);
+    });
+    
+    $('#curEvtSearchTypeSelector').change(function() {
+        var selectedOption = $('#curEvtSearchTypeSelector').val();
+        QuickSearchHandler(selectedOption);
+    });
+    
     // Set up search filter panel
     $('#modalOverlay').slideReveal({
         position: "right",
@@ -1627,6 +1638,41 @@ function LeaveEvents(selectedEventIds)
          sweetAlert("Events Not Left", "Canceled leave events", "info");
       }
    });
+}
+
+function QuickSearchHandler(selectedOption)
+{
+    switch(selectedOption)
+    {
+        case "allCurEvts":
+            $('#evtStatusOpenOnly').prop('checked', false);
+            break;
+        case "open":
+            $('#evtStatusOpenOnly').prop('checked', true);
+            break;
+        case "allMyEvts":
+            $('#evtStatusJoined').prop('checked', true);
+            $('#evtStatusCreated').prop('checked', true);
+            $('#evtStatusFull').prop('checked', false);
+            break;
+        case "created":
+            $('#evtStatusJoined').prop('checked', false);
+            $('#evtStatusCreated').prop('checked', true);
+            $('#evtStatusFull').prop('checked', false);
+            break;
+        case "joined":
+            $('#evtStatusJoined').prop('checked', true);
+            $('#evtStatusCreated').prop('checked', false);
+            $('#evtStatusFull').prop('checked', false);
+            break;
+        case "fullCreated":
+            $('#evtStatusJoined').prop('checked', false);
+            $('#evtStatusCreated').prop('checked', true);
+            $('#evtStatusFull').prop('checked', true);
+            break;
+    }
+    
+    $('#searchBtn').click();
 }
 
 function ReloadUserHostedEventsTable(fullRefresh)
