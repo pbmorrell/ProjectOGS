@@ -30,19 +30,19 @@
                                                 <tr>
                                                     <td>
                                                         <select style="width: 10em;" name="os0">
-                                                            <option value="1:">1: $5.00 USD</option>
-                                                            <option value="2:">2: $10.00 USD</option>
-                                                            <option value="3:">3: $25.00 USD</option>
-                                                            <option value="4:">4: $50.00 USD</option>
-                                                            <option value="5:">5: $100.00 USD</option>
-                                                            <option value="6:">6: $200.00 USD</option>
-                                                            <option value="7:">7: $500.00 USD</option>
+                                                            <option value="1:">&nbsp; 1: $5.00 USD</option>
+                                                            <option value="2:">&nbsp; 2: $10.00 USD</option>
+                                                            <option value="3:">&nbsp; 3: $25.00 USD</option>
+                                                            <option value="4:">&nbsp; 4: $50.00 USD</option>
+                                                            <option value="5:">&nbsp; 5: $100.00 USD</option>
+                                                            <option value="6:">&nbsp; 6: $200.00 USD</option>
+                                                            <option value="7:">&nbsp; 7: $500.00 USD</option>
                                                         </select>
                                                     </td>
                                                 </tr>
                                             </table>
                                             <input type="hidden" name="currency_code" value="USD">
-                                            <input type="image" style="width: 150px; background:#191d23; padding-left:0px;" src="<?php echo $payPalDonationButtonImgUrl; ?>" border="0" name="submit" 
+                                            <input type="image" style="width: 150px; background: inherit; padding-left:0px;" src="<?php echo $payPalDonationButtonImgUrl; ?>" border="0" name="submit" 
                                                    alt="PayPal - The safer, easier way to pay online!" height="55" onclick="return DonateOnClick();">
                                             <img alt="" border="0" src="<?php echo $payPalPixelImgUrl; ?>" width="1" height="1">
                                         </form>
