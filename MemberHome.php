@@ -44,7 +44,7 @@ by => Stephen Giles and Paul Morrell
 				<div class="controlPanelSection">
                                     <!-- Content -->
                                     <div id="content">							
-					<section class="box style1">
+					<section class="box ctaz">
                                             <section>
                                                 <h2>Control Panel</h2>
 						<ul class="style3 contact">
@@ -332,31 +332,15 @@ by => Stephen Giles and Paul Morrell
                                     </div>
 				</div>
 				<div id="currentEventsDiv" class="9u jTableContainer">
-                                    <section class="box style3">
+                                    <section class="box style1">
 					<h2>Current Events</h2>
-                                        <div class="quickSearchLinkDiv">
-                                            <span>Quick Search:</span>
-                                            <select id="curEvtSearchTypeSelector" class="searchTypeSelector">
-                                                <option value="allCurEvts" selected="true">All Events</option>
-                                                <option value="open">Open Events Only</option>
-                                            </select>
-                                        </div>
-					<span id="totalGamesToJoin" class="byline"></span><br/><br/>
+					<span id="totalGamesToJoin" class="byline"></span>
 					<div id="currentEventsContent">
                                         </div>
-                                    </section><br/>
+                                    </section><br />
 				</div>
 				<div id="manageEventsDiv" class="9u jTableContainer">
-                                    <section class="box style3">
-                                        <div class="quickSearchLinkDiv">
-                                            <span>Quick Search:</span>
-                                            <select id="myEvtSearchTypeSelector" class="searchTypeSelector">
-                                                <option value="allMyEvts" selected="true">All Events</option>
-                                                <option value="created">Created Events Only</option>
-                                                <option value="joined">Joined Events Only</option>
-                                                <option value="fullCreated">FULL Created Events Only</option>
-                                            </select>
-                                        </div>
+                                    <section class="box style1">
                                         <h2>Manage Your Events</h2>
                                         <div class="dashboardTitle">Dashboard</div>
                                         <?php if($objUser->IsPremiumMember): ?>

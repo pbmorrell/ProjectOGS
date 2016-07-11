@@ -52,7 +52,16 @@
     .desktopButtonDisplay {
         display:none;
     }
-    
+	
+    .searchTypeLabel {
+	margin-right: 5px;
+	width: 40%;
+    }
+	
+    .searchTypeSelector {
+	width: 60%;
+    }
+	
     .overlayPanelToggleLinkWrap {
         display: table-cell;
         padding: 0.5em;

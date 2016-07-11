@@ -20,23 +20,39 @@ var expandedEvtMgrFilterGroups = [];
 var lastWindowWidth = -1;
 var lastWindowHeight = -1;
 
+var lastMyEvtsQuickSearchSel = "allMyEvts";
+var lastCurEvtsQuickSearchSel = "allCurEvts";
+var quickSearchDivMyEvts = "#quickSearchDivMyEvts";
+var quickSearchDivMyEvtsHtml = '<div id="quickSearchDivMyEvts">' +
+                                    '<span class="searchTypeLabel">Quick Search:</span>' +
+                                    '<select id="myEvtSearchTypeSelector" class="searchTypeSelector">' +
+                                        '<option value="allMyEvts">All Events</option>' +
+                                        '<option value="created">Created Events Only</option>' +
+                                        '<option value="joined">Joined Events Only</option>' +
+                                        '<option value="fullCreated">FULL Created Events Only</option>' +
+                                    '</select>' +
+                                '</div>';
+
+var quickSearchDivCurEvts = "#quickSearchDivCurEvts";
+var quickSearchDivCurEvtsHtml = '<span id="quickSearchDivCurEvts">' +
+                                    '<span class="searchTypeLabel">Quick Search:</span>' +
+                                    '<select id="curEvtSearchTypeSelector" class="searchTypeSelector">' +
+                                        '<option value="allCurEvts">All Events</option>' +
+                                        '<option value="open">Open Events Only</option>' +
+                                    '</select>' +
+                                '</span>';
+                        
+var myEvtsSpacerHtml = '<div id="spacerHtmlMyEvts"><br /><br /></div>';
+var curEvtsSpacerHtml = '<div id="spacerHtmlCurEvts"><br /></div>';
+var myEvtsSpacerHtmlMobile = '<div id="spacerHtmlMyEvts"><br /><br /><br /></div>';
+var curEvtsSpacerHtmlMobile = '<div id="spacerHtmlCurEvts"><br /><br /></div>';
+
 // Functions
 function MemberHomeOnReady()
 {
     $(panelEnum.MyEventViewer).hide();
     LoadCurrentEventViewer();
     LoadEventManager();
-    
-    // Add change listener to quick search dropdowns
-    $('#myEvtSearchTypeSelector').change(function() {
-        var selectedOption = $('#myEvtSearchTypeSelector').val();
-        QuickSearchHandler(selectedOption);
-    });
-    
-    $('#curEvtSearchTypeSelector').change(function() {
-        var selectedOption = $('#curEvtSearchTypeSelector').val();
-        QuickSearchHandler(selectedOption);
-    });
     
     // Set up search filter panel
     $('#modalOverlay').slideReveal({
@@ -338,6 +354,14 @@ function HandleWidthTransition(curWindowWidth, lastWidthClass, curWidthClass, in
             FormatCurrentEventsTableForCurrentView(false);
             FormatEventManagerTableForCurrentView(false);
         }
+        else { 
+            // This condition is met only if on initial load, and in desktop view.
+            // In this case, the quick search dropdown won't automatically be added, so we have
+            //  to do it manually here (above both event manager tables).
+            var isMobile = false;
+            AddQuickSearchDropdown(isMobile, false);
+            AddQuickSearchDropdown(isMobile, true);
+        }
         
         isWidthTransition = true;
     }
@@ -401,6 +425,60 @@ function OnViewportSizeChanged(curWindowWidth, curWindowHeight, lastWidthClass, 
         
         // Show search panel button div toggle icon
         $('.swipeHoverIconContainer').show();
+    }
+}
+
+function AddQuickSearchDropdown(isMobile, isForCurEvtsMgr)
+{
+    var quickSearchClass = "";
+    var spacerHtml = "";
+    
+    if(isForCurEvtsMgr) {
+        quickSearchClass = "quickSearchLinkContainerCurEvts";
+        spacerHtml = curEvtsSpacerHtml;
+        
+        if(isMobile || (GetCurHeightClass() !== "desktop")) {
+            quickSearchClass = "quickSearchLinkContainerCurEvtsMobile";
+            spacerHtml = curEvtsSpacerHtmlMobile;
+        }
+        
+        // Add quick search dropdown above event manager
+        $(currentEventViewerJTableDiv).before(quickSearchDivCurEvtsHtml);
+        $(currentEventViewerJTableDiv).before(spacerHtml);
+        $(quickSearchDivCurEvts).addClass(quickSearchClass);
+        
+        // Pre-select last selected option (or "all" option, if first load)
+        $('#curEvtSearchTypeSelector').val(lastCurEvtsQuickSearchSel);
+
+        // Add change listener to quick search dropdowns
+        $('#curEvtSearchTypeSelector').change(function() {
+            var selectedOption = $('#curEvtSearchTypeSelector').val();
+            lastCurEvtsQuickSearchSel = selectedOption;
+            QuickSearchHandler(selectedOption);
+        });
+    }
+    else {
+        quickSearchClass = "quickSearchLinkContainerMyEvts";
+        spacerHtml = myEvtsSpacerHtml;
+        
+        if(isMobile || (GetCurHeightClass() !== "desktop")) {
+            quickSearchClass = "quickSearchLinkContainerMyEvtsMobile";
+            spacerHtml = myEvtsSpacerHtmlMobile;
+        }
+        
+        // Add quick search dropdown above event manager
+        $(eventManagerJTableDiv).before(quickSearchDivMyEvtsHtml);
+        $(eventManagerJTableDiv).before(spacerHtml);
+        $(quickSearchDivMyEvts).addClass(quickSearchClass);
+        
+        // Pre-select last selected option (or "all" option, if first load)
+        $('#myEvtSearchTypeSelector').val(lastMyEvtsQuickSearchSel);
+
+        $('#myEvtSearchTypeSelector').change(function() {
+            var selectedOption = $('#myEvtSearchTypeSelector').val();
+            lastMyEvtsQuickSearchSel = selectedOption;
+            QuickSearchHandler(selectedOption);
+        });
     }
 }
 
@@ -824,18 +902,7 @@ function LoadCurrentEventViewer()
                 sorting: false
             }
         },
-	recordsLoaded: function(event, data) {
-            // Set total count of games that need joining
-            if((data.records !== null) && (data.records.length > 0)) {
-		var totalGameCount = data.records[0].TotalGamesToJoinCount;
-		var needText = "need";
-		if(totalGameCount == 1) {
-                    needText = "needs";
-		}
-				
-		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
-            }
-				
+	recordsLoaded: function(event, data) {				
             $(currentEventViewerJTableDiv + ' .jtable-data-row').each(function() {
 		// Store PlayersSignedUpData as custom data attribute on each row, for use in child table expansion
 		var id = $(this).attr('data-record-key');
@@ -863,6 +930,17 @@ function LoadCurrentEventViewer()
 				
             var curWidthClass = GetCurWidthClass();
             if(curWidthClass != 'desktop')  FormatCurrentEventsTableForCurrentView(true, curWidthClass);
+            
+            // Set total count of games that need joining
+            if((data.records !== null) && (data.records.length > 0)) {
+		var totalGameCount = data.records[0].TotalGamesToJoinCount;
+		var needText = "need";
+		if(totalGameCount == 1) {
+                    needText = "needs";
+		}
+				
+		$('#totalGamesToJoin').text('(' + totalGameCount + ') ' + needText + ' joining!');
+            }
 	}
     });
 
@@ -882,6 +960,13 @@ function LoadCurrentEventViewer()
 function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
 {
     var hiddenClass = "evtMgrHiddenInMobileView";
+    
+    // Temporarily remove quick search selector before formatting
+    if($(quickSearchDivMyEvts).length) {
+        $(quickSearchDivMyEvts).remove();
+        $("#spacerHtmlMyEvts").remove();
+    }
+    
     if(isMobile) {
 	// Temporarily show hidden columns, to allow for column combination to work properly in all cases
 	$('.' + hiddenClass).removeClass(hiddenClass);
@@ -971,12 +1056,21 @@ function FormatEventManagerTableForCurrentView(isMobile, curWidthClass)
 	// Remove fixed-width scrollable container
 	$(eventManagerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
     }
+    
+    // Re-add quick search dropdown above event manager
+    AddQuickSearchDropdown(isMobile, false);
 }
 
 function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
 {
     var hiddenClass = "curEvtsHiddenInMobileView";
-	
+    
+    // Temporarily remove quick search selector before formatting
+    if($(quickSearchDivCurEvts).length) {
+        $(quickSearchDivCurEvts).remove();
+        $("#spacerHtmlCurEvts").remove();
+    }
+        
     if(isMobile) {
 	// Temporarily show hidden columns, to allow for column combination to work properly in all cases
 	$('.' + hiddenClass).removeClass(hiddenClass);
@@ -1068,6 +1162,9 @@ function FormatCurrentEventsTableForCurrentView(isMobile, curWidthClass)
 	// Remove fixed-width scrollable container
 	$(currentEventViewerJTableDiv + ' .fixedWidthScrollableContainer .jtable').unwrap();
     }
+    
+    // Re-add quick search dropdown above event manager
+    AddQuickSearchDropdown(isMobile, true);
 }
 
 function ToggleSearchDivDisplay(curDiv, curToggleLink)
