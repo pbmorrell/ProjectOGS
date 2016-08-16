@@ -650,25 +650,21 @@
     }
     
     .quickSearchLinkContainerCurEvts {
-        float: right;
 	width: 300px;
-        margin-top: 0.5em;
+        margin: 0.4;
     }
 	
     .quickSearchLinkContainerMyEvts {
-        float: left;
 	width: 300px;
-        margin-top: 0.2em;
+        margin: 0.4em;
     }
     
     .quickSearchLinkContainerCurEvtsMobile {
-	width: 145px;
-	float: right;
+	width: 100%;
     }
 	
     .quickSearchLinkContainerMyEvtsMobile {
-	width: 190px;
-	float: left;
+	width: 100%;
     }
 	
     .searchTypeLabel {
